@@ -1,3 +1,13 @@
+<script setup>
+import { useRoute } from "vue-router";
+
+const route = useRoute();
+
+function getActiveNavbar(path) {
+    return route.name === path;
+}
+</script>
+
 <template>
     <nav class="container flex justify-around py-8 mx-auto bg-slate-100 mt-32">
         <div class="flex items-center">
@@ -5,7 +15,15 @@
         </div>
         <!-- left header section -->
         <div class="items-center hidden space-x-8 lg:flex">
-            <a href="" class="px-4 py-2 bg-blue-100 rounded-md">ตารางการจอง</a>
+            <a
+                href=""
+                :class="
+                    getActiveNavbar('Home')
+                        ? 'px-4 py-2 bg-blue-100 rounded-md'
+                        : ''
+                "
+                >ตารางการจอง</a
+            >
             <a href="">เกี่ยวกับเรา</a>
             <a href="">ทีมของเรา</a>
             <a href="">ติดต่อพวกเรา</a>
@@ -69,7 +87,5 @@
         </div>
     </nav>
 </template>
-
-<script setup></script>
 
 <style></style>
