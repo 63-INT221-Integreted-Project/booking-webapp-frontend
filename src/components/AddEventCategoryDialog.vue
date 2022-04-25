@@ -4,10 +4,6 @@ const props = defineProps({
         type: Boolean,
         default: false,
     },
-    title: {
-        type: String,
-        default: "",
-    },
 });
 const emit = defineEmits(["close"]);
 </script>
@@ -17,10 +13,9 @@ const emit = defineEmits(["close"]);
         style="background-color: rgba(0, 0, 0, 0.8)"
         class="fixed z-40 top-0 right-0 left-0 bottom-0 h-full w-full"
         v-show.transition.opacity="openModal"
-        @click.self.prevent="emit('close', !openModal)"
     >
         <div
-            class="p-4 max-w-xl mx-auto relative absolute left-0 right-0 overflow-hidden top-[25%]"
+            class="p-4 max-w-xl mx-auto relative absolute left-0 right-0 overflow-hidden mt-56"
         >
             <div
                 class="shadow absolute right-0 top-0 w-10 h-10 rounded-full bg-white text-gray-500 hover:text-gray-800 inline-flex items-center justify-center cursor-pointer"
@@ -41,13 +36,13 @@ const emit = defineEmits(["close"]);
                 class="shadow w-full rounded-lg bg-white overflow-hidden w-full block p-8"
             >
                 <h2 class="font-bold text-2xl mb-6 text-gray-800 border-b pb-2">
-                    {{ title }}
+                    เพิ่มหมวดหมู่กิจกรรม
                 </h2>
 
                 <div class="mb-4">
                     <label
                         class="text-gray-800 block mb-1 font-bold text-sm tracking-wide"
-                        >ชื่อกิจกรรม</label
+                        >ชื่อหมวดหมู่</label
                     >
                     <input
                         class="bg-gray-200 appearance-none border-2 border-gray-200 rounded-lg w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-blue-500"
@@ -59,7 +54,7 @@ const emit = defineEmits(["close"]);
                 <div class="mb-4">
                     <label
                         class="text-gray-800 block mb-1 font-bold text-sm tracking-wide"
-                        >อีเมล</label
+                        >รายละเอียดหมวดหมู่</label
                     >
                     <input
                         class="bg-gray-200 appearance-none border-2 border-gray-200 rounded-lg w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-blue-500"
@@ -71,11 +66,12 @@ const emit = defineEmits(["close"]);
                 <div class="mb-4">
                     <label
                         class="text-gray-800 block mb-1 font-bold text-sm tracking-wide"
-                        >หมายเหตุ</label
+                        >ระยะเวลา</label
                     >
-                    <textarea
-                        class="bg-gray-200 appearance-none border-2 border-gray-200 rounded-lg w-full py-8 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-blue-500"
-                        v-model="eventNotes"
+                    <input
+                        class="bg-gray-200 appearance-none border-2 border-gray-200 rounded-lg w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-blue-500"
+                        type="time"
+                        v-model="event_date"
                         readonly
                     />
                 </div>
