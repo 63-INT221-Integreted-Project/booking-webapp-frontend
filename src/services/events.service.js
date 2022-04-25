@@ -18,6 +18,11 @@ const addEvent = async function (event) {
     }).then((res) => res.json());
 };
 
+const findAll = async function () {
+    return await fetch(`${BaseUrl.getUrl()}/events/`).then((res) => res.json());
+};
+
 export default {
     addEvent,
+    findAll,
 };
