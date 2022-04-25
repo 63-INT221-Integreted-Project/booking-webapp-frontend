@@ -1,7 +1,26 @@
 <script setup>
+import { ref } from "@vue/reactivity";
 import { useRoute } from "vue-router";
 
 const route = useRoute();
+
+const navItems = ref([
+    {
+        name: "Home",
+        path: "/",
+        text: "หน้าหลัก",
+    },
+    {
+        name: "EventCategories",
+        path: "/event-categories",
+        text: "หมวดหมู่การจอง",
+    },
+    {
+        name: "Teams",
+        path: "/teams",
+        text: "ทีมของเรา",
+    },
+]);
 
 function getActiveNavbar(path) {
     return route.name === path;
@@ -16,6 +35,19 @@ function getActiveNavbar(path) {
         <!-- left header section -->
         <div class="items-center hidden space-x-8 lg:flex">
             <a
+                v-for="item in navItems"
+                :key="item.name"
+                :href="item.path"
+                class="text-black font-bold hover:text-blue-600"
+                :class="{
+                    'px-4 py-2 bg-blue-100 rounded-md': getActiveNavbar(
+                        item.name
+                    ),
+                }"
+            >
+                {{ item.text }}
+            </a>
+            <!-- <a
                 href=""
                 :class="
                     getActiveNavbar('Home')
@@ -26,7 +58,7 @@ function getActiveNavbar(path) {
             >
             <a href="">เกี่ยวกับเรา</a>
             <a href="">ทีมของเรา</a>
-            <a href="">ติดต่อพวกเรา</a>
+            <a href="">ติดต่อพวกเรา</a> -->
         </div>
         <!-- right header section -->
         <div class="flex items-center space-x-2">
