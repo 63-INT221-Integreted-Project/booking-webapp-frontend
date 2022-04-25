@@ -1,6 +1,9 @@
 <script setup>
 import { ref } from "@vue/reactivity";
 import { onMounted } from "@vue/runtime-core";
+import EventService from "../services/events.service";
+import AddEventDialog from "../components/AddEventDialog.vue";
+import dayjs from "dayjs";
 
 const MONTH_NAMES = [
     "มกราคม",
@@ -22,9 +25,14 @@ const year = ref(new Date().getFullYear());
 const no_of_days = ref([]);
 const blankdays = ref([]);
 const events = ref([]);
+const eventModal = ref({
+    open: false,
+    event: {},
+});
 
-onMounted(() => {
+onMounted(async () => {
     getNoOfDays();
+    events.value = await getEvents();
 });
 
 function isToday(date) {
@@ -34,7 +42,19 @@ function isToday(date) {
     return today.toDateString() === d.toDateString();
 }
 
+function getEvents(date) {
+    return EventService.findAll();
+}
+
 function getNoOfDays() {
+    if (month.value === -1) {
+        month.value = 11;
+        year.value--;
+    }
+    if (month.value === 12) {
+        month.value = 0;
+        year.value++;
+    }
     let daysInMonth = new Date(year.value, month.value + 1, 0).getDate();
 
     // find where to start calendar day of week
@@ -52,10 +72,47 @@ function getNoOfDays() {
     blankdays.value = blankdaysArray;
     no_of_days.value = daysArray;
 }
+
+//*Create convert function from example 2022-4-24T01:30:00.000-05:00 to 2022-4-24 01:30:00
+function formatDate(date) {
+    let year = date.split("-")[0];
+    let month = date.split("-")[1];
+    let day = date.split("-")[2].split("T")[0];
+    let hour = date.split("T")[1].split(":")[0];
+    let minute = date.split("T")[1].split(":")[1];
+    let second = date.split("T")[1].split(":")[2];
+    let time = hour + ":" + minute + ":" + second;
+    return year + "-" + month + "-" + day + " " + time;
+}
+
+function showEventModal(date) {
+    let dateConvert = dayjs(`${year.value}-${month.value + 1}-${date}`);
+    eventModal.value = {
+        open: true,
+        event: {
+            eventId: "E-001",
+            bookingName: "จองปรึกษาออกแบบ Repo",
+            bookingEmail: "thiraphat.itamonchai@mail.kmutt.ac.th",
+            eventStartTime: "2022-4-24T01:30:00.000-05:00",
+            eventNotes: "เข้าปรึกษาพร้อมทีม ขออัดวีดีโอระหว่างปรึกษา",
+            eventCategoryId: "EC-002",
+        },
+        title: `เพิ่ม Event ประจำวันที่ ${dayjs(dateConvert).format(
+            "DD/MM/YYYY"
+        )}`,
+    };
+}
 </script>
 
 <template>
     <div class="grid grid-rows-3 grid-flow-col gap-x-12 gap-y-0">
+        <AddEventDialog
+            v-if="eventModal.open"
+            :openModal="eventModal.open"
+            :title="eventModal.title"
+            :event="eventModal.event"
+            @close="eventModal.open = false"
+        />
         <div class="col-span-3">
             <div
                 class="flex flex-col md:flex-row overflow-hidden bg-white rounded-lg shadow-xl w-full py-4"
@@ -198,10 +255,6 @@ function getNoOfDays() {
                             <button
                                 type="button"
                                 class="leading-none rounded-lg transition ease-in-out duration-100 inline-flex cursor-pointer hover:bg-gray-200 p-1 items-center"
-                                :class="{
-                                    'cursor-not-allowed opacity-25': month == 0,
-                                }"
-                                :disabled="month == 0 ? true : false"
                                 @click="
                                     month--;
                                     getNoOfDays();
@@ -225,11 +278,6 @@ function getNoOfDays() {
                             <button
                                 type="button"
                                 class="leading-none rounded-lg transition ease-in-out duration-100 inline-flex items-center cursor-pointer hover:bg-gray-200 p-1"
-                                :class="{
-                                    'cursor-not-allowed opacity-25':
-                                        month == 11,
-                                }"
-                                :disabled="month == 11 ? true : false"
                                 @click="
                                     month++;
                                     getNoOfDays();
@@ -285,12 +333,12 @@ function getNoOfDays() {
                                     <div
                                         @click="showEventModal(date)"
                                         v-text="date"
-                                        class="inline-flex w-6 h-6 items-center justify-center cursor-pointer text-center leading-none rounded-full transition ease-in-out duration-100"
+                                        class="inline-flex w-8 h-8 items-center justify-center cursor-pointer text-center leading-none rounded-full transition ease-in-out duration-100"
                                         :class="{
                                             'bg-blue-500 text-white':
-                                                isToday(date) == true,
+                                                isToday(date),
                                             'text-gray-700 hover:bg-blue-200':
-                                                isToday(date) == false,
+                                                +isToday(date),
                                         }"
                                     ></div>
                                     <div
@@ -301,12 +349,14 @@ function getNoOfDays() {
 										class="absolute top-0 right-0 mt-2 mr-2 inline-flex items-center justify-center rounded-full text-sm w-6 h-6 bg-gray-700 text-white leading-none"
 										x-show="events.filter(e => e.event_date === new Date(year, month, date).toDateString()).length"
 										x-text="events.filter(e => e.event_date === new Date(year, month, date).toDateString()).length"></div> -->
-
                                         <template
                                             v-for="event in events.filter(
                                                 (e) =>
                                                     new Date(
-                                                        e.event_date
+                                                        formatDate(
+                                                            events[0]
+                                                                .eventStartTime
+                                                        )
                                                     ).toDateString() ===
                                                     new Date(
                                                         year,
@@ -319,7 +369,7 @@ function getNoOfDays() {
                                                 class="px-2 py-1 rounded-lg mt-1 overflow-hidden border border-blue-200 text-blue-800 bg-blue-100 blue"
                                             >
                                                 <p
-                                                    x-text="event.event_title"
+                                                    v-html="event.bookingName"
                                                     class="text-sm truncate leading-tight"
                                                 ></p>
                                             </div>
