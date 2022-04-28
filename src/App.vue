@@ -10,7 +10,7 @@ import Navbar from "./components/Navbar.vue";
 </template>
 
 <style>
-@import url("https://fonts.googleapis.com/css2?family=Kanit:wght@100&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Kanit:wght@500&display=swap");
 body {
     background-color: rgb(249 250 251 / 1);
 }
