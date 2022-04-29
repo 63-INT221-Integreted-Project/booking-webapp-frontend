@@ -13,7 +13,7 @@ const props = defineProps({
         type: String,
         default: "",
     },
-    item: {
+    event: {
         type: Object,
         default: null,
     },
@@ -24,16 +24,20 @@ const props = defineProps({
         type: String,
         default: dayjs(),
     },
+    isInvalid: {
+        type: Boolean,
+        default: false,
+    },
 });
 const emit = defineEmits(["close"]);
 
 const form = ref({
-    bookingName: props.item?.bookingName || "",
-    bookingEmail: props.item?.bookingEmail || "",
-    eventStartTime: props.item?.eventStartTime || "",
-    eventDuration: props.item?.eventDuration || "",
-    eventCategory: props.item?.eventCategory || "",
-    eventNotes: props.item?.eventNotes || "",
+    bookingName: props.event?.bookingName || "",
+    bookingEmail: props.event?.bookingEmail || "",
+    eventStartTime: props.event?.eventStartTime || "",
+    eventDuration: props.event?.eventDuration || "",
+    eventCategory: props.event?.eventCategory || "",
+    eventNotes: props.event?.eventNotes || "",
 });
 
 const today = ref(dayjs().format("YYYY-MM-DDTHH:mm"));
@@ -103,9 +107,19 @@ function compareDate() {
                     >
                     <input
                         class="bg-gray-200 appearance-none border-2 border-gray-200 rounded-lg w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-blue-500"
+                        :class="{
+                            'border-red-500 border-3':
+                                isInvalid && form.bookingName.length < 1,
+                        }"
                         type="text"
                         v-model="form.bookingName"
                     />
+                    <p
+                        class="text-error text-xs text-red-600"
+                        v-if="isInvalid && !form.bookingName"
+                    >
+                        กรุณากรอกชื่อกิจกรรม
+                    </p>
                 </div>
 
                 <div class="mb-4">
@@ -115,9 +129,19 @@ function compareDate() {
                     >
                     <input
                         class="bg-gray-200 appearance-none border-2 border-gray-200 rounded-lg w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-blue-500"
+                        :class="{
+                            'border-red-500 border-3':
+                                isInvalid && !form.bookingEmail,
+                        }"
                         type="text"
                         v-model="form.bookingEmail"
                     />
+                    <p
+                        class="text-error text-xs text-red-600"
+                        v-if="isInvalid && !form.bookingEmail"
+                    >
+                        กรุณากรอกอีเมล
+                    </p>
                 </div>
                 <div class="mb-4">
                     <label
@@ -147,20 +171,40 @@ function compareDate() {
                         class="bg-gray-200 appearance-none border-2 border-gray-200 rounded-lg w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-blue-500"
                         type="datetime-local"
                         v-model="form.eventStartTime"
+                        :class="{
+                            'border-red-500 border-3':
+                                isInvalid && !form.eventStartTime,
+                        }"
                         :min="today"
                         @blur="compareDate"
                     />
+                    <p
+                        class="text-error text-xs text-red-600"
+                        v-if="isInvalid && !form.eventStartTime"
+                    >
+                        กรุณาเลือกเวลาที่ต้องการ
+                    </p>
                 </div>
                 <div class="mb-4">
                     <label
                         class="text-gray-800 block mb-1 font-bold text-sm tracking-wide"
-                        >ช่วงเวลา</label
+                        >ระยะเวลา</label
                     >
                     <input
                         class="bg-gray-200 appearance-none border-2 border-gray-200 rounded-lg w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-blue-500"
                         type="text"
+                        :class="{
+                            'border-red-500 border-3':
+                                isInvalid && !form.eventDuration,
+                        }"
                         v-model="form.eventDuration"
                     />
+                    <p
+                        class="text-error text-xs text-red-600"
+                        v-if="isInvalid && !form.eventDuration"
+                    >
+                        กรุณากรอกระยะเวลา
+                    </p>
                 </div>
                 <div class="mb-4">
                     <label

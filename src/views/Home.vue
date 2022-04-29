@@ -31,16 +31,19 @@ const eventCategories = ref([]);
 const eventModal = ref({
     open: false,
     event: {},
+    isInvalid: false,
 });
 const scheduleModal = ref({
     open: false,
     events: [],
     title: "",
+    date: "",
 });
 
 onMounted(async () => {
     getNoOfDays();
-    events.value = await getEvents();
+    await fetchEvents();
+    console.log(events.value);
     eventCategories.value = await getEventCategories();
 });
 
@@ -51,8 +54,8 @@ function isToday(date) {
     return today.toDateString() === d.toDateString();
 }
 
-function getEvents(date) {
-    return EventService.findAllByBetweenDate(
+async function fetchEvents() {
+    events.value = await EventService.findAllByBetweenDate(
         dayjs(new Date(year.value, month.value, 1)).format(
             "YYYY-MM-DD HH:mm:ss"
         ),
@@ -116,6 +119,26 @@ const bookingInThisMonth = computed(() => {
     return events.value.length;
 });
 
+const getUniqueEventCategory = computed(() => {
+    try {
+        let uniqueEventCategory = [];
+        events.value
+            .map((ev) => ev.eventCategory)
+            .forEach((ec) => {
+                if (
+                    uniqueEventCategory
+                        .map((uev) => uev.eventCategoryId)
+                        .indexOf(ec.eventCategoryId) === -1
+                ) {
+                    uniqueEventCategory.push(ec);
+                }
+            });
+        return uniqueEventCategory;
+    } catch (error) {
+        return [];
+    }
+});
+
 function openEventScheduleModal(date) {
     let dateConvert = dayjs(`${year.value}-${month.value + 1}-${date}`).format(
         "DD/MM/YYYY"
@@ -123,6 +146,9 @@ function openEventScheduleModal(date) {
     scheduleModal.value = {
         title: `กิจกรรมประจำวันที่ ${dateConvert}`,
         open: true,
+        date: dayjs(`${year.value}-${month.value + 1}-${date}`).format(
+            "YYYY-MM-DD"
+        ),
         events: events.value.filter(
             (event) =>
                 dayjs(event.eventStartTime).format("YYYY-MM-DD") ===
@@ -132,19 +158,34 @@ function openEventScheduleModal(date) {
         ),
     };
 }
-function openBookingEventModal() {
+
+function openBookingEventModal(date) {
+    scheduleModal.value.open = false;
     eventModal.value = {
         open: true,
         event: {
-            eventId: "E-001",
-            bookingName: "จองปรึกษาออกแบบ Repo",
-            bookingEmail: "thiraphat.itamonchai@mail.kmutt.ac.th",
-            eventStartTime: "2022-4-24T01:30:00.000-05:00",
-            eventNotes: "เข้าปรึกษาพร้อมทีม ขออัดวีดีโอระหว่างปรึกษา",
-            eventCategoryId: "EC-002",
+            eventStartTime: dayjs(date).format("YYYY-MM-DDTHH:mm"),
         },
         title: `เพิ่ม Event`,
     };
+}
+
+async function addEvent(form) {
+    if (!form.bookingName || !form.bookingEmail || !form.eventDuration)
+        return (eventModal.value.isInvalid = true);
+    await EventService.createEvent({
+        ...form,
+        eventCategory: {
+            eventCategoryId: eventCategories.value.find(
+                (eventCategory) =>
+                    eventCategory.eventCategoryName === form.eventCategory
+            ).eventCategoryId,
+        },
+        eventStartTime: dayjs(form.eventStartTime).format(
+            "YYYY-MM-DD HH:mm:ss"
+        ),
+    });
+    await fetchEvents();
 }
 </script>
 
@@ -156,14 +197,18 @@ function openBookingEventModal() {
             :title="eventModal.title"
             :event="eventModal.event"
             :eventCategories="eventCategories"
+            :isInvalid="eventModal.isInvalid"
             @close="eventModal.open = false"
+            @save="addEvent"
         />
         <ScheduleEventDialog
             v-if="scheduleModal.open"
             :openModal="scheduleModal.open"
             :title="scheduleModal.title"
             :events="scheduleModal.events"
+            :date="scheduleModal.date"
             @close="scheduleModal.open = false"
+            @bookingThisDate="openBookingEventModal"
         ></ScheduleEventDialog>
         <div class="col-span-3">
             <div
@@ -257,9 +302,7 @@ function openBookingEventModal() {
                         </h3>
                         <div
                             class="flex items-center space-x-4"
-                            v-for="eventCategory in events.map(
-                                (e) => e.eventCategory
-                            )"
+                            v-for="eventCategory in getUniqueEventCategory"
                         >
                             <div class="flex-shrink-0">*</div>
                             <div class="flex-1 min-w-0">
@@ -316,7 +359,7 @@ function openBookingEventModal() {
                                 @click="
                                     month--;
                                     getNoOfDays();
-                                    getEvents();
+                                    fetchEvents();
                                 "
                             >
                                 <svg
@@ -340,7 +383,7 @@ function openBookingEventModal() {
                                 @click="
                                     month++;
                                     getNoOfDays();
-                                    getEvents();
+                                    fetchEvents();
                                 "
                             >
                                 <svg
