@@ -18,7 +18,7 @@ const props = defineProps({
         type: String,
     },
 });
-const emit = defineEmits(["close"]);
+const emit = defineEmits(["close", "bookingThisDate"]);
 
 function getHoursAndMinutes(dateTime) {
     return dayjs(dateTime).format("HH:mm");
@@ -67,6 +67,7 @@ const isFromFutureOrToday = computed(() => {
                         class="bg-indigo-500 text-white active:bg-indigo-600 text-sm font-bold uppercase px-3 py-3 rounded outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
                         type="button"
                         v-if="isFromFutureOrToday"
+                        @click="emit('bookingThisDate', date)"
                     >
                         + จองวันนี้
                     </button>
