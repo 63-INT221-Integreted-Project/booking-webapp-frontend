@@ -1,4 +1,5 @@
 <script setup>
+import { computed } from "@vue/runtime-core";
 import dayjs from "dayjs";
 
 const props = defineProps({
@@ -13,12 +14,21 @@ const props = defineProps({
     events: {
         type: Array,
     },
+    date: {
+        type: String,
+    },
 });
 const emit = defineEmits(["close"]);
 
 function getHoursAndMinutes(dateTime) {
     return dayjs(dateTime).format("HH:mm");
 }
+
+const isFromFutureOrToday = computed(() => {
+    return (
+        dayjs(props.date).format("YYYY-MM-DD") >= dayjs().format("YYYY-MM-DD")
+    );
+});
 </script>
 
 <template>
@@ -56,6 +66,7 @@ function getHoursAndMinutes(dateTime) {
                     <button
                         class="bg-indigo-500 text-white active:bg-indigo-600 text-sm font-bold uppercase px-3 py-3 rounded outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
                         type="button"
+                        v-if="isFromFutureOrToday"
                     >
                         + จองวันนี้
                     </button>
