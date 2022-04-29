@@ -1,0 +1,13 @@
+version: "3.7"
+services:
+    oasip-frontend:
+        container_name: oasip-frontend
+        build:
+            context: .
+            dockerfile: ./Dockerfile
+        ports:
+            - "3000:3000"
+        networks:
+            - oasip-backend
+        environment:
+            TZ: "Asia/Bangkok"
