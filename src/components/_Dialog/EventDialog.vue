@@ -1,5 +1,8 @@
 <script setup>
 import { ref } from "@vue/reactivity";
+import { computed } from "@vue/runtime-core";
+import dayjs from "dayjs";
+import InputAutocomplete from "../InputAutocomplete.vue";
 
 const props = defineProps({
     openModal: {
@@ -14,6 +17,13 @@ const props = defineProps({
         type: Object,
         default: null,
     },
+    eventCategories: {
+        type: Array,
+    },
+    date: {
+        type: String,
+        default: dayjs(),
+    },
 });
 const emit = defineEmits(["close"]);
 
@@ -22,8 +32,21 @@ const form = ref({
     bookingEmail: props.item?.bookingEmail || "",
     eventStartTime: props.item?.eventStartTime || "",
     eventDuration: props.item?.eventDuration || "",
+    eventCategory: props.item?.eventCategory || "",
     eventNotes: props.item?.eventNotes || "",
 });
+
+const getEventCategoriesName = computed(() => {
+    return props.eventCategories?.map((ec) => ec.eventCategoryName) || [];
+});
+
+function checkIfEventCategoryExists() {
+    let exist = getEventCategoriesName.value.includes(form.value.eventCategory);
+    if (!exist) return (form.value.eventCategory = "");
+    form.value.eventDuration = props.eventCategories?.find(
+        (ec) => ec.eventCategoryName === form.value.eventCategory
+    )?.eventDuration;
+}
 </script>
 
 <template>
@@ -84,12 +107,31 @@ const form = ref({
                 <div class="mb-4">
                     <label
                         class="text-gray-800 block mb-1 font-bold text-sm tracking-wide"
-                        >หมวดหมู่กิจกรรม</label
-                    >
+                        >หมวดหมู่กิจกรรม
+                    </label>
+
                     <input
                         class="bg-gray-200 appearance-none border-2 border-gray-200 rounded-lg w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-blue-500"
                         type="text"
                         v-model="form.eventCategory"
+                        list="eventCategoriesList"
+                        @blur="checkIfEventCategoryExists"
+                    />
+                    <datalist id="eventCategoriesList">
+                        <template v-for="(ec, index) in getEventCategoriesName">
+                            <option :data-value="ec">{{ ec }}</option>
+                        </template>
+                    </datalist>
+                </div>
+                <div class="mb-4">
+                    <label
+                        class="text-gray-800 block mb-1 font-bold text-sm tracking-wide"
+                        >ช่วงเวลาเริ่มต้น</label
+                    >
+                    <input
+                        class="bg-gray-200 appearance-none border-2 border-gray-200 rounded-lg w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-blue-500"
+                        type="datetime-local"
+                        v-model="form.eventStartTime"
                     />
                 </div>
                 <div class="mb-4">
