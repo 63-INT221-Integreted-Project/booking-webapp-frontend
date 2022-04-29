@@ -1,9 +1,11 @@
 <script setup>
 import { ref } from "@vue/reactivity";
-import { onMounted } from "@vue/runtime-core";
+import { computed, onMounted } from "@vue/runtime-core";
 import EventService from "../services/events.service";
-import AddEventDialog from "../components/AddEventDialog.vue";
+import EventCategoriesService from "../services/event-categories.service";
+import EventDialog from "../components/_Dialog/EventDialog.vue";
 import dayjs from "dayjs";
+import ScheduleEventDialog from "../components/_Dialog/ScheduleEventDialog.vue";
 
 const MONTH_NAMES = [
     "มกราคม",
@@ -25,14 +27,21 @@ const year = ref(new Date().getFullYear());
 const no_of_days = ref([]);
 const blankdays = ref([]);
 const events = ref([]);
+const eventCategories = ref([]);
 const eventModal = ref({
     open: false,
     event: {},
+});
+const scheduleModal = ref({
+    open: false,
+    events: [],
+    title: "",
 });
 
 onMounted(async () => {
     getNoOfDays();
     events.value = await getEvents();
+    eventCategories.value = await getEventCategories();
 });
 
 function isToday(date) {
@@ -43,7 +52,18 @@ function isToday(date) {
 }
 
 function getEvents(date) {
-    return EventService.findAll();
+    return EventService.findAllByBetweenDate(
+        dayjs(new Date(year.value, month.value, 1)).format(
+            "YYYY-MM-DD HH:mm:ss"
+        ),
+        dayjs(
+            new Date(year.value, month.value, no_of_days.value.length)
+        ).format("YYYY-MM-DD HH:mm:ss")
+    );
+}
+
+async function getEventCategories() {
+    return await EventCategoriesService.findAll();
 }
 
 function getNoOfDays() {
@@ -75,18 +95,44 @@ function getNoOfDays() {
 
 //*Create convert function from example 2022-4-24T01:30:00.000-05:00 to 2022-4-24 01:30:00
 function formatDate(date) {
-    let year = date.split("-")[0];
-    let month = date.split("-")[1];
-    let day = date.split("-")[2].split("T")[0];
-    let hour = date.split("T")[1].split(":")[0];
-    let minute = date.split("T")[1].split(":")[1];
-    let second = date.split("T")[1].split(":")[2];
-    let time = hour + ":" + minute + ":" + second;
-    return year + "-" + month + "-" + day + " " + time;
+    return dayjs(date).format("YYYY-MM-DD HH:mm:ss");
 }
 
-function showEventModal(date) {
-    let dateConvert = dayjs(`${year.value}-${month.value + 1}-${date}`);
+function dateCompare(date, dateEvent) {
+    return (
+        dayjs(`${year.value}-${month.value + 1}-${date}`).format(
+            "YYYY-MM-DD"
+        ) === dayjs(dateEvent).format("YYYY-MM-DD")
+    );
+}
+
+const bookingToday = computed(() => {
+    return events.value.filter((event) =>
+        dateCompare(dayjs().date(), event.eventStartTime)
+    ).length;
+});
+
+const bookingInThisMonth = computed(() => {
+    return events.value.length;
+});
+
+function openEventScheduleModal(date) {
+    let dateConvert = dayjs(`${year.value}-${month.value + 1}-${date}`).format(
+        "DD/MM/YYYY"
+    );
+    scheduleModal.value = {
+        title: `กิจกรรมประจำวันที่ ${dateConvert}`,
+        open: true,
+        events: events.value.filter(
+            (event) =>
+                dayjs(event.eventStartTime).format("YYYY-MM-DD") ===
+                dayjs(`${year.value}-${month.value + 1}-${date}`).format(
+                    "YYYY-MM-DD"
+                )
+        ),
+    };
+}
+function openBookingEventModal() {
     eventModal.value = {
         open: true,
         event: {
@@ -97,22 +143,28 @@ function showEventModal(date) {
             eventNotes: "เข้าปรึกษาพร้อมทีม ขออัดวีดีโอระหว่างปรึกษา",
             eventCategoryId: "EC-002",
         },
-        title: `เพิ่ม Event ประจำวันที่ ${dayjs(dateConvert).format(
-            "DD/MM/YYYY"
-        )}`,
+        title: `เพิ่ม Event`,
     };
 }
 </script>
 
 <template>
     <div class="grid grid-rows-3 grid-flow-col gap-x-12 gap-y-0">
-        <AddEventDialog
+        <EventDialog
             v-if="eventModal.open"
             :openModal="eventModal.open"
             :title="eventModal.title"
             :event="eventModal.event"
+            :eventCategories="eventCategories"
             @close="eventModal.open = false"
         />
+        <ScheduleEventDialog
+            v-if="scheduleModal.open"
+            :openModal="scheduleModal.open"
+            :title="scheduleModal.title"
+            :events="scheduleModal.events"
+            @close="scheduleModal.open = false"
+        ></ScheduleEventDialog>
         <div class="col-span-3">
             <div
                 class="flex flex-col md:flex-row overflow-hidden bg-white rounded-lg shadow-xl w-full py-4"
@@ -139,15 +191,11 @@ function showEventModal(date) {
                     class="w-full text-gray-800 flex items-center justify-end px-12"
                 >
                     <div class="text-right flex flex-col">
-                        <h3
-                            class="font-semibold text-lg leading-tight truncate"
-                        >
+                        <h3 class="text-lg leading-tight truncate">
                             การจองวันนี้
                         </h3>
-                        <h2
-                            class="font-semibold text-2xl leading-tight truncate"
-                        >
-                            0
+                        <h2 class="font-bold text-2xl leading-tight truncate">
+                            {{ bookingToday }}
                         </h2>
                     </div>
                     <p
@@ -182,15 +230,11 @@ function showEventModal(date) {
                     class="w-full text-gray-800 flex items-center justify-end px-12"
                 >
                     <div class="text-right flex flex-col">
-                        <h3
-                            class="font-semibold text-lg leading-tight truncate"
-                        >
-                            ห้องประชุมในระบบ
+                        <h3 class="text-lg leading-tight truncate">
+                            จองภายในเดือนนี้
                         </h3>
-                        <h2
-                            class="font-semibold text-2xl leading-tight truncate"
-                        >
-                            0
+                        <h2 class="font-bold text-2xl leading-tight truncate">
+                            {{ bookingInThisMonth }}
                         </h2>
                     </div>
                     <p
@@ -211,19 +255,24 @@ function showEventModal(date) {
                         >
                             หมวดหมู่ห้องประชุม
                         </h3>
-                        <div class="flex items-center space-x-4">
+                        <div
+                            class="flex items-center space-x-4"
+                            v-for="eventCategory in events.map(
+                                (e) => e.eventCategory
+                            )"
+                        >
                             <div class="flex-shrink-0">*</div>
                             <div class="flex-1 min-w-0">
                                 <p
                                     class="text-sm font-medium text-gray-900 truncate"
                                 >
-                                    ชื่อหมวดหมู่
+                                    {{ eventCategory.eventCategoryName }}
                                 </p>
                             </div>
                             <div
                                 class="inline-flex items-center text-base font-semibold text-gray-900 text-right"
                             >
-                                20 min
+                                {{ eventCategory.eventDuration }} min
                             </div>
                         </div>
                     </div>
@@ -231,6 +280,15 @@ function showEventModal(date) {
             </div>
         </div>
         <div class="col-span-5 row-span-3">
+            <div class="flex justify-end mb-2">
+                <button
+                    class="bg-indigo-500 text-white active:bg-indigo-600 text-sm font-bold uppercase px-3 py-3 rounded outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
+                    type="button"
+                    @click="openBookingEventModal"
+                >
+                    + จองการประชุม
+                </button>
+            </div>
             <div>
                 <!-- <div class="font-bold text-gray-800 text-xl mb-4">
 				Schedule Tasks
@@ -258,6 +316,7 @@ function showEventModal(date) {
                                 @click="
                                     month--;
                                     getNoOfDays();
+                                    getEvents();
                                 "
                             >
                                 <svg
@@ -281,6 +340,7 @@ function showEventModal(date) {
                                 @click="
                                     month++;
                                     getNoOfDays();
+                                    getEvents();
                                 "
                             >
                                 <svg
@@ -331,7 +391,7 @@ function showEventModal(date) {
                                     class="px-4 pt-2 border-r border-b relative"
                                 >
                                     <div
-                                        @click="showEventModal(date)"
+                                        @click="openEventScheduleModal(date)"
                                         v-text="date"
                                         class="inline-flex w-8 h-8 items-center justify-center cursor-pointer text-center leading-none rounded-full transition ease-in-out duration-100"
                                         :class="{
@@ -350,19 +410,11 @@ function showEventModal(date) {
 										x-show="events.filter(e => e.event_date === new Date(year, month, date).toDateString()).length"
 										x-text="events.filter(e => e.event_date === new Date(year, month, date).toDateString()).length"></div> -->
                                         <template
-                                            v-for="event in events.filter(
-                                                (e) =>
-                                                    new Date(
-                                                        formatDate(
-                                                            events[0]
-                                                                .eventStartTime
-                                                        )
-                                                    ).toDateString() ===
-                                                    new Date(
-                                                        year,
-                                                        month,
-                                                        date
-                                                    ).toDateString()
+                                            v-for="event in events.filter((e) =>
+                                                dateCompare(
+                                                    date,
+                                                    e.eventStartTime
+                                                )
                                             )"
                                         >
                                             <div
