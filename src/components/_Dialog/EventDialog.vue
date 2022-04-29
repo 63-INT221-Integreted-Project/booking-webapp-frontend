@@ -1,6 +1,6 @@
 <script setup>
 import { ref } from "@vue/reactivity";
-import { computed } from "@vue/runtime-core";
+import { computed, onMounted } from "@vue/runtime-core";
 import dayjs from "dayjs";
 import InputAutocomplete from "../InputAutocomplete.vue";
 
@@ -36,6 +36,15 @@ const form = ref({
     eventNotes: props.item?.eventNotes || "",
 });
 
+const today = ref(dayjs().format("YYYY-MM-DDTHH:mm"));
+
+onMounted(() => {
+    setInterval(() => {
+        today.value = dayjs().format("YYYY-MM-DDTHH:mm");
+        compareDate();
+    }, 1000);
+});
+
 const getEventCategoriesName = computed(() => {
     return props.eventCategories?.map((ec) => ec.eventCategoryName) || [];
 });
@@ -46,6 +55,12 @@ function checkIfEventCategoryExists() {
     form.value.eventDuration = props.eventCategories?.find(
         (ec) => ec.eventCategoryName === form.value.eventCategory
     )?.eventDuration;
+}
+
+function compareDate() {
+    if (dayjs(form.value.eventStartTime).isBefore(today.value)) {
+        form.value.eventStartTime = today.value;
+    }
 }
 </script>
 
@@ -132,6 +147,8 @@ function checkIfEventCategoryExists() {
                         class="bg-gray-200 appearance-none border-2 border-gray-200 rounded-lg w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-blue-500"
                         type="datetime-local"
                         v-model="form.eventStartTime"
+                        :min="today"
+                        @blur="compareDate"
                     />
                 </div>
                 <div class="mb-4">
@@ -167,7 +184,7 @@ function checkIfEventCategoryExists() {
                     <button
                         type="button"
                         class="bg-green-700 hover:bg-green-800 text-white font-semibold py-2 px-4 border border-green-700 rounded-lg shadow-sm"
-                        @click="addEvent()"
+                        @click="emit('save', form)"
                     >
                         บันทึก
                     </button>
