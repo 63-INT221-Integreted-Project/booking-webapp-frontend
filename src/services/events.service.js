@@ -18,11 +18,13 @@ const addEvent = async function (event) {
     }).then((res) => res.json());
 };
 
-const findAll = async function () {
-    return await fetch(`${BaseUrl.getUrl()}/events/`).then((res) => res.json());
+const findAllByBetweenDate = async function (date1, date2) {
+    return await fetch(
+        `${BaseUrl.getUrl()}/events/check-between?date1=${date1}&date2=${date2}`
+    ).then((res) => res.json());
 };
 
 export default {
     addEvent,
-    findAll,
+    findAllByBetweenDate,
 };
