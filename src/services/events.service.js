@@ -24,7 +24,25 @@ const findAllByBetweenDate = async function (date1, date2) {
     ).then((res) => res.json());
 };
 
+const createEvent = async function (event) {
+    return await fetch(`${BaseUrl.getUrl()}/events/`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+            bookingName: event.bookingName,
+            bookingEmail: event.bookingEmail,
+            eventStartTime: event.eventStartTime,
+            eventDuration: +event.eventDuration,
+            eventNotes: event.eventNotes,
+            eventCategory: event.eventCategory,
+        }),
+    });
+};
+
 export default {
     addEvent,
     findAllByBetweenDate,
+    createEvent,
 };
