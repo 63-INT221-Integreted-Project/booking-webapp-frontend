@@ -8,6 +8,6 @@ services:
         ports:
             - "3000:3000"
         networks:
-            - oasip-backend
+            - oasip-network
         environment:
             TZ: "Asia/Bangkok"
