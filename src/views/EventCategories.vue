@@ -5,16 +5,11 @@ import { useRoute } from "vue-router";
 import EventCategoriesService from "../services/event-categories.service";
 import EventCategoryDialog from "../components/_Dialog/EventCategoryDialog.vue";
 import WarningDialog from "../components/_Dialog/WarningDialog.vue";
+import { useModalStore } from "../stores/modal";
 
 const route = useRoute();
 const eventCategories = ref([]);
-const openModal = ref({
-    isOpen: false,
-});
-const warningModal = ref({
-    isOpen: false,
-    item: null,
-});
+const modal = useModalStore();
 
 onMounted(async () => {
     eventCategories.value = await findAllEventCategories();
@@ -22,13 +17,6 @@ onMounted(async () => {
 
 async function findAllEventCategories() {
     return await EventCategoriesService.findAll();
-}
-
-function toggleModal({ isOpen, item }) {
-    openModal.value = {
-        isOpen,
-        item,
-    };
 }
 
 async function saveEventCategory(eventCategory) {
@@ -45,22 +33,34 @@ async function saveEventCategory(eventCategory) {
     }
     eventCategories.value = await findAllEventCategories();
 }
+
+async function deleteEventCategory(eventCategory) {
+    await EventCategoriesService.deleteEventCategory(
+        eventCategory.eventCategoryId
+    );
+    modal.toggleWarningModal({ isOpen: false, item: null });
+    eventCategories.value = await findAllEventCategories();
+}
 </script>
 
 <template>
     <div class="w-full px-4 mx-auto">
         <EventCategoryDialog
-            v-if="openModal.isOpen"
-            :openModal="openModal.isOpen"
-            :item="openModal.item"
-            @close="toggleModal"
+            v-if="modal.eventCategoryModal.isOpen"
+            :openModal="modal.eventCategoryModal.isOpen"
+            :item="modal.eventCategoryModal.item"
+            @close="
+                modal.toggleEventCategoryModal({ isOpen: false, item: null })
+            "
             @save="saveEventCategory"
         ></EventCategoryDialog>
         <WarningDialog
-            v-if="warningModal.isOpen"
-            :openModal="warningModal.isOpen"
-            :item="warningModal.item"
-            name="หมวดหมู่"
+            v-if="modal.warningModal.isOpen"
+            :openModal="modal.warningModal.isOpen"
+            :item="modal.warningModal.item"
+            @onSubmit="deleteEventCategory"
+            @close="modal.toggleWarningModal({ isOpen: false, item: null })"
+            :name="modal.getNameWarningModal"
         ></WarningDialog>
         <div
             class="relative flex flex-col min-w-0 break-words bg-white w-full mb-6 shadow-lg rounded"
@@ -80,7 +80,12 @@ async function saveEventCategory(eventCategory) {
                         <button
                             class="bg-indigo-500 text-white active:bg-indigo-600 text-sm font-bold uppercase px-3 py-3 rounded outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
                             type="button"
-                            @click="toggleModal({ isOpen: true, item: null })"
+                            @click="
+                                modal.toggleEventCategoryModal({
+                                    isOpen: true,
+                                    item: null,
+                                })
+                            "
                         >
                             เพิ่มหมวดหมู่การจอง
                         </button>
@@ -144,7 +149,7 @@ async function saveEventCategory(eventCategory) {
                                 <button
                                     class="bg-yellow-500 hover:bg-blue-light text-white font-extrabold py-2 px-4 border-b-4 border-yellow-600 hover:border-blue rounded mr-2"
                                     @click="
-                                        toggleModal({
+                                        modal.toggleEventCategoryModal({
                                             isOpen: true,
                                             item: event,
                                         })
@@ -155,8 +160,10 @@ async function saveEventCategory(eventCategory) {
                                 <button
                                     class="bg-red-500 hover:bg-blue-light text-white font-extrabold py-2 px-4 border-b-4 border-red-600 hover:border-blue rounded"
                                     @click="
-                                        warningModal.item = event;
-                                        warningModal.isOpen = true;
+                                        modal.toggleWarningModal({
+                                            isOpen: true,
+                                            item: event,
+                                        })
                                     "
                                 >
                                     ลบ
