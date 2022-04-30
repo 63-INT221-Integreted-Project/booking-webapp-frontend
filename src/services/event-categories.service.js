@@ -38,8 +38,21 @@ const updateEventCategory = async function (eventCategoryId, eventCategory) {
     ).then((res) => res.json());
 };
 
+const deleteEventCategory = async function (eventCategory) {
+    return await fetch(
+        `${BaseUrl.getUrl()}/event-categories/${eventCategory.id}`,
+        {
+            method: "DELETE",
+            headers: {
+                "Content-Type": "application/json",
+            },
+        }
+    ).then((res) => res.json());
+};
+
 export default {
     findAll,
     createEventCategory,
     updateEventCategory,
+    deleteEventCategory,
 };
