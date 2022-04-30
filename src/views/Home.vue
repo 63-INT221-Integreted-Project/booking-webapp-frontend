@@ -61,7 +61,7 @@ async function fetchEvents() {
         ),
         dayjs(
             new Date(year.value, month.value, no_of_days.value.length)
-        ).format("YYYY-MM-DD HH:mm:ss")
+        ).format("YYYY-MM-DD [23:59:59]")
     );
 }
 
@@ -173,6 +173,19 @@ function openBookingEventModal(date) {
 async function addEvent(form) {
     if (!form.bookingName || !form.bookingEmail || !form.eventDuration)
         return (eventModal.value.isInvalid = true);
+    let findIsSameDateTime = events.value.find((event) => {
+        let endFromEvent = dayjs(event.eventStartTime)
+            .add(event.eventDuration, "minute")
+            .format("YYYY-MM-DD HH:mm");
+        let endFromForm = dayjs(form.eventStartTime)
+            .add(form.eventDuration, "minute")
+            .format("YYYY-MM-DD HH:mm");
+        return endFromForm >= endFromEvent || endFromEvent <= endFromEvent;
+    });
+    if (findIsSameDateTime) {
+        eventModal.value.isInvalid = true;
+        return;
+    }
     await EventService.createEvent({
         ...form,
         eventCategory: {
@@ -186,6 +199,11 @@ async function addEvent(form) {
         ),
     });
     await fetchEvents();
+    eventModal.value = {
+        open: false,
+        event: {},
+        isInvalid: false,
+    // };
 }
 </script>
 
