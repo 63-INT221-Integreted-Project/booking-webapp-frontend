@@ -30,7 +30,7 @@ function getHoursAndMinutes(dateTime) {
         @click.self.prevent="emit('close', !openModal)"
     >
         <div
-            class="p-4 max-w-xl mx-auto relative absolute left-0 right-0 overflow-hidden top-[25%]"
+            class="p-4 max-w-2xl mx-auto relative absolute left-0 right-0 overflow-hidden top-[25%]"
         >
             <div
                 class="shadow absolute right-0 top-0 w-10 h-10 rounded-full bg-white text-gray-500 hover:text-gray-800 inline-flex items-center justify-center cursor-pointer"
@@ -56,15 +56,22 @@ function getHoursAndMinutes(dateTime) {
 
                 <div class="mt-12">
                     <div class="flex justify-center">
-                        <img src="_svg/warning.png" alt="logo" class="w-32" />
+                        <img
+                            src="/images/_svg/warning.png"
+                            alt="logo"
+                            class="w-32"
+                        />
                     </div>
                     <div class="text-center p-12">
                         <div class="text-gray-800 text-2xl">
-                            คุณต้องการจะลบ {{ name }} หรือไม่ ?
+                            คุณต้องการจะลบ
+                            <span class="underline text-red-500">{{
+                                name
+                            }}</span>
+                            หรือไม่ ?
                         </div>
                         <div class="text-gray-600 text-lg mt-2">
                             คุณจะไม่สามารถกู้คืนข้อมูลได้
-                            {{ item }}
                         </div>
                     </div>
                 </div>
