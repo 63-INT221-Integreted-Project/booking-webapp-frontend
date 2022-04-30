@@ -28,6 +28,10 @@ const props = defineProps({
         type: Boolean,
         default: false,
     },
+    isSameBookingDateTime: {
+        type: Boolean,
+        default: false,
+    },
 });
 const emit = defineEmits(["close"]);
 
@@ -66,6 +70,28 @@ function compareDate() {
         form.value.eventStartTime = today.value;
     }
 }
+
+const showErrorList = computed(() => {
+    let error = [];
+    if (props.isInvalid) {
+        if (props.findSameBookingDate) {
+            error.push("มีผู้ใช้งานจองแล้วในระบบ");
+        }
+        if (!form.value.bookingName) {
+            error.push("- กรุณากรอกชื่อผู้จอง");
+        }
+        if (!form.value.bookingEmail) {
+            error.push("- กรุณากรอกอีเมลผู้จอง");
+        }
+        if (!form.value.eventStartTime) {
+            error.push("- กรุณากรอกเวลาเริ่มกิจกรรม");
+        }
+        if (!form.value.eventDuration) {
+            error.push("- กรุณากรอกระยะเวลากิจกรรม");
+        }
+    }
+    return error.join("<br/>");
+});
 </script>
 
 <template>
@@ -99,6 +125,19 @@ function compareDate() {
                 <h2 class="font-bold text-2xl mb-6 text-gray-800 border-b pb-2">
                     {{ title }}
                 </h2>
+
+                <div role="alert" class="mb-4" v-if="isInvalid">
+                    <div
+                        class="bg-red-500 text-white font-bold rounded-t px-4 py-2"
+                    >
+                        เกิดข้อผิดพลาด
+                    </div>
+                    <div
+                        class="border border-t-0 border-red-400 rounded-b bg-red-100 px-4 py-3 text-red-700"
+                    >
+                        <p v-html="showErrorList"></p>
+                    </div>
+                </div>
 
                 <div class="mb-4">
                     <label

@@ -33,13 +33,14 @@ const modalTitle = computed(() => {
         style="background-color: rgba(0, 0, 0, 0.8)"
         class="fixed z-40 top-0 right-0 left-0 bottom-0 h-full w-full"
         v-show.transition.opacity="openModal"
+        @click="emit('close', { isOpen: false, item: null })"
     >
         <div
             class="p-4 max-w-xl mx-auto relative absolute left-0 right-0 overflow-hidden mt-56"
         >
             <div
                 class="shadow absolute right-0 top-0 w-10 h-10 rounded-full bg-white text-gray-500 hover:text-gray-800 inline-flex items-center justify-center cursor-pointer"
-                @click="emit('close', !openModal)"
+                @click="emit('close', { isOpen: false, item: null })"
             >
                 <svg
                     class="fill-current w-6 h-6"
