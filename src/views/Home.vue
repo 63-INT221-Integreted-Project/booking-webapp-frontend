@@ -203,7 +203,7 @@ async function addEvent(form) {
         open: false,
         event: {},
         isInvalid: false,
-    // };
+    };
 }
 </script>
 
