@@ -32,6 +32,7 @@ const eventModal = ref({
     open: false,
     event: {},
     isInvalid: false,
+    errorType: [],
 });
 const scheduleModal = ref({
     open: false,
@@ -144,7 +145,7 @@ function openEventScheduleModal(date) {
         "DD/MM/YYYY"
     );
     scheduleModal.value = {
-        title: `กิจกรรมประจำวันที่ ${dateConvert}`,
+        title: `การจองประจำวันที่ ${dateConvert}`,
         open: true,
         date: dayjs(`${year.value}-${month.value + 1}-${date}`).format(
             "YYYY-MM-DD"
@@ -166,44 +167,86 @@ function openBookingEventModal(date) {
         event: {
             eventStartTime: dayjs(date).format("YYYY-MM-DDTHH:mm"),
         },
+        isInvalid: false,
+        errorType: [],
         title: `เพิ่ม Event`,
     };
 }
 
+function validate(form) {
+    if (
+        !form.bookingName ||
+        !form.bookingEmail ||
+        !form.eventDuration ||
+        !form.eventCategory ||
+        !form.eventStartTime
+    ) {
+        if (!form.bookingName) {
+            eventModal.value.errorType.push("- กรุณากรอกชื่อผู้จอง");
+        }
+        if (!form.bookingEmail) {
+            eventModal.value.errorType.push("- กรุณากรอกอีเมลผู้จอง");
+        }
+        if (!form.eventStartTime) {
+            eventModal.value.errorType.push("- กรุณากรอกเวลาเริ่มการจอง");
+        }
+        if (!form.eventCategory) {
+            eventModal.value.errorType.push("- กรุณาเลือกประเภทการจอง");
+        }
+        if (!form.eventDuration) {
+            eventModal.value.errorType.push("- กรุณากรอกระยะเวลาการจอง");
+        }
+        eventModal.value.isInvalid = true;
+        return false;
+    }
+    return true;
+}
+
 async function addEvent(form) {
-    if (!form.bookingName || !form.bookingEmail || !form.eventDuration)
-        return (eventModal.value.isInvalid = true);
-    let findIsSameDateTime = events.value.find((event) => {
+    if (!validate(form)) return;
+    let findIsInRange = events.value.find((event) => {
+        let startFromEvent = dayjs(event.eventStartTime).format(
+            "YYYY-MM-DD HH:mm"
+        );
+        let startFromForm = dayjs(form.eventStartTime).format(
+            "YYYY-MM-DD HH:mm"
+        );
         let endFromEvent = dayjs(event.eventStartTime)
             .add(event.eventDuration, "minute")
             .format("YYYY-MM-DD HH:mm");
         let endFromForm = dayjs(form.eventStartTime)
             .add(form.eventDuration, "minute")
             .format("YYYY-MM-DD HH:mm");
-        return endFromForm >= endFromEvent || endFromEvent <= endFromEvent;
+        return (
+            (startFromForm >= startFromEvent &&
+                startFromForm <= endFromEvent) ||
+            (endFromForm >= startFromEvent && endFromForm <= endFromEvent)
+        );
     });
-    if (findIsSameDateTime) {
+    if (findIsInRange) {
         eventModal.value.isInvalid = true;
+        eventModal.value.errorType = ["inRange"];
         return;
     }
-    await EventService.createEvent({
-        ...form,
-        eventCategory: {
-            eventCategoryId: eventCategories.value.find(
-                (eventCategory) =>
-                    eventCategory.eventCategoryName === form.eventCategory
-            ).eventCategoryId,
-        },
-        eventStartTime: dayjs(form.eventStartTime).format(
-            "YYYY-MM-DD HH:mm:ss"
-        ),
-    });
-    await fetchEvents();
-    eventModal.value = {
-        open: false,
-        event: {},
-        isInvalid: false,
-    };
+    // await EventService.createEvent({
+    //     ...form,
+    //     eventCategory: {
+    //         eventCategoryId: eventCategories.value.find(
+    //             (eventCategory) =>
+    //                 eventCategory.eventCategoryName === form.eventCategory
+    //         ).eventCategoryId,
+    //     },
+    //     eventStartTime: dayjs(form.eventStartTime).format(
+    //         "YYYY-MM-DD HH:mm:ss"
+    //     ),
+    // });
+    // await fetchEvents();
+    // eventModal.value = {
+    //     open: false,
+    //     event: {},
+    //     isInvalid: false,
+    // errorType: []
+    // };
 }
 </script>
 
@@ -214,10 +257,11 @@ async function addEvent(form) {
             :openModal="eventModal.open"
             :title="eventModal.title"
             :event="eventModal.event"
+            :errorType="eventModal.errorType"
             :eventCategories="eventCategories"
             :isInvalid="eventModal.isInvalid"
             @close="eventModal.open = false"
-            @save="addEvent"
+            @onSave="addEvent"
         />
         <ScheduleEventDialog
             v-if="scheduleModal.open"
