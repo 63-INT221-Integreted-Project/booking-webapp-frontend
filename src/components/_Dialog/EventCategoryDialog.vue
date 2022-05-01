@@ -33,7 +33,7 @@ const modalTitle = computed(() => {
         style="background-color: rgba(0, 0, 0, 0.8)"
         class="fixed z-40 top-0 right-0 left-0 bottom-0 h-full w-full"
         v-show.transition.opacity="openModal"
-        @click="emit('close', { isOpen: false, item: null })"
+        @click.self.prevent="emit('close', { isOpen: false, item: null })"
     >
         <div
             class="p-4 max-w-xl mx-auto relative absolute left-0 right-0 overflow-hidden mt-56"
