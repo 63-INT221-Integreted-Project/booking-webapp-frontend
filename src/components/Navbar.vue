@@ -30,7 +30,7 @@ function getActiveNavbar(path) {
 <template>
     <nav class="container flex justify-around py-8 mx-auto bg-slate-100 mt-32">
         <div class="flex items-center">
-            <h3 class="text-2xl font-medium text-blue-500">LOGO</h3>
+            <h3 class="text-2xl font-medium text-blue-500">OASIP</h3>
         </div>
         <!-- left header section -->
         <div class="items-center hidden space-x-8 lg:flex">
