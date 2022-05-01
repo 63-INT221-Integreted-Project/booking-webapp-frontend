@@ -10,9 +10,8 @@ export default defineConfig({
         },
     },
     server: {
-        port: 3000,
         proxy: {
-            "/api": "http://oasip-backend:8080",
+            "/api": "http://localhost:8080",
         },
     },
 });
