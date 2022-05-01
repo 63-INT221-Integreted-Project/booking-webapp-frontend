@@ -11,3 +11,8 @@ services:
             - oasip-network
         environment:
             TZ: "Asia/Bangkok"
+
+networks:
+    oasip-network:
+        external:
+            name: oasip-network
