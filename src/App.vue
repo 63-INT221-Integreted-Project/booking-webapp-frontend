@@ -4,7 +4,7 @@ import Navbar from "./components/Navbar.vue";
 
 <template>
     <Navbar></Navbar>
-    <div class="container mt-32 flex mx-auto">
+    <div class="container mt-16 flex mx-auto">
         <router-view></router-view>
     </div>
 </template>
