@@ -106,7 +106,7 @@ function getHoursAndMinutes(event) {
                     v-if="!events.length"
                 >
                     <img
-                        src="/images/_svg/No data.svg"
+                        src="/images/_svg/no-data.svg"
                         alt="calendar"
                         width="500"
                     />
