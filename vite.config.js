@@ -8,7 +8,7 @@ export default defineConfig({
     plugins: [vue()],
     build: {
         rollupOptions: {
-            external: ["/images/_svg/No%20data.svg"],
+            external: ["_svg"],
         },
     },
     server: {
