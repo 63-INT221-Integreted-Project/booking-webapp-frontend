@@ -44,9 +44,6 @@ const deleteEventCategory = async function (eventCategoryId) {
         `${BaseUrl.getUrl()}/event-categories/${eventCategoryId}`,
         {
             method: "DELETE",
-            headers: {
-                "Content-Type": "application/json",
-            },
         }
     ).then((res) => res.json());
 };
