@@ -40,7 +40,7 @@ async function deleteEventCategory(eventCategory) {
     await EventCategoriesService.deleteEventCategory(
         eventCategory.eventCategoryId
     );
-    modal.toggleWarningModal({ isOpen: false, item: null });
+    // modal.toggleWarningModal({ isOpen: false, item: null });
     eventCategories.value = await EventCategoriesService.findAll();
 }
 </script>
