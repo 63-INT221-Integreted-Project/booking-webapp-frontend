@@ -15,7 +15,7 @@ const props = defineProps({
         default: null,
     },
 });
-const emit = defineEmits(["close"]);
+const emit = defineEmits(["close", "remove"]);
 
 function getHoursAndMinutes(dateTime) {
     return dayjs(dateTime).format("HH:mm");
@@ -27,7 +27,6 @@ function getHoursAndMinutes(dateTime) {
         style="background-color: rgba(0, 0, 0, 0.8)"
         class="fixed z-40 top-0 right-0 left-0 bottom-0 h-full w-full"
         v-show.transition.opacity="openModal"
-        @click.self.prevent="emit('close', !openModal)"
     >
         <div
             class="p-4 max-w-2xl mx-auto relative absolute left-0 right-0 overflow-hidden top-[25%]"
@@ -86,7 +85,7 @@ function getHoursAndMinutes(dateTime) {
                     <button
                         type="button"
                         class="bg-green-700 hover:bg-green-800 text-white font-semibold py-2 px-4 border border-green-700 rounded-lg shadow-sm"
-                        @click="emit('remove', item.eventCategoryId)"
+                        @click="emit('remove', item)"
                     >
                         ยืนยัน
                     </button>
