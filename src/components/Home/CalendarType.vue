@@ -5,7 +5,12 @@ import EventService from "@/services/events.service";
 import EventCategoriesService from "@/services/event-categories.service";
 import EventDialog from "@/components/_Dialog/EventDialog.vue";
 import dayjs from "dayjs";
-import ScheduleEventDialog from "@/components/_Dialog/ScheduleEventDialog.vue";
+
+import { useModalStore } from "../../stores/modal";
+import ScheduleEventDialog from "../_Dialog/ScheduleEventDialog.vue";
+import WarningDialog from "../_Dialog/WarningDialog.vue";
+
+const modal = useModalStore();
 
 const MONTH_NAMES = [
     "มกราคม",
@@ -204,6 +209,8 @@ function validate(form) {
 async function addEvent(form) {
     if (!validate(form)) return;
     let findIsInRange = events.value.find((event) => {
+        if (event.eventCategory.eventCategoryName !== form.eventCategory)
+            return undefined;
         let startFromEvent = dayjs(event.eventStartTime).format(
             "YYYY-MM-DD HH:mm"
         );
@@ -224,7 +231,7 @@ async function addEvent(form) {
     });
     if (findIsInRange) {
         eventModal.value.isInvalid = true;
-        eventModal.value.errorType = ["inRange"];
+        eventModal.value.errorType = ["- หมวดหมู่นี่มีการจองในช่วงเวลานี้แล้ว"];
         return;
     }
     await EventService.createEvent({
@@ -247,10 +254,35 @@ async function addEvent(form) {
         errorType: [],
     };
 }
+
+function warningCancleEvent(event) {
+    scheduleModal.value.open = false;
+    modal.warningModal = {
+        isOpen: true,
+        item: event,
+    };
+}
+
+async function submitCancleEvent(event) {
+    await EventService.cancleEvent(event.eventId);
+    modal.warningModal = {
+        isOpen: false,
+        item: null,
+    };
+    await fetchEvents();
+}
 </script>
 
 <template>
     <div class="grid grid-rows-3 grid-flow-col gap-x-12 gap-y-0 mt-4">
+        <WarningDialog
+            v-if="modal.warningModal.isOpen"
+            :openModal="modal.warningModal.isOpen"
+            :item="modal.warningModal.item"
+            @close="modal.toggleWarningModal({ isOpen: false, item: null })"
+            @remove="submitCancleEvent"
+            :name="modal.getNameWarningModal('event')"
+        ></WarningDialog>
         <EventDialog
             v-if="eventModal.open"
             :openModal="eventModal.open"
@@ -270,6 +302,7 @@ async function addEvent(form) {
             :date="scheduleModal.date"
             @close="scheduleModal.open = false"
             @bookingThisDate="openBookingEventModal"
+            @cancleEvent="warningCancleEvent"
         ></ScheduleEventDialog>
 
         <div class="col-span-3">
@@ -483,7 +516,7 @@ async function addEvent(form) {
                         <div class="flex flex-wrap border-t border-l">
                             <template v-for="blankday in blankdays">
                                 <div
-                                    style="width: 14.28%; height: 120px"
+                                    style="width: 14.28%; height: 150px"
                                     class="text-center border-r border-b px-4 pt-2"
                                 ></div>
                             </template>
@@ -492,7 +525,7 @@ async function addEvent(form) {
                                 :key="dateIndex"
                             >
                                 <div
-                                    style="width: 14.28%; height: 120px"
+                                    style="width: 14.28%; height: 150px"
                                     class="px-4 pt-2 border-r border-b relative"
                                 >
                                     <div
@@ -507,7 +540,7 @@ async function addEvent(form) {
                                         }"
                                     ></div>
                                     <div
-                                        style="height: 80px"
+                                        style="height: 120px"
                                         class="overflow-y-auto mt-1"
                                     >
                                         <!-- <div 
@@ -515,20 +548,33 @@ async function addEvent(form) {
 										x-show="events.filter(e => e.event_date === new Date(year, month, date).toDateString()).length"
 										x-text="events.filter(e => e.event_date === new Date(year, month, date).toDateString()).length"></div> -->
                                         <template
-                                            v-for="event in events.filter((e) =>
-                                                dateCompare(
-                                                    date,
-                                                    e.eventStartTime
-                                                )
+                                            v-for="(
+                                                event, index
+                                            ) in events.filter(
+                                                (e, i) =>
+                                                    dateCompare(
+                                                        date,
+                                                        e.eventStartTime
+                                                    ) && i < 3
                                             )"
                                         >
                                             <div
-                                                class="px-2 py-1 rounded-lg mt-1 overflow-hidden border border-blue-200 text-blue-800 bg-blue-100 blue"
+                                                class="px-2 py-1 rounded-lg mt-1 overflow-hidden border border-blue-200 text-blue-800 bg-blue-100"
                                             >
                                                 <p
                                                     v-html="event.bookingName"
                                                     class="text-sm truncate leading-tight"
                                                 ></p>
+                                            </div>
+                                            <div
+                                                class="px-2 py-1 rounded-lg mt-1 overflow-hidden border border-gray-400 text-black bg-gray-100"
+                                                v-if="index === 1"
+                                            >
+                                                <p
+                                                    class="text-sm truncate leading-tight"
+                                                >
+                                                    กดคลิกเพื่อดูเพิ่มเติม
+                                                </p>
                                             </div>
                                         </template>
                                     </div>
