@@ -11,6 +11,11 @@ const route = useRoute();
 const eventCategories = ref([]);
 const modal = useModalStore();
 
+const pagination = ref({
+    page: 1,
+    perPage: 10,
+});
+
 onMounted(async () => {
     eventCategories.value = await findAllEventCategories();
 });
@@ -32,6 +37,7 @@ async function saveEventCategory(eventCategory) {
         );
     }
     eventCategories.value = await findAllEventCategories();
+    modal.toggleEventCategoryModal({ isOpen: false, item: null });
 }
 
 async function deleteEventCategory(eventCategory) {
@@ -58,9 +64,9 @@ async function deleteEventCategory(eventCategory) {
             v-if="modal.warningModal.isOpen"
             :openModal="modal.warningModal.isOpen"
             :item="modal.warningModal.item"
-            @onSubmit="deleteEventCategory"
+            @remove="deleteEventCategory"
             @close="modal.toggleWarningModal({ isOpen: false, item: null })"
-            :name="modal.getNameWarningModal"
+            :name="modal.getNameWarningModal('event-category')"
         ></WarningDialog>
         <div
             class="relative flex flex-col min-w-0 break-words bg-white w-full mb-6 shadow-lg rounded"
@@ -193,14 +199,19 @@ async function deleteEventCategory(eventCategory) {
                             class="relative z-0 inline-flex rounded-md shadow-sm"
                             aria-label="Pagination"
                         >
-                            <a
+                            <button
                                 href="#"
                                 class="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
+                                :class="{
+                                    'cursor-not-allowed opacity-50':
+                                        pagination.page === 1,
+                                }"
+                                :disabled="pagination.page === 1"
                             >
-                                <span class="sr-only">Previous</span>
+                                <span>Previous</span>
                                 <!-- Heroicon name: solid/chevron-left -->
                                 <svg
-                                    class="h-5 w-5"
+                                    class="h-5 w-5 sr-only"
                                     xmlns="http://www.w3.org/2000/svg"
                                     viewBox="0 0 20 20"
                                     fill="currentColor"
@@ -212,9 +223,8 @@ async function deleteEventCategory(eventCategory) {
                                         clip-rule="evenodd"
                                     />
                                 </svg>
-                            </a>
-                            <!-- Current: "z-10 bg-indigo-50 border-indigo-500 text-indigo-600", Default: "bg-white border-gray-300 text-gray-500 hover:bg-gray-50" -->
-                            <a
+                            </button>
+                            <!-- <a
                                 href="#"
                                 aria-current="page"
                                 class="z-10 bg-indigo-50 border-indigo-500 text-indigo-600 relative inline-flex items-center px-4 py-2 border text-sm font-medium"
@@ -255,15 +265,24 @@ async function deleteEventCategory(eventCategory) {
                                 class="bg-white border-gray-300 text-gray-500 hover:bg-gray-50 relative inline-flex items-center px-4 py-2 border text-sm font-medium"
                             >
                                 10
-                            </a>
-                            <a
+                            </a> -->
+                            <button
                                 href="#"
                                 class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
+                                :class="{
+                                    'cursor-not-allowed opacity-50':
+                                        eventCategories.length / 10 <
+                                        pagination.page,
+                                }"
+                                :disabled="
+                                    eventCategories.length / 10 <
+                                    pagination.page
+                                "
                             >
-                                <span class="sr-only">Next</span>
+                                <span>Next</span>
                                 <!-- Heroicon name: solid/chevron-right -->
                                 <svg
-                                    class="h-5 w-5"
+                                    class="h-5 w-5 sr-only"
                                     xmlns="http://www.w3.org/2000/svg"
                                     viewBox="0 0 20 20"
                                     fill="currentColor"
@@ -275,7 +294,7 @@ async function deleteEventCategory(eventCategory) {
                                         clip-rule="evenodd"
                                     />
                                 </svg>
-                            </a>
+                            </button>
                         </nav>
                     </div>
                 </div>
