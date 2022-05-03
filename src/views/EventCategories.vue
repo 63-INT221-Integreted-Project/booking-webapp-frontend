@@ -17,12 +17,8 @@ const pagination = ref({
 });
 
 onMounted(async () => {
-    eventCategories.value = await findAllEventCategories();
+    eventCategories.value = await EventCategoriesService.findAll();
 });
-
-async function findAllEventCategories() {
-    return await EventCategoriesService.findAll();
-}
 
 async function saveEventCategory(eventCategory) {
     let response;
@@ -36,7 +32,7 @@ async function saveEventCategory(eventCategory) {
             eventCategory
         );
     }
-    eventCategories.value = await findAllEventCategories();
+    eventCategories.value = await EventCategoriesService.findAll();
     modal.toggleEventCategoryModal({ isOpen: false, item: null });
 }
 
@@ -45,7 +41,7 @@ async function deleteEventCategory(eventCategory) {
         eventCategory.eventCategoryId
     );
     modal.toggleWarningModal({ isOpen: false, item: null });
-    eventCategories.value = await findAllEventCategories();
+    eventCategories.value = await EventCategoriesService.findAll();
 }
 </script>
 
