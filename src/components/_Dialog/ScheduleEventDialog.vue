@@ -132,6 +132,7 @@ const isFromFutureOrToday = computed(() => {
                             <div class="block" v-if="isFromFutureOrToday">
                                 <button
                                     class="bg-red-500 hover:bg-blue-light text-white font-extrabold py-2 px-4 border-b-4 border-red-600 hover:border-blue rounded"
+                                    @click="emit('cancleEvent', event)"
                                 >
                                     ยกเลิกการจอง
                                 </button>
