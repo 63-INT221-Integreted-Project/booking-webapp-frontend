@@ -126,7 +126,7 @@ const showErrorList = computed(() => {
                 <div class="mb-4">
                     <label
                         class="text-gray-800 block mb-1 font-bold text-sm tracking-wide"
-                        >ชื่อกิจกรรม</label
+                        >ชื่อการจอง</label
                     >
                     <input
                         class="bg-gray-200 appearance-none border-2 border-gray-200 rounded-lg w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-blue-500"
@@ -141,7 +141,7 @@ const showErrorList = computed(() => {
                         class="text-error text-xs text-red-600"
                         v-if="isInvalid && !form.bookingName"
                     >
-                        กรุณากรอกชื่อกิจกรรม
+                        กรุณากรอกชื่อการจอง
                     </p>
                 </div>
 
@@ -169,7 +169,7 @@ const showErrorList = computed(() => {
                 <div class="mb-4">
                     <label
                         class="text-gray-800 block mb-1 font-bold text-sm tracking-wide"
-                        >หมวดหมู่กิจกรรม
+                        >หมวดหมู่การจอง
                     </label>
 
                     <input
