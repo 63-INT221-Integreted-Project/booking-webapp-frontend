@@ -44,9 +44,6 @@ const createEvent = async function (event) {
 const cancleEvent = async function (eventId) {
     return await fetch(`${BaseUrl.getUrl()}/events/${eventId}`, {
         method: "DELETE",
-        headers: {
-            "Content-Type": "application/json",
-        },
     });
 };
 
