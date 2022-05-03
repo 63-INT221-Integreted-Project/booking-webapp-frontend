@@ -13,12 +13,14 @@ export const useModalStore = defineStore("modal", {
             },
         };
     },
-    getters: {
-        getNameWarningModal() {
-            return this.warningModal.item?.eventCategoryName;
-        },
-    },
     actions: {
+        getNameWarningModal(type) {
+            let name = {
+                "event-category": this.warningModal.item?.eventCategoryName,
+                event: this.warningModal.item?.bookingName,
+            };
+            return name[type];
+        },
         toggleWarningModal(data) {
             this.warningModal = {
                 isOpen: data.isOpen,
