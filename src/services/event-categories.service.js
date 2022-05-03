@@ -40,12 +40,9 @@ const updateEventCategory = async function (eventCategoryId, eventCategory) {
 };
 
 const deleteEventCategory = async function (eventCategoryId) {
-    return await fetch(
-        `${BaseUrl.getUrl()}/event-categories/${eventCategoryId}`,
-        {
-            method: "DELETE",
-        }
-    ).then((res) => res.json());
+    await fetch(`${BaseUrl.getUrl()}/event-categories/${eventCategoryId}`, {
+        method: "DELETE",
+    });
 };
 
 export default {
