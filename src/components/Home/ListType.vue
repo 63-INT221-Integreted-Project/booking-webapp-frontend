@@ -1,14 +1,27 @@
 <script setup>
 import dayjs from "dayjs";
-import { onMounted, ref } from "vue-demi";
+import { computed, onMounted, ref } from "vue-demi";
+import EventCategoriesService from "../../services/event-categories.service";
 import EventsService from "../../services/events.service";
 
 const events = ref([]);
+const eventCategories = ref([]);
 
 const form = ref({
     startDateTime: "",
     endDateTime: "",
+    eventCategory: "",
 });
+
+onMounted(async () => {
+    eventCategories.value = await getEventCategories();
+});
+
+const getNameEventCategories = computed(() =>
+    eventCategories.value.map(
+        (eventCategory) => eventCategory.eventCategoryName
+    )
+);
 
 async function filterByDateTime() {
     const { startDateTime, endDateTime } = form.value;
@@ -30,6 +43,10 @@ function getHoursAndMinutes(event) {
             .format("HH:mm")
     );
 }
+
+async function getEventCategories() {
+    return await EventCategoriesService.findAll();
+}
 </script>
 
 <template>
@@ -46,14 +63,17 @@ function getHoursAndMinutes(event) {
                     >
                     <select
                         name="cars"
-                        id="cars"
-                        form="carform"
                         class="bg-gray-200 appearance-none border-2 border-gray-200 rounded-lg w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-blue-500"
+                        placeholder="--- เลือกหมวดหมู่ ---"
+                        v-model="form.eventCategory"
                     >
-                        <option value="volvo">Volvo</option>
-                        <option value="saab">Saab</option>
-                        <option value="opel">Opel</option>
-                        <option value="audi">Audi</option>
+                        <option
+                            v-for="(ec, index) in getNameEventCategories"
+                            :key="index"
+                            :value="ec"
+                        >
+                            {{ ec }}
+                        </option>
                     </select>
                 </div>
                 <div class="mb-8 w-full">
@@ -66,13 +86,11 @@ function getHoursAndMinutes(event) {
                             class="bg-gray-200 appearance-none border-2 border-gray-200 rounded-lg w-1/2 py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-blue-500 mr-2"
                             placeholder="วันที่"
                             v-model="form.startDateTime"
-                            @input="filterByDateTime"
                             type="datetime-local"
                         />
                         <input
                             class="bg-gray-200 appearance-none border-2 border-gray-200 rounded-lg w-1/2 py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-blue-500 ml-2"
                             v-model="form.endDateTime"
-                            @input="filterByDateTime"
                             placeholder="สิ้นสุด"
                             type="datetime-local"
                         />
@@ -88,9 +106,14 @@ function getHoursAndMinutes(event) {
                         type="text"
                     />
                 </div>
-                <div class="mb-8 w-full">
+                <div class="mb-8 w-full flex justify-end">
                     <button
-                        class="bg-red-500 hover:bg-blue-light text-white font-extrabold py-2 px-4 border-b-4 border-red-600 hover:border-blue rounded"
+                        class="transition ease-in-out hover:-translate-y-1 hover:scale-110 duration-300 bg-blue-500 hover:bg-blue-600 text-white font-extrabold py-2 px-4 border-b-4 border-blue-600 hover:border-blue-700 rounded mr-4"
+                    >
+                        ค้นหา
+                    </button>
+                    <button
+                        class="transition ease-in-out hover:-translate-y-1 hover:scale-110 duration-300 bg-red-500 hover:bg-red-600 text-white font-extrabold py-2 px-4 border-b-4 border-red-600 hover:border-red-700 rounded"
                     >
                         ล้างข้อมูล
                     </button>
@@ -110,11 +133,11 @@ function getHoursAndMinutes(event) {
                         alt="calendar"
                         width="500"
                     />
-                    <h2 class="text-2xl text-center">ไม่พบข้อมูล</h2>
+                    <h2 class="text-2xl text-center">ไม่มีการจองในวันนี้</h2>
                 </div>
                 <div class="flex flex-col w-full" v-else>
                     <h2 class="block text-xl mb-4">
-                        ผลการค้นหาทั้งหมด {{ events.length }} กิจกรรม
+                        ผลการค้นหาทั้งหมด {{ events.length }} การจอง
                     </h2>
                     <div
                         class="p-6 my-2 bg-gray-50 border-1 rounded-xl shadow-xl"
@@ -148,15 +171,7 @@ function getHoursAndMinutes(event) {
                                     นาที)
                                 </h3>
                             </div>
-                            <!-- <div>
-                                <h2 class="block text-lg">
-                                    {{ getHoursAndMinutes(event) }}
-                                </h2>
-                                <h3 class="block text-xs">
-                                    {{ event.eventDuration }} นาที
-                                </h3>
-                            </div> -->
-                            <div>
+                            <div class="block">
                                 <button
                                     class="bg-red-500 hover:bg-blue-light text-white font-extrabold py-2 px-4 border-b-4 border-red-600 hover:border-blue rounded"
                                 >
