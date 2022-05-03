@@ -1,8 +1,9 @@
 <script setup>
 import CalendarType from "../components/Home/CalendarType.vue";
 import { useRoute } from "vue-router";
-import { computed } from "vue-demi";
 import ListType from "../components/Home/ListType.vue";
+import EventService from "../services/events.service";
+import { computed } from "vue-demi";
 
 const route = useRoute();
 
