@@ -18,7 +18,7 @@ const props = defineProps({
         type: String,
     },
 });
-const emit = defineEmits(["close", "bookingThisDate"]);
+const emit = defineEmits(["close", "bookingThisDate", "cancleEvent"]);
 
 function getHoursAndMinutes(event) {
     return (
@@ -42,10 +42,9 @@ const isFromFutureOrToday = computed(() => {
         style="background-color: rgba(0, 0, 0, 0.8)"
         class="fixed z-40 top-0 right-0 left-0 bottom-0 h-full w-full"
         v-show.transition.opacity="openModal"
-        @click.self.prevent="emit('close', !openModal)"
     >
         <div
-            class="p-4 max-w-2xl mx-auto relative absolute left-0 right-0 overflow-hidden top-[25%]"
+            class="p-4 max-w-3xl mx-auto relative absolute left-0 right-0 overflow-hidden top-[25%]"
         >
             <div
                 class="shadow absolute right-0 top-0 w-10 h-10 rounded-full bg-white text-gray-500 hover:text-gray-800 inline-flex items-center justify-center cursor-pointer"
@@ -79,19 +78,66 @@ const isFromFutureOrToday = computed(() => {
                     </button>
                 </div>
                 <div v-if="!events.length">
-                    <div class="text-center p-12">
-                        <div class="text-gray-800 text-xl">
-                            ไม่มีกิจกรรมในวันนี้
-                        </div>
+                    <div
+                        class="flex flex-col items-center justify-center w-full p-12"
+                    >
+                        <img
+                            src="/images/_svg/no-data.svg"
+                            alt="calendar"
+                            width="300"
+                        />
+                        <h2 class="text-xl text-center">ไม่มีการจองในวันนี้</h2>
                     </div>
                 </div>
 
                 <div class="mt-4" v-else>
                     <div
-                        class="p-6 my-2 bg-red-50 rounded-xl shadow-lg"
+                        class="p-6 my-2 border-1 rounded-xl shadow-2xl"
                         v-for="event in props.events"
                     >
                         <div class="flex justify-between items-center">
+                            <div>
+                                <h2 class="block text-lg">
+                                    <span class="text-blue-700 font-bold"
+                                        >หมวดหมู่: </span
+                                    >{{ event.eventCategory.eventCategoryName }}
+                                </h2>
+                                <h2 class="block text-lg">
+                                    <span class="text-blue-500 font-bold"
+                                        >ชื่อการจอง: </span
+                                    >{{ event.bookingName }}
+                                </h2>
+                                <h3 class="block text-lg">
+                                    <span class="text-blue-500 font-bold"
+                                        >อีเมล:
+                                    </span>
+                                    {{ event.bookingEmail }}
+                                </h3>
+                                <h3 class="block text-lg">
+                                    <span class="text-blue-500 font-bold"
+                                        >ระยะเวลา:
+                                    </span>
+                                    {{ getHoursAndMinutes(event) }} ({{
+                                        event.eventDuration
+                                    }}
+                                    นาที)
+                                </h3>
+                                <h3 class="block text-lg">
+                                    <span class="text-blue-500 font-bold"
+                                        >หมายเหตุ:
+                                    </span>
+                                    {{ event.eventNotes || "-" }}
+                                </h3>
+                            </div>
+                            <div class="block" v-if="isFromFutureOrToday">
+                                <button
+                                    class="bg-red-500 hover:bg-blue-light text-white font-extrabold py-2 px-4 border-b-4 border-red-600 hover:border-blue rounded"
+                                >
+                                    ยกเลิกการจอง
+                                </button>
+                            </div>
+                        </div>
+                        <!-- <div class="flex justify-between items-center">
                             <div>
                                 <h2 class="block text-lg">
                                     {{ event.bookingName }}
@@ -108,14 +154,15 @@ const isFromFutureOrToday = computed(() => {
                                     {{ event.eventDuration }} นาที
                                 </h3>
                             </div>
-                            <div>
+                            <div v-if="isFromFutureOrToday">
                                 <button
                                     class="bg-red-500 hover:bg-blue-light text-white font-extrabold py-2 px-4 border-b-4 border-red-600 hover:border-blue rounded"
+                                    @click="emit('cancleEvent', event)"
                                 >
                                     ยกเลิกการจอง
                                 </button>
                             </div>
-                        </div>
+                        </div> -->
                     </div>
                 </div>
             </div>
