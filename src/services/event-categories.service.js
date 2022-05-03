@@ -29,6 +29,7 @@ const updateEventCategory = async function (eventCategoryId, eventCategory) {
                 "Content-Type": "application/json",
             },
             body: JSON.stringify({
+                eventCategoryId: eventCategoryId,
                 eventCategoryName: eventCategory.eventCategoryName,
                 eventCategoryDescription:
                     eventCategory.eventCategoryDescription,
@@ -38,9 +39,9 @@ const updateEventCategory = async function (eventCategoryId, eventCategory) {
     ).then((res) => res.json());
 };
 
-const deleteEventCategory = async function (eventCategory) {
+const deleteEventCategory = async function (eventCategoryId) {
     return await fetch(
-        `${BaseUrl.getUrl()}/event-categories/${eventCategory.id}`,
+        `${BaseUrl.getUrl()}/event-categories/${eventCategoryId}`,
         {
             method: "DELETE",
             headers: {
