@@ -40,6 +40,7 @@ const props = defineProps({
 const emit = defineEmits(["close", "onSave"]);
 
 const form = ref({
+    eventId: props.event?.eventId || "",
     bookingName: props.event?.bookingName || "",
     bookingEmail: props.event?.bookingEmail || "",
     eventStartTime: props.event?.eventStartTime || "",
@@ -147,6 +148,7 @@ const isEmailInvalid = computed(() => {
                         }"
                         type="text"
                         v-model="form.bookingName"
+                        :readonly="form.eventId"
                     />
                     <p
                         class="text-error text-xs text-red-600"
@@ -169,6 +171,7 @@ const isEmailInvalid = computed(() => {
                         }"
                         type="text"
                         v-model="form.bookingEmail"
+                        :readonly="form.eventId"
                     />
                     <p
                         class="text-error text-xs text-red-600"
@@ -193,6 +196,7 @@ const isEmailInvalid = computed(() => {
                                 isInvalid && !form.eventCategory,
                         }"
                         @blur="checkIfEventCategoryExists"
+                        :readonly="form.eventId"
                     />
                     <datalist id="eventCategoriesList">
                         <template v-for="(ec, index) in getEventCategoriesName">
@@ -242,6 +246,7 @@ const isEmailInvalid = computed(() => {
                                 isInvalid && isEventDurationInvalid,
                         }"
                         v-model="form.eventDuration"
+                        :readonly="form.eventId"
                     />
                     <p
                         class="text-error text-xs text-red-600"
