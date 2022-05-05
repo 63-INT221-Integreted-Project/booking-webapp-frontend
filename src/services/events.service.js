@@ -29,6 +29,20 @@ const createEvent = async function (event) {
     });
 };
 
+const updateEvent = async function (eventId, event) {
+    return await fetch(`${BaseUrl.getUrl()}/events/${eventId}`, {
+        method: "PUT",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+            eventId: eventId,
+            eventStartTime: event.eventStartTime,
+            eventNotes: event.eventNotes,
+        }),
+    });
+};
+
 const cancleEvent = async function (eventId) {
     return await fetch(`${BaseUrl.getUrl()}/events/${eventId}`, {
         method: "DELETE",
@@ -40,4 +54,5 @@ export default {
     findAllByBetweenDate,
     createEvent,
     cancleEvent,
+    updateEvent,
 };
