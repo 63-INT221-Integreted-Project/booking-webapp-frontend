@@ -12,7 +12,7 @@ const addEvent = async function (event) {
             eventStartTime: event.eventStartTime,
             eventNotes: event.eventNotes,
             eventCategoryId: {
-                id: event.eventCategoryId,
+                eventCategoryId: event.eventCategoryId,
             },
         }),
     }).then((res) => res.json());
@@ -21,6 +21,12 @@ const addEvent = async function (event) {
 const findAllByBetweenDate = async function (date1, date2) {
     return await fetch(
         `${BaseUrl.getUrl()}/events/check-between?date1=${date1}&date2=${date2}`
+    ).then((res) => res.json());
+};
+
+const search = async function (dateStart, dateEnd, name, word) {
+    return await fetch(
+        `${BaseUrl.getUrl()}/events/filter/event?dateStart=${dateStart}&dateEnd=${dateEnd}&name=${name}&word=${word}`
     ).then((res) => res.json());
 };
 
@@ -48,6 +54,7 @@ const cancleEvent = async function (eventId) {
 };
 
 export default {
+    search,
     addEvent,
     findAllByBetweenDate,
     createEvent,
