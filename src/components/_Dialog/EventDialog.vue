@@ -78,6 +78,17 @@ function compareDate() {
 const showErrorList = computed(() => {
     return props.errorType.join("<br/>");
 });
+
+const isEmailInvalid = computed(() => {
+    if (!form.value.bookingEmail) return "กรุณากรอกอีเมล";
+    if (
+        !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(
+            form.value.bookingEmail
+        )
+    )
+        return "กรุณากรอกรูปแบบอีเมล เช่น @gmail.com, @hotmail.com";
+    return "";
+});
 </script>
 
 <template>
@@ -154,16 +165,16 @@ const showErrorList = computed(() => {
                         class="bg-gray-200 appearance-none border-2 border-gray-200 rounded-lg w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-blue-500"
                         :class="{
                             'border-red-500 border-3':
-                                isInvalid && !form.bookingEmail,
+                                isInvalid && isEmailInvalid,
                         }"
                         type="text"
                         v-model="form.bookingEmail"
                     />
                     <p
                         class="text-error text-xs text-red-600"
-                        v-if="isInvalid && !form.bookingEmail"
+                        v-if="isInvalid && isEmailInvalid"
                     >
-                        กรุณากรอกอีเมล
+                        {{ isEmailInvalid }}
                     </p>
                 </div>
                 <div class="mb-4">
@@ -177,6 +188,10 @@ const showErrorList = computed(() => {
                         type="text"
                         v-model="form.eventCategory"
                         list="eventCategoriesList"
+                        :class="{
+                            'border-red-500 border-3':
+                                isInvalid && !form.eventCategory,
+                        }"
                         @blur="checkIfEventCategoryExists"
                     />
                     <datalist id="eventCategoriesList">
@@ -184,6 +199,12 @@ const showErrorList = computed(() => {
                             <option :data-value="ec">{{ ec }}</option>
                         </template>
                     </datalist>
+                    <p
+                        class="text-error text-xs text-red-600"
+                        v-if="isInvalid && !form.eventCategory"
+                    >
+                        กรุณาเลือกหมวดหมู่การจอง
+                    </p>
                 </div>
                 <div class="mb-4">
                     <label
@@ -218,15 +239,15 @@ const showErrorList = computed(() => {
                         type="text"
                         :class="{
                             'border-red-500 border-3':
-                                isInvalid && !form.eventDuration,
+                                isInvalid && isEventDurationInvalid,
                         }"
                         v-model="form.eventDuration"
                     />
                     <p
                         class="text-error text-xs text-red-600"
-                        v-if="isInvalid && !form.eventDuration"
+                        v-if="isInvalid && isEventDurationInvalid"
                     >
-                        กรุณากรอกระยะเวลา และระยะเวลาต้องอยู่ในช่วง 1 - 480 นาที
+                        {{ isEventDurationInvalid }}
                     </p>
                 </div>
                 <div class="mb-4">
