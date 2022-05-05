@@ -28,7 +28,9 @@ function getActiveNavbar(path) {
 </script>
 
 <template>
-    <nav class="container flex justify-around py-8 mx-auto bg-slate-100 mt-32">
+    <nav
+        class="container flex justify-between py-8 mx-auto bg-slate-100 mt-32 px-12"
+    >
         <div class="flex items-center">
             <h3 class="text-2xl font-medium text-blue-500">OASIP</h3>
         </div>
@@ -61,7 +63,7 @@ function getActiveNavbar(path) {
             <a href="">ติดต่อพวกเรา</a> -->
         </div>
         <!-- right header section -->
-        <div class="flex items-center space-x-2">
+        <!-- <div class="flex items-center space-x-2">
             <a href="#">
                 <svg
                     xmlns="http://www.w3.org/2000/svg"
@@ -116,7 +118,7 @@ function getActiveNavbar(path) {
                     />
                 </svg>
             </a>
-        </div>
+        </div> -->
     </nav>
 </template>
 
