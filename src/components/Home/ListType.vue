@@ -11,6 +11,7 @@ const form = ref({
     startDateTime: "",
     endDateTime: "",
     eventCategory: "",
+    search: "",
 });
 
 onMounted(async () => {
@@ -46,6 +47,16 @@ function getHoursAndMinutes(event) {
 
 async function getEventCategories() {
     return await EventCategoriesService.findAll();
+}
+
+async function search() {
+    let data = await EventsService.search(
+        dayjs(form.value.startDateTime).format("YYYY-MM-DD HH:mm:ss"),
+        dayjs(form.value.endDateTime).format("YYYY-MM-DD HH:mm:ss"),
+        form.value.eventCategory,
+        form.value.search
+    );
+    events.value = data;
 }
 </script>
 
@@ -104,11 +115,13 @@ async function getEventCategories() {
                     <input
                         class="bg-gray-200 appearance-none border-2 border-gray-200 rounded-lg w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-blue-500"
                         type="text"
+                        v-model="form.search"
                     />
                 </div>
                 <div class="mb-8 w-full flex justify-end">
                     <button
                         class="transition ease-in-out hover:-translate-y-1 hover:scale-110 duration-300 bg-blue-500 hover:bg-blue-600 text-white font-extrabold py-2 px-4 border-b-4 border-blue-600 hover:border-blue-700 rounded mr-4"
+                        @click="search"
                     >
                         ค้นหา
                     </button>
