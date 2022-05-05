@@ -164,17 +164,34 @@ function openEventScheduleModal(date) {
     };
 }
 
-function openBookingEventModal(date) {
+function openBookingEventModal(date, event) {
     scheduleModal.value.open = false;
     eventModal.value = {
         open: true,
-        event: {
-            eventStartTime: dayjs(date).format("YYYY-MM-DDTHH:mm"),
-        },
+        //*กรณีมี event หรือเราจะอัพเดท ให้ใช้ Logic แรก
+        ...(event
+            ? {
+                  event: {
+                      ...event,
+                      eventCategory: event.eventCategory.eventCategoryName,
+                      eventStartTime: dayjs(event.eventStartTime).format(
+                          "YYYY-MM-DDTHH:mm"
+                      ),
+                  },
+              }
+            : {
+                  event: {
+                      eventStartTime: dayjs(date).format("YYYY-MM-DDTHH:mm"),
+                  },
+              }),
         isInvalid: false,
         errorType: [],
         title: `เพิ่ม Event`,
     };
+}
+
+function editBookingEventModal(event) {
+    openBookingEventModal(null, event);
 }
 
 function validate(form) {
@@ -223,7 +240,7 @@ function validate(form) {
     return true;
 }
 
-async function addEvent(form) {
+async function saveEvent(form) {
     if (!validate(form)) return;
     let findIsInRange = events.value.find((event) => {
         if (event.eventCategory.eventCategoryName !== form.eventCategory)
@@ -241,7 +258,8 @@ async function addEvent(form) {
             .add(form.eventDuration, "minute")
             .format("YYYY-MM-DD HH:mm");
         return (
-            (startFromForm >= startFromEvent &&
+            (event.eventId !== form.eventId &&
+                startFromForm >= startFromEvent &&
                 startFromForm <= endFromEvent) ||
             (endFromForm >= startFromEvent && endFromForm <= endFromEvent)
         );
@@ -251,16 +269,25 @@ async function addEvent(form) {
         eventModal.value.errorType = ["- หมวดหมู่นี่มีการจองในช่วงเวลานี้แล้ว"];
         return;
     }
-    await EventService.createEvent({
-        ...form,
-        eventCategoryId: eventCategories.value.find(
-            (eventCategory) =>
-                eventCategory.eventCategoryName === form.eventCategory
-        ).eventCategoryId,
-        eventStartTime: dayjs(form.eventStartTime).format(
-            "YYYY-MM-DD HH:mm:ss"
-        ),
-    });
+    if (form.eventId) {
+        await EventService.updateEvent(form.eventId, {
+            eventStartTime: dayjs(form.eventStartTime).format(
+                "YYYY-MM-DD HH:mm:ss"
+            ),
+            eventNotes: form.eventNotes,
+        });
+    } else {
+        await EventService.createEvent({
+            ...form,
+            eventCategoryId: eventCategories.value.find(
+                (eventCategory) =>
+                    eventCategory.eventCategoryName === form.eventCategory
+            ).eventCategoryId,
+            eventStartTime: dayjs(form.eventStartTime).format(
+                "YYYY-MM-DD HH:mm:ss"
+            ),
+        });
+    }
     await fetchEvents();
     eventModal.value = {
         open: false,
@@ -307,7 +334,7 @@ async function submitCancleEvent(event) {
             :eventCategories="eventCategories"
             :isInvalid="eventModal.isInvalid"
             @close="eventModal.open = false"
-            @onSave="addEvent"
+            @onSave="saveEvent"
         />
         <ScheduleEventDialog
             v-if="scheduleModal.open"
@@ -318,6 +345,7 @@ async function submitCancleEvent(event) {
             @close="scheduleModal.open = false"
             @bookingThisDate="openBookingEventModal"
             @cancleEvent="warningCancleEvent"
+            @editEvent="editBookingEventModal"
         ></ScheduleEventDialog>
 
         <div class="col-span-3">
