@@ -129,13 +129,23 @@ const isFromFutureOrToday = computed(() => {
                                     {{ event.eventNotes || "-" }}
                                 </h3>
                             </div>
-                            <div class="block" v-if="isFromFutureOrToday">
-                                <button
-                                    class="bg-red-500 hover:bg-blue-light text-white font-extrabold py-2 px-4 border-b-4 border-red-600 hover:border-blue rounded"
-                                    @click="emit('cancleEvent', event)"
-                                >
-                                    ยกเลิกการจอง
-                                </button>
+                            <div v-if="isFromFutureOrToday">
+                                <div class="block mb-2">
+                                    <button
+                                        class="bg-yellow-500 hover:bg-blue-light text-white font-extrabold py-2 px-4 border-b-4 border-yellow-600 rounded mr-2"
+                                        @click="emit('editEvent', event)"
+                                    >
+                                        แก้ไขการจอง
+                                    </button>
+                                </div>
+                                <div class="block">
+                                    <button
+                                        class="bg-red-500 hover:bg-blue-light text-white font-extrabold py-2 px-4 border-b-4 border-red-600 rounded"
+                                        @click="emit('cancleEvent', event)"
+                                    >
+                                        ยกเลิกการจอง
+                                    </button>
+                                </div>
                             </div>
                         </div>
                         <!-- <div class="flex justify-between items-center">
