@@ -26,7 +26,7 @@ const findAllByBetweenDate = async function (date1, date2) {
 
 const search = async function (dateStart, dateEnd, name, word) {
     return await fetch(
-        `${BaseUrl.getUrl()}/events/filter/event?dateStart=${dateStart}&dateEnd=${dateEnd}&name=${name}&word=${word}`
+        `${BaseUrl.getUrl()}/events/search?dateStart=${dateStart}&dateEnd=${dateEnd}&name=${name}&word=${word}`
     ).then((res) => res.json());
 };
 
