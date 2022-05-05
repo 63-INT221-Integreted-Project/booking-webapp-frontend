@@ -2,8 +2,12 @@
 import dayjs from "dayjs";
 import { computed, onMounted, ref } from "vue-demi";
 import EventCategoriesService from "../../services/event-categories.service";
-import EventsService from "../../services/events.service";
+import EventService from "../../services/events.service";
 
+import { useModalStore } from "../../stores/modal";
+import WarningDialog from "../_Dialog/WarningDialog.vue";
+
+const modal = useModalStore();
 const events = ref([]);
 const eventCategories = ref([]);
 
@@ -32,7 +36,7 @@ async function filterByDateTime() {
     const endDate = endDateTime
         ? dayjs(endDateTime).format("YYYY-MM-DD HH:mm:ss")
         : dayjs().format("YYYY-MM-DD HH:mm:ss");
-    events.value = await EventsService.findAllByBetweenDate(startDate, endDate);
+    events.value = await EventService.findAllByBetweenDate(startDate, endDate);
 }
 
 function getHoursAndMinutes(event) {
@@ -45,12 +49,22 @@ function getHoursAndMinutes(event) {
     );
 }
 
+function getDate(event) {
+    return (
+        dayjs(event.eventStartTime).format("DD/MM/YYYY") +
+        " - " +
+        dayjs(event.eventStartTime)
+            .add(event.eventDuration, "minute")
+            .format("DD/MM/YYYY")
+    );
+}
+
 async function getEventCategories() {
     return await EventCategoriesService.findAll();
 }
 
 async function search() {
-    let data = await EventsService.search(
+    let data = await EventService.search(
         dayjs(form.value.startDateTime).format("YYYY-MM-DD HH:mm:ss"),
         dayjs(form.value.endDateTime).format("YYYY-MM-DD HH:mm:ss"),
         form.value.eventCategory,
@@ -58,10 +72,43 @@ async function search() {
     );
     events.value = data;
 }
+
+function clearInputFilter() {
+    form.value = {
+        startDateTime: "",
+        endDateTime: "",
+        eventCategory: "",
+        search: "",
+    };
+}
+
+function warningCancleEvent(event) {
+    modal.warningModal = {
+        isOpen: true,
+        item: event,
+    };
+}
+
+async function submitCancleEvent(event) {
+    await EventService.cancleEvent(event.eventId);
+    modal.warningModal = {
+        isOpen: false,
+        item: null,
+    };
+    await search();
+}
 </script>
 
 <template>
     <div class="grid grid-rows-3 grid-flow-col gap-x-12 gap-y-0 mt-4">
+        <WarningDialog
+            v-if="modal.warningModal.isOpen"
+            :openModal="modal.warningModal.isOpen"
+            :item="modal.warningModal.item"
+            @close="modal.toggleWarningModal({ isOpen: false, item: null })"
+            @remove="submitCancleEvent"
+            :name="modal.getNameWarningModal('event')"
+        ></WarningDialog>
         <div class="col-span-1">
             <div
                 class="overflow-hidden bg-white rounded-lg shadow-xl w-full p-8 h-full"
@@ -127,6 +174,7 @@ async function search() {
                     </button>
                     <button
                         class="transition ease-in-out hover:-translate-y-1 hover:scale-110 duration-300 bg-red-500 hover:bg-red-600 text-white font-extrabold py-2 px-4 border-b-4 border-red-600 hover:border-red-700 rounded"
+                        @click="clearInputFilter"
                     >
                         ล้างข้อมูล
                     </button>
@@ -176,6 +224,12 @@ async function search() {
                                 </h3>
                                 <h3 class="block text-lg">
                                     <span class="text-blue-500 font-bold"
+                                        >วันที่:
+                                    </span>
+                                    {{ getDate(event) }}
+                                </h3>
+                                <h3 class="block text-lg">
+                                    <span class="text-blue-500 font-bold"
                                         >ระยะเวลา:
                                     </span>
                                     {{ getHoursAndMinutes(event) }} ({{
@@ -187,6 +241,7 @@ async function search() {
                             <div class="block">
                                 <button
                                     class="bg-red-500 hover:bg-blue-light text-white font-extrabold py-2 px-4 border-b-4 border-red-600 hover:border-blue rounded"
+                                    @click="warningCancleEvent(event)"
                                 >
                                     ยกเลิกการจอง
                                 </button>
