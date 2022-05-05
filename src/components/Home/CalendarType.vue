@@ -178,12 +178,14 @@ function openBookingEventModal(date) {
 }
 
 function validate(form) {
+    eventModal.value.errorType = [];
     if (
         !form.bookingName ||
         !form.bookingEmail ||
         !form.eventDuration ||
         !form.eventCategory ||
-        !form.eventStartTime
+        !form.eventStartTime ||
+        !/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,5})+$/.test(form.bookingEmail)
     ) {
         if (!form.bookingName) {
             eventModal.value.errorType.push("- กรุณากรอกชื่อผู้จอง");
@@ -191,14 +193,29 @@ function validate(form) {
         if (!form.bookingEmail) {
             eventModal.value.errorType.push("- กรุณากรอกอีเมลผู้จอง");
         }
+        if (
+            !/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,5})+$/.test(
+                form.bookingEmail
+            )
+        ) {
+            eventModal.value.errorType.push("- รูปแบบอีเมลไม่ถูกต้อง");
+        }
         if (!form.eventStartTime) {
             eventModal.value.errorType.push("- กรุณากรอกเวลาเริ่มการจอง");
         }
         if (!form.eventCategory) {
-            eventModal.value.errorType.push("- กรุณาเลือกประเภทการจอง");
+            eventModal.value.errorType.push("- กรุณาเลือกหมวดหมู่การจอง");
         }
         if (!form.eventDuration) {
             eventModal.value.errorType.push("- กรุณากรอกระยะเวลาการจอง");
+        }
+        if (isNaN(form.eventDuration)) {
+            eventModal.value.errorType.push("- ระยะเวลาต้องเป็นตัวเลขเท่านั้น");
+        }
+        if (!form.eventDuration >= 1 && !form.eventDuration <= 480) {
+            eventModal.value.errorType.push(
+                "- ช่วงระยะเวลาในการจองต้องอยู่ในช่วง 1 - 480 นาที"
+            );
         }
         eventModal.value.isInvalid = true;
         return false;
@@ -236,12 +253,10 @@ async function addEvent(form) {
     }
     await EventService.createEvent({
         ...form,
-        eventCategory: {
-            eventCategoryId: eventCategories.value.find(
-                (eventCategory) =>
-                    eventCategory.eventCategoryName === form.eventCategory
-            ).eventCategoryId,
-        },
+        eventCategoryId: eventCategories.value.find(
+            (eventCategory) =>
+                eventCategory.eventCategoryName === form.eventCategory
+        ).eventCategoryId,
         eventStartTime: dayjs(form.eventStartTime).format(
             "YYYY-MM-DD HH:mm:ss"
         ),
@@ -550,16 +565,16 @@ async function submitCancleEvent(event) {
                                         <template
                                             v-for="(
                                                 event, index
-                                            ) in events.filter(
-                                                (e, i) =>
-                                                    dateCompare(
-                                                        date,
-                                                        e.eventStartTime
-                                                    ) && i < 3
+                                            ) in events.filter((e, i) =>
+                                                dateCompare(
+                                                    date,
+                                                    e.eventStartTime
+                                                )
                                             )"
                                         >
                                             <div
                                                 class="px-2 py-1 rounded-lg mt-1 overflow-hidden border border-blue-200 text-blue-800 bg-blue-100"
+                                                v-if="index <= 1"
                                             >
                                                 <p
                                                     v-html="event.bookingName"
@@ -568,7 +583,7 @@ async function submitCancleEvent(event) {
                                             </div>
                                             <div
                                                 class="px-2 py-1 rounded-lg mt-1 overflow-hidden border border-gray-400 text-black bg-gray-100"
-                                                v-if="index === 1"
+                                                v-else
                                             >
                                                 <p
                                                     class="text-sm truncate leading-tight"
