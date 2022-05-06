@@ -7,9 +7,30 @@ const findAllByBetweenDate = async function (date1, date2) {
 };
 
 const search = async function (dateStart, dateEnd, name, word) {
-    return await fetch(
-        `${BaseUrl.getUrl()}/events/search?dateStart=${dateStart}&dateEnd=${dateEnd}&name=${name}&word=${word}`
-    ).then((res) => res.json());
+    if(dateStart != "Invalid Date" && dateEnd != "Invalid Date" && name != ""){
+        return await fetch(
+            `${BaseUrl.getUrl()}/events/search?dateStart=${dateStart}&dateEnd=${dateEnd}&category=${name}`
+        ).then((res) => res.json());
+    }
+    else if (dateStart != "Invalid Date" && dateEnd != "Invalid Date" && name == ""){
+        return await fetch(
+            `${BaseUrl.getUrl()}/events/search/?dateStart=${dateStart}&dateEnd=${dateEnd}`
+        ).then((res) => res.json());
+    }
+    else if (dateStart == "Invalid Date" && dateEnd == "Invalid Date" && name != ""){
+        return await fetch(
+            `${BaseUrl.getUrl()}/events/search?category=${name}`
+        ).then((res) => res.json());
+    }
+    else{
+        return await fetch(
+            `${BaseUrl.getUrl()}/events/`
+        ).then((res) => res.json());
+    }
+    // โค้ดเดิมโจม
+    // return await fetch(
+    //     `${BaseUrl.getUrl()}/events/search/filter/test?dateStart=${dateStart}&dateEnd=${dateEnd}&name=${name}&word=${word}`
+    // ).then((res) => res.json());
 };
 
 const createEvent = async function (event) {
