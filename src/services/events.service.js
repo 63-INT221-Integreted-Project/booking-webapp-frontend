@@ -25,7 +25,7 @@ const search = async function (dateStart, dateEnd, name, word) {
     }
     else{
         return await fetch(
-            `${BaseUrl.getUrl()}/events/`
+            `${BaseUrl.getUrl()}/events/find/sort`
         ).then((res) => res.json());
     }
 }
@@ -47,13 +47,13 @@ else if(word != ""){
     }
     else{
         return await fetch(
-            `${BaseUrl.getUrl()}/events/`
+            `${BaseUrl.getUrl()}/events/find/sort/`
         ).then((res) => res.json());
     }
 }
 else{
     return await fetch(
-        `${BaseUrl.getUrl()}/events/`
+        `${BaseUrl.getUrl()}/events/find/sort/`
     ).then((res) => res.json());
 }
     // โค้ดเดิมโจม
