@@ -3,9 +3,25 @@ import CalendarType from "../components/Home/CalendarType.vue";
 import { useRoute } from "vue-router";
 import ListType from "../components/Home/ListType.vue";
 import EventService from "../services/events.service";
-import { computed } from "vue-demi";
+import { computed, onMounted, ref } from "vue-demi";
+import EventDialog from "../components/_Dialog/EventDialog.vue";
+import EventCategoriesService from "@/services/event-categories.service";
+import dayjs from "dayjs";
+import { useModalStore } from "../stores/modal";
+import WarningDialog from "../components/_Dialog/WarningDialog.vue";
+
+const calendarType = ref(null);
+const listType = ref(null);
 
 const route = useRoute();
+
+const modal = useModalStore();
+
+const eventCategories = ref([]);
+
+onMounted(async () => {
+    eventCategories.value = await getEventCategories();
+});
 
 const getTabItem = computed(() => {
     if (route.hash === "#calendar" || !route.hash) {
@@ -15,10 +31,160 @@ const getTabItem = computed(() => {
         return "list";
     }
 });
+
+async function getEventCategories() {
+    return await EventCategoriesService.findAll();
+}
+
+function validate(form) {
+    modal.eventModal.errorType = [];
+    if (
+        !form.bookingName ||
+        !form.bookingEmail ||
+        !form.eventDuration ||
+        !form.eventCategory ||
+        !form.eventStartTime ||
+        !/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,5})+$/.test(form.bookingEmail)
+    ) {
+        if (!form.bookingName) {
+            modal.eventModal.errorType.push("- กรุณากรอกชื่อผู้จอง");
+        }
+        if (!form.bookingEmail) {
+            modal.eventModal.errorType.push("- กรุณากรอกอีเมลผู้จอง");
+        }
+        if (
+            !/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,5})+$/.test(
+                form.bookingEmail
+            )
+        ) {
+            modal.eventModal.errorType.push("- รูปแบบอีเมลไม่ถูกต้อง");
+        }
+        if (!form.eventStartTime) {
+            modal.eventModal.errorType.push("- กรุณากรอกเวลาเริ่มการจอง");
+        }
+        if (!form.eventCategory) {
+            modal.eventModal.errorType.push("- กรุณาเลือกหมวดหมู่การจอง");
+        }
+        if (!form.eventDuration) {
+            modal.eventModal.errorType.push("- กรุณากรอกระยะเวลาการจอง");
+        }
+        if (isNaN(form.eventDuration)) {
+            modal.eventModal.errorType.push("- ระยะเวลาต้องเป็นตัวเลขเท่านั้น");
+        }
+        if (!form.eventDuration >= 1 && !form.eventDuration <= 480) {
+            modal.eventModal.errorType.push(
+                "- ช่วงระยะเวลาในการจองต้องอยู่ในช่วง 1 - 480 นาที"
+            );
+        }
+        modal.eventModal.isInvalid = true;
+        return false;
+    }
+    return true;
+}
+
+async function saveEvent(form) {
+    if (!validate(form)) return;
+    let events = await EventService.findAllByBetweenDate(
+        dayjs(form.eventStartTime).format("YYYY-MM-DD HH:mm:ss"),
+        dayjs(form.eventStartTime)
+            .add(form.eventDuration, "minute")
+            .format("YYYY-MM-DD HH:mm:ss")
+    );
+    let findIsInRange = events.find((event) => {
+        if (event.eventCategory.eventCategoryName !== form.eventCategory)
+            return undefined;
+        let startFromEvent = dayjs(event.eventStartTime).format(
+            "YYYY-MM-DD HH:mm"
+        );
+        let startFromForm = dayjs(form.eventStartTime).format(
+            "YYYY-MM-DD HH:mm"
+        );
+        let endFromEvent = dayjs(event.eventStartTime)
+            .add(event.eventDuration, "minute")
+            .format("YYYY-MM-DD HH:mm");
+        let endFromForm = dayjs(form.eventStartTime)
+            .add(form.eventDuration, "minute")
+            .format("YYYY-MM-DD HH:mm");
+        return (
+            (event.eventId !== form.eventId &&
+                startFromForm >= startFromEvent &&
+                startFromForm <= endFromEvent) ||
+            (endFromForm >= startFromEvent && endFromForm <= endFromEvent)
+        );
+    });
+    if (findIsInRange) {
+        modal.eventModal.isInvalid = true;
+        modal.eventModal.errorType = ["- หมวดหมู่นี่มีการจองในช่วงเวลานี้แล้ว"];
+        return;
+    }
+    if (form.eventId) {
+        await EventService.updateEvent(form.eventId, {
+            eventStartTime: dayjs(form.eventStartTime).format(
+                "YYYY-MM-DD HH:mm:ss"
+            ),
+            eventNotes: form.eventNotes,
+            eventCategoryId: eventCategories.value.find(
+                (eventCategory) =>
+                    eventCategory.eventCategoryName === form.eventCategory
+            ).eventCategoryId,
+        });
+    } else {
+        await EventService.createEvent({
+            ...form,
+            eventCategoryId: eventCategories.value.find(
+                (eventCategory) =>
+                    eventCategory.eventCategoryName === form.eventCategory
+            ).eventCategoryId,
+            eventStartTime: dayjs(form.eventStartTime).format(
+                "YYYY-MM-DD HH:mm:ss"
+            ),
+        });
+    }
+    if (getTabItem.value === "calendar") await calendarType.value.fetchEvents();
+    if (getTabItem.value === "list") await listType.value.search();
+    modal.clearEventModal();
+}
+
+function warningCancleEvent(event) {
+    modal.scheduleModal.open = false;
+    modal.warningModal = {
+        isOpen: true,
+        item: event,
+    };
+}
+
+async function submitCancleEvent(event) {
+    await EventService.cancleEvent(event.eventId);
+    modal.warningModal = {
+        isOpen: false,
+        item: null,
+    };
+    if (getTabItem.value === "calendar") await calendarType.value.fetchEvents();
+    if (getTabItem.value === "list") await listType.value.search();
+}
 </script>
 
 <template>
     <div class="block w-full">
+        <WarningDialog
+            v-if="modal.warningModal.isOpen"
+            :openModal="modal.warningModal.isOpen"
+            :item="modal.warningModal.item"
+            @close="modal.toggleWarningModal({ isOpen: false, item: null })"
+            @remove="submitCancleEvent"
+            :name="modal.getNameWarningModal('event')"
+        ></WarningDialog>
+        <EventDialog
+            v-if="modal.eventModal.open"
+            :openModal="modal.eventModal.open"
+            :title="modal.eventModal.title"
+            :event="modal.eventModal.event"
+            :errorType="modal.eventModal.errorType"
+            :eventCategories="eventCategories"
+            :isInvalid="modal.eventModal.isInvalid"
+            @close="modal.eventModal.open = false"
+            @onSave="saveEvent"
+        />
         <div class="flex justify-center">
             <ul
                 class="flex flex-wrap text-sm font-medium text-center text-gray-500 dark:text-gray-400"
@@ -46,8 +212,16 @@ const getTabItem = computed(() => {
                 </li>
             </ul>
         </div>
-        <CalendarType v-if="getTabItem === 'calendar'"></CalendarType>
-        <ListType v-if="getTabItem === 'list'"></ListType>
+        <CalendarType
+            ref="calendarType"
+            v-if="getTabItem === 'calendar'"
+            :eventCategories="eventCategories"
+        ></CalendarType>
+        <ListType
+            v-if="getTabItem === 'list'"
+            ref="listType"
+            :eventCategories="eventCategories"
+        ></ListType>
     </div>
 </template>
 

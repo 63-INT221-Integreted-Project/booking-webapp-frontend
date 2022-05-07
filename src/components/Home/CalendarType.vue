@@ -1,16 +1,30 @@
 <script setup>
 import { ref } from "@vue/reactivity";
-import { computed, onMounted } from "@vue/runtime-core";
+import { computed, onMounted, defineExpose } from "@vue/runtime-core";
 import EventService from "@/services/events.service";
 import EventCategoriesService from "@/services/event-categories.service";
 import EventDialog from "@/components/_Dialog/EventDialog.vue";
 import dayjs from "dayjs";
 
 import { useModalStore } from "../../stores/modal";
+import { useUtilStore } from "../../stores/utils";
 import ScheduleEventDialog from "../_Dialog/ScheduleEventDialog.vue";
 import WarningDialog from "../_Dialog/WarningDialog.vue";
 
 const modal = useModalStore();
+
+const util = useUtilStore();
+
+defineExpose({ fetchEvents });
+
+const props = defineProps({
+    eventCategories: {
+        type: Array,
+        default: () => [],
+    },
+});
+
+const { openBookingEventModal, editBookingEventModal } = modal;
 
 const MONTH_NAMES = [
     "มกราคม",
@@ -32,24 +46,10 @@ const year = ref(new Date().getFullYear());
 const no_of_days = ref([]);
 const blankdays = ref([]);
 const events = ref([]);
-const eventCategories = ref([]);
-const eventModal = ref({
-    open: false,
-    event: {},
-    isInvalid: false,
-    errorType: [],
-});
-const scheduleModal = ref({
-    open: false,
-    events: [],
-    title: "",
-    date: "",
-});
 
 onMounted(async () => {
     getNoOfDays();
     await fetchEvents();
-    eventCategories.value = await getEventCategories();
 });
 
 function isToday(date) {
@@ -68,10 +68,6 @@ async function fetchEvents() {
             new Date(year.value, month.value, no_of_days.value.length)
         ).format("YYYY-MM-DD [23:59:59]")
     );
-}
-
-async function getEventCategories() {
-    return await EventCategoriesService.findAll();
 }
 
 function getNoOfDays() {
@@ -101,23 +97,13 @@ function getNoOfDays() {
     no_of_days.value = daysArray;
 }
 
-//*Create convert function from example 2022-4-24T01:30:00.000-05:00 to 2022-4-24 01:30:00
-function formatDate(date) {
-    return dayjs(date).format("YYYY-MM-DD HH:mm:ss");
-}
-
-function dateCompare(date, dateEvent) {
-    return (
-        dayjs(`${year.value}-${month.value + 1}-${date}`).format(
-            "YYYY-MM-DD"
-        ) === dayjs(dateEvent).format("YYYY-MM-DD")
-    );
-}
-
-const bookingToday = computed(() => {
-    return events.value.filter((event) =>
-        dateCompare(dayjs().date(), event.eventStartTime)
-    ).length;
+const getEventToday = computed(() => {
+    return events.value
+        .filter((event) => util.dateCompare(dayjs(), event.eventStartTime))
+        .sort(
+            (a, b) =>
+                dayjs(a.eventStartTime).unix() - dayjs(b.eventStartTime).unix()
+        );
 });
 
 const bookingInThisMonth = computed(() => {
@@ -148,7 +134,7 @@ function openEventScheduleModal(date) {
     let dateConvert = dayjs(`${year.value}-${month.value + 1}-${date}`).format(
         "DD/MM/YYYY"
     );
-    scheduleModal.value = {
+    modal.openScheduleModal({
         title: `การจองประจำวันที่ ${dateConvert}`,
         open: true,
         date: dayjs(`${year.value}-${month.value + 1}-${date}`).format(
@@ -161,198 +147,64 @@ function openEventScheduleModal(date) {
                     "YYYY-MM-DD"
                 )
         ),
-    };
-}
-
-function openBookingEventModal(date, event) {
-    scheduleModal.value.open = false;
-    eventModal.value = {
-        open: true,
-        //*กรณีมี event หรือเราจะอัพเดท ให้ใช้ Logic แรก
-        ...(event
-            ? {
-                  event: {
-                      ...event,
-                      eventCategory: event.eventCategory.eventCategoryName,
-                      eventStartTime: dayjs(event.eventStartTime).format(
-                          "YYYY-MM-DDTHH:mm"
-                      ),
-                  },
-              }
-            : {
-                  event: {
-                      eventStartTime: dayjs(date).format("YYYY-MM-DDTHH:mm"),
-                  },
-              }),
-        isInvalid: false,
-        errorType: [],
-        title: `เพิ่ม Event`,
-    };
-}
-
-function editBookingEventModal(event) {
-    openBookingEventModal(null, event);
-}
-
-function validate(form) {
-    eventModal.value.errorType = [];
-    if (
-        !form.bookingName ||
-        !form.bookingEmail ||
-        !form.eventDuration ||
-        !form.eventCategory ||
-        !form.eventStartTime ||
-        !/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,5})+$/.test(form.bookingEmail)
-    ) {
-        if (!form.bookingName) {
-            eventModal.value.errorType.push("- กรุณากรอกชื่อผู้จอง");
-        }
-        if (!form.bookingEmail) {
-            eventModal.value.errorType.push("- กรุณากรอกอีเมลผู้จอง");
-        }
-        if (
-            !/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,5})+$/.test(
-                form.bookingEmail
-            )
-        ) {
-            eventModal.value.errorType.push("- รูปแบบอีเมลไม่ถูกต้อง");
-        }
-        if (!form.eventStartTime) {
-            eventModal.value.errorType.push("- กรุณากรอกเวลาเริ่มการจอง");
-        }
-        if (!form.eventCategory) {
-            eventModal.value.errorType.push("- กรุณาเลือกหมวดหมู่การจอง");
-        }
-        if (!form.eventDuration) {
-            eventModal.value.errorType.push("- กรุณากรอกระยะเวลาการจอง");
-        }
-        if (isNaN(form.eventDuration)) {
-            eventModal.value.errorType.push("- ระยะเวลาต้องเป็นตัวเลขเท่านั้น");
-        }
-        if (!form.eventDuration >= 1 && !form.eventDuration <= 480) {
-            eventModal.value.errorType.push(
-                "- ช่วงระยะเวลาในการจองต้องอยู่ในช่วง 1 - 480 นาที"
-            );
-        }
-        eventModal.value.isInvalid = true;
-        return false;
-    }
-    return true;
-}
-
-async function saveEvent(form) {
-    if (!validate(form)) return;
-    let findIsInRange = events.value.find((event) => {
-        if (event.eventCategory.eventCategoryName !== form.eventCategory)
-            return undefined;
-        let startFromEvent = dayjs(event.eventStartTime).format(
-            "YYYY-MM-DD HH:mm"
-        );
-        let startFromForm = dayjs(form.eventStartTime).format(
-            "YYYY-MM-DD HH:mm"
-        );
-        let endFromEvent = dayjs(event.eventStartTime)
-            .add(event.eventDuration, "minute")
-            .format("YYYY-MM-DD HH:mm");
-        let endFromForm = dayjs(form.eventStartTime)
-            .add(form.eventDuration, "minute")
-            .format("YYYY-MM-DD HH:mm");
-        return (
-            (event.eventId !== form.eventId &&
-                startFromForm >= startFromEvent &&
-                startFromForm <= endFromEvent) ||
-            (endFromForm >= startFromEvent && endFromForm <= endFromEvent)
-        );
     });
-    if (findIsInRange) {
-        eventModal.value.isInvalid = true;
-        eventModal.value.errorType = ["- หมวดหมู่นี่มีการจองในช่วงเวลานี้แล้ว"];
-        return;
-    }
-    if (form.eventId) {
-        await EventService.updateEvent(form.eventId, {
-            eventStartTime: dayjs(form.eventStartTime).format(
-                "YYYY-MM-DD HH:mm:ss"
-            ),
-            eventNotes: form.eventNotes,
-        });
-    } else {
-        await EventService.createEvent({
-            ...form,
-            eventCategoryId: eventCategories.value.find(
-                (eventCategory) =>
-                    eventCategory.eventCategoryName === form.eventCategory
-            ).eventCategoryId,
-            eventStartTime: dayjs(form.eventStartTime).format(
-                "YYYY-MM-DD HH:mm:ss"
-            ),
-        });
-    }
-    await fetchEvents();
-    eventModal.value = {
-        open: false,
-        event: {},
-        isInvalid: false,
-        errorType: [],
-    };
-}
-
-function warningCancleEvent(event) {
-    scheduleModal.value.open = false;
-    modal.warningModal = {
-        isOpen: true,
-        item: event,
-    };
-}
-
-async function submitCancleEvent(event) {
-    await EventService.cancleEvent(event.eventId);
-    modal.warningModal = {
-        isOpen: false,
-        item: null,
-    };
-    await fetchEvents();
 }
 </script>
 
 <template>
     <div class="grid grid-rows-3 grid-flow-col gap-x-12 gap-y-0 mt-4">
-        <WarningDialog
-            v-if="modal.warningModal.isOpen"
-            :openModal="modal.warningModal.isOpen"
-            :item="modal.warningModal.item"
-            @close="modal.toggleWarningModal({ isOpen: false, item: null })"
-            @remove="submitCancleEvent"
-            :name="modal.getNameWarningModal('event')"
-        ></WarningDialog>
-        <EventDialog
-            v-if="eventModal.open"
-            :openModal="eventModal.open"
-            :title="eventModal.title"
-            :event="eventModal.event"
-            :errorType="eventModal.errorType"
-            :eventCategories="eventCategories"
-            :isInvalid="eventModal.isInvalid"
-            @close="eventModal.open = false"
-            @onSave="saveEvent"
-        />
         <ScheduleEventDialog
-            v-if="scheduleModal.open"
-            :openModal="scheduleModal.open"
-            :title="scheduleModal.title"
-            :events="scheduleModal.events"
-            :date="scheduleModal.date"
-            @close="scheduleModal.open = false"
+            v-if="modal.scheduleModal.open"
+            :openModal="modal.scheduleModal.open"
+            :title="modal.scheduleModal.title"
+            :events="modal.scheduleModal.events"
+            :date="modal.scheduleModal.date"
+            @close="modal.scheduleModal.open = false"
             @bookingThisDate="openBookingEventModal"
-            @cancleEvent="warningCancleEvent"
+            @cancleEvent="modal.toggleWarningModal"
             @editEvent="editBookingEventModal"
         ></ScheduleEventDialog>
-
         <div class="col-span-3">
             <div
+                class="flex flex-col md:flex-row overflow-hidden bg-white rounded-lg shadow-xl w-full p-8"
+            >
+                <!-- content -->
+                <div class="w-full text-gray-800 flex justify-start">
+                    <div class="flex flex-col w-full pr-6">
+                        <div class="flex flex-wrap justify-between">
+                            <h3
+                                class="font-semibold text-lg leading-tight truncate mb-4"
+                            >
+                                การจองวันนี้
+                            </h3>
+                            <h3 class="text-lg leading-tight truncate mb-4">
+                                <span class="font-semibold text-green-700"
+                                    >{{ getEventToday.length }}
+                                </span>
+                                จอง
+                            </h3>
+                        </div>
+                        <div
+                            class="flex items-center space-x-4"
+                            v-for="event in getEventToday"
+                        >
+                            <div class="flex-shrink-0">
+                                ({{ util.getHoursAndMinutes(event) }})
+                            </div>
+                            <div class="flex-1 min-w-0">
+                                <p
+                                    class="text-sm font-medium text-gray-900 truncate"
+                                >
+                                    {{ event.bookingName }}
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- <div
                 class="flex flex-col md:flex-row overflow-hidden bg-white rounded-lg shadow-xl w-full py-4"
             >
-                <!-- media -->
                 <div class="h-32 flex items-center justify-center px-12">
                     <svg
                         xmlns="http://www.w3.org/2000/svg"
@@ -369,7 +221,6 @@ async function submitCancleEvent(event) {
                         />
                     </svg>
                 </div>
-                <!-- content -->
                 <div
                     class="w-full text-gray-800 flex items-center justify-end px-12"
                 >
@@ -385,7 +236,7 @@ async function submitCancleEvent(event) {
                         class="text-sm text-gray-700 uppercase tracking-wide font-semibold mt-2"
                     ></p>
                 </div>
-            </div>
+            </div> -->
         </div>
         <div class="col-span-3">
             <div
@@ -471,10 +322,6 @@ async function submitCancleEvent(event) {
                 </button>
             </div>
             <div>
-                <!-- <div class="font-bold text-gray-800 text-xl mb-4">
-				Schedule Tasks
-			</div> -->
-
                 <div class="bg-white rounded-lg shadow overflow-hidden">
                     <div class="flex items-center justify-between py-2 px-6">
                         <div>
@@ -594,8 +441,12 @@ async function submitCancleEvent(event) {
                                             v-for="(
                                                 event, index
                                             ) in events.filter((e, i) =>
-                                                dateCompare(
-                                                    date,
+                                                util.dateCompare(
+                                                    dayjs(
+                                                        `${year}-${
+                                                            month + 1
+                                                        }-${date}`
+                                                    ).format('YYYY-MM-DD'),
                                                     e.eventStartTime
                                                 )
                                             )"
