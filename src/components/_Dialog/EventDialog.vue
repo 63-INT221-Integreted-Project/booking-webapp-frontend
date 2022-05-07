@@ -99,7 +99,7 @@ const isEmailInvalid = computed(() => {
         v-show.transition.opacity="openModal"
     >
         <div
-            class="p-4 max-w-xl mx-auto relative absolute left-0 right-0 overflow-hidden top-[15%]"
+            class="p-4 max-w-xl mx-auto absolute left-0 right-0 overflow-hidden top-[5%] 2xl:top-[15%]"
         >
             <div
                 class="shadow absolute right-0 top-0 w-10 h-10 rounded-full bg-white text-gray-500 hover:text-gray-800 inline-flex items-center justify-center cursor-pointer"
@@ -148,7 +148,7 @@ const isEmailInvalid = computed(() => {
                         }"
                         type="text"
                         v-model="form.bookingName"
-                        :readonly="form.eventId"
+                        :readonly="!!form.eventId"
                     />
                     <p
                         class="text-error text-xs text-red-600"
@@ -171,7 +171,7 @@ const isEmailInvalid = computed(() => {
                         }"
                         type="text"
                         v-model="form.bookingEmail"
-                        :readonly="form.eventId"
+                        :readonly="!!form.eventId"
                     />
                     <p
                         class="text-error text-xs text-red-600"
@@ -196,7 +196,7 @@ const isEmailInvalid = computed(() => {
                                 isInvalid && !form.eventCategory,
                         }"
                         @blur="checkIfEventCategoryExists"
-                        :readonly="form.eventId"
+                        :readonly="!!form.eventId"
                     />
                     <datalist id="eventCategoriesList">
                         <template v-for="(ec, index) in getEventCategoriesName">
@@ -246,7 +246,7 @@ const isEmailInvalid = computed(() => {
                                 isInvalid && isEventDurationInvalid,
                         }"
                         v-model="form.eventDuration"
-                        :readonly="form.eventId"
+                        :readonly="!!form.eventId"
                     />
                     <p
                         class="text-error text-xs text-red-600"

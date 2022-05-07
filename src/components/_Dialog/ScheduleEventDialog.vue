@@ -1,6 +1,7 @@
 <script setup>
 import { computed } from "@vue/runtime-core";
 import dayjs from "dayjs";
+import { useUtilStore } from "../../stores/utils";
 
 const props = defineProps({
     openModal: {
@@ -20,15 +21,7 @@ const props = defineProps({
 });
 const emit = defineEmits(["close", "bookingThisDate", "cancleEvent"]);
 
-function getHoursAndMinutes(event) {
-    return (
-        dayjs(event.eventStartTime).format("HH:mm") +
-        " - " +
-        dayjs(event.eventStartTime)
-            .add(event.eventDuration, "minute")
-            .format("HH:mm")
-    );
-}
+const util = useUtilStore();
 
 const isFromFutureOrToday = computed(() => {
     return (
@@ -44,7 +37,7 @@ const isFromFutureOrToday = computed(() => {
         v-show.transition.opacity="openModal"
     >
         <div
-            class="p-4 max-w-3xl mx-auto relative absolute left-0 right-0 overflow-hidden top-[25%]"
+            class="p-4 max-w-3xl mx-auto absolute left-0 right-0 overflow-hidden top-[5%] 2xl:top-[15%]"
         >
             <div
                 class="shadow absolute right-0 top-0 w-10 h-10 rounded-full bg-white text-gray-500 hover:text-gray-800 inline-flex items-center justify-center cursor-pointer"
@@ -117,7 +110,7 @@ const isFromFutureOrToday = computed(() => {
                                     <span class="text-blue-500 font-bold"
                                         >ระยะเวลา:
                                     </span>
-                                    {{ getHoursAndMinutes(event) }} ({{
+                                    {{ util.getHoursAndMinutes(event) }} ({{
                                         event.eventDuration
                                     }}
                                     นาที)
@@ -141,39 +134,18 @@ const isFromFutureOrToday = computed(() => {
                                 <div class="block">
                                     <button
                                         class="bg-red-500 hover:bg-blue-light text-white font-extrabold py-2 px-4 border-b-4 border-red-600 rounded"
-                                        @click="emit('cancleEvent', event)"
+                                        @click="
+                                            emit('cancleEvent', {
+                                                isOpen: true,
+                                                item: event,
+                                            })
+                                        "
                                     >
                                         ยกเลิกการจอง
                                     </button>
                                 </div>
                             </div>
                         </div>
-                        <!-- <div class="flex justify-between items-center">
-                            <div>
-                                <h2 class="block text-lg">
-                                    {{ event.bookingName }}
-                                </h2>
-                                <h3 class="block text-xs">
-                                    {{ event.bookingEmail }}
-                                </h3>
-                            </div>
-                            <div>
-                                <h2 class="block text-lg">
-                                    {{ getHoursAndMinutes(event) }}
-                                </h2>
-                                <h3 class="block text-xs">
-                                    {{ event.eventDuration }} นาที
-                                </h3>
-                            </div>
-                            <div v-if="isFromFutureOrToday">
-                                <button
-                                    class="bg-red-500 hover:bg-blue-light text-white font-extrabold py-2 px-4 border-b-4 border-red-600 hover:border-blue rounded"
-                                    @click="emit('cancleEvent', event)"
-                                >
-                                    ยกเลิกการจอง
-                                </button>
-                            </div>
-                        </div> -->
                     </div>
                 </div>
             </div>

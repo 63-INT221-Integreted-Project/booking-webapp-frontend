@@ -66,7 +66,7 @@ function onSubmit() {
         @click.self.prevent.stop="emit('close', !openModal)"
     >
         <div
-            class="p-4 max-w-xl mx-auto relative absolute left-0 right-0 overflow-hidden mt-56"
+            class="p-4 max-w-xl mx-auto absolute left-0 right-0 overflow-hidden mt-56 top-[5%] 2xl:top-[15%]"
         >
             <div
                 class="shadow absolute right-0 top-0 w-10 h-10 rounded-full bg-white text-gray-500 hover:text-gray-800 inline-flex items-center justify-center cursor-pointer"
