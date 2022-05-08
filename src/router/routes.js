@@ -2,7 +2,7 @@ import { createRouter, createWebHistory } from "vue-router";
 import Home from "../views/Home.vue";
 import EventCategories from "../views/EventCategories.vue";
 import Teams from "../views/Teams.vue";
-const history = createWebHistory("/kp2");
+const history = createWebHistory("/kp2/");
 const routes = [
     {
         path: "/",
