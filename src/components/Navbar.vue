@@ -7,17 +7,17 @@ const route = useRoute();
 const navItems = ref([
     {
         name: "Home",
-        path: "/",
+        path: "/kp2",
         text: "หน้าหลัก",
     },
     {
         name: "EventCategories",
-        path: "/event-categories",
+        path: "/kp2/event-categories",
         text: "หมวดหมู่การจอง",
     },
     {
         name: "Teams",
-        path: "/teams",
+        path: "/kp2/teams",
         text: "ทีมของเรา",
     },
 ]);
