@@ -1,5 +1,5 @@
 export default {
     getUrl() {
-        return "/api";
+        return "/kp2/api";
     },
 };
