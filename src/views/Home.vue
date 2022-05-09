@@ -91,7 +91,10 @@ async function saveEvent(form) {
             .format("YYYY-MM-DD HH:mm:ss")
     );
     let findIsInRange = events.find((event) => {
-        if (event.eventCategory.eventCategoryName !== form.eventCategory)
+        if (
+            event.eventCategory.eventCategoryName !== form.eventCategory &&
+            form.eventId === event.eventId
+        )
             return undefined;
         let startFromEvent = dayjs(event.eventStartTime).format(
             "YYYY-MM-DD HH:mm"
@@ -123,10 +126,6 @@ async function saveEvent(form) {
                 "YYYY-MM-DD HH:mm:ss"
             ),
             eventNotes: form.eventNotes,
-            eventCategoryId: eventCategories.value.find(
-                (eventCategory) =>
-                    eventCategory.eventCategoryName === form.eventCategory
-            ).eventCategoryId,
         });
     } else {
         await EventService.createEvent({
