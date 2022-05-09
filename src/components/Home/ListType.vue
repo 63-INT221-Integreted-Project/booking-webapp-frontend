@@ -5,11 +5,19 @@ import EventCategoriesService from "../../services/event-categories.service";
 import EventService from "../../services/events.service";
 
 import { useModalStore } from "../../stores/modal";
+import { useUtilStore } from "../../stores/utils";
 import WarningDialog from "../_Dialog/WarningDialog.vue";
+import EventDialog from "../_Dialog/EventDialog.vue";
+
+const props = defineProps({
+    eventCategories: [],
+});
+
+defineExpose({ search });
 
 const modal = useModalStore();
+const util = useUtilStore();
 const events = ref([]);
-const eventCategories = ref([]);
 
 const form = ref({
     startDateTime: "",
@@ -18,50 +26,13 @@ const form = ref({
     search: "",
 });
 
-onMounted(async () => {
-    eventCategories.value = await getEventCategories();
-});
+const arrDate = ref([]);
 
 const getNameEventCategories = computed(() =>
-    eventCategories.value.map(
+    props.eventCategories.map(
         (eventCategory) => eventCategory.eventCategoryName
     )
 );
-
-async function filterByDateTime() {
-    const { startDateTime, endDateTime } = form.value;
-    const startDate = startDateTime
-        ? dayjs(startDateTime).format("YYYY-MM-DD HH:mm:ss")
-        : dayjs().format("YYYY-MM-DD HH:mm:ss");
-    const endDate = endDateTime
-        ? dayjs(endDateTime).format("YYYY-MM-DD HH:mm:ss")
-        : dayjs().format("YYYY-MM-DD HH:mm:ss");
-    events.value = await EventService.findAllByBetweenDate(startDate, endDate);
-}
-
-function getHoursAndMinutes(event) {
-    return (
-        dayjs(event.eventStartTime).format("HH:mm") +
-        " - " +
-        dayjs(event.eventStartTime)
-            .add(event.eventDuration, "minute")
-            .format("HH:mm")
-    );
-}
-
-function getDate(event) {
-    return (
-        dayjs(event.eventStartTime).format("DD/MM/YYYY") +
-        " - " +
-        dayjs(event.eventStartTime)
-            .add(event.eventDuration, "minute")
-            .format("DD/MM/YYYY")
-    );
-}
-
-async function getEventCategories() {
-    return await EventCategoriesService.findAll();
-}
 
 async function search() {
     let data = await EventService.search(
@@ -70,7 +41,20 @@ async function search() {
         form.value.eventCategory,
         form.value.search
     );
+    createUniqueDate(data);
     events.value = data;
+}
+
+function createUniqueDate(events) {
+    arrDate.value = [];
+    for (let event of events) {
+        if (!arrDate.value.includes(util.getDate(event))) {
+            arrDate.value.push({
+                text: dayjs(event.eventStartTime).format("DD/MM/YYYY"),
+                value: dayjs(event.eventStartTime).format("YYYY-MM-DD"),
+            });
+        }
+    }
 }
 
 function clearInputFilter() {
@@ -97,6 +81,14 @@ async function submitCancleEvent(event) {
     };
     await search();
 }
+
+function isFromFutureOrToday(event) {
+    return dayjs(event.eventStartTime).add(1, "minute") >= dayjs();
+}
+
+function editEvent(event) {
+    modal.editBookingEventModal(event);
+}
 </script>
 
 <template>
@@ -110,9 +102,7 @@ async function submitCancleEvent(event) {
             :name="modal.getNameWarningModal('event')"
         ></WarningDialog>
         <div class="col-span-1">
-            <div
-                class="overflow-hidden bg-white rounded-lg shadow-xl w-full p-8 h-full"
-            >
+            <div class="bg-white rounded-lg shadow-xl w-full p-8 h-full">
                 <h2 class="text-2xl">กรองข้อมูล</h2>
                 <div class="my-8 w-full">
                     <label
@@ -183,7 +173,7 @@ async function submitCancleEvent(event) {
         </div>
         <div class="col-span-5 row-span-3">
             <div
-                class="flex flex-wrap md:flex-row overflow-hidden bg-white rounded-lg shadow-xl w-full p-8 h-[900px]"
+                class="overflow-y-scroll flex flex-wrap md:flex-row bg-white rounded-lg shadow-xl w-full p-8 h-[900px]"
             >
                 <div
                     class="flex flex-col items-center justify-center w-full"
@@ -200,51 +190,67 @@ async function submitCancleEvent(event) {
                     <h2 class="block text-xl mb-4">
                         ผลการค้นหาทั้งหมด {{ events.length }} การจอง
                     </h2>
-                    <div
-                        class="p-6 my-2 bg-gray-50 border-1 rounded-xl shadow-xl"
-                        v-for="event in events"
-                    >
-                        <div class="flex justify-between items-center">
-                            <div>
-                                <h2 class="block text-lg">
-                                    <span class="text-blue-700 font-bold"
-                                        >หมวดหมู่: </span
-                                    >{{ event.eventCategory.eventCategoryName }}
-                                </h2>
-                                <h2 class="block text-lg">
-                                    <span class="text-blue-500 font-bold"
-                                        >ชื่อการจอง: </span
-                                    >{{ event.bookingName }}
-                                </h2>
-                                <h3 class="block text-lg">
-                                    <span class="text-blue-500 font-bold"
-                                        >อีเมล:
-                                    </span>
-                                    {{ event.bookingEmail }}
-                                </h3>
-                                <h3 class="block text-lg">
-                                    <span class="text-blue-500 font-bold"
-                                        >วันที่:
-                                    </span>
-                                    {{ getDate(event) }}
-                                </h3>
-                                <h3 class="block text-lg">
-                                    <span class="text-blue-500 font-bold"
-                                        >ระยะเวลา:
-                                    </span>
-                                    {{ getHoursAndMinutes(event) }} ({{
-                                        event.eventDuration
-                                    }}
-                                    นาที)
-                                </h3>
-                            </div>
-                            <div class="block">
-                                <button
-                                    class="bg-red-500 hover:bg-blue-light text-white font-extrabold py-2 px-4 border-b-4 border-red-600 hover:border-blue rounded"
-                                    @click="warningCancleEvent(event)"
-                                >
-                                    ยกเลิกการจอง
-                                </button>
+                    <div v-for="date in arrDate" class="my-6">
+                        <div class="border-l-8 border-blue-600">
+                            <h2 class="text-3xl pl-4">
+                                {{ date.text }}
+                            </h2>
+                        </div>
+                        <div
+                            class="p-6 my-2 bg-gray-50 border-1 rounded-xl shadow-xl"
+                            v-for="event in events.filter((e) =>
+                                util.dateCompare(date.value, e.eventStartTime)
+                            )"
+                        >
+                            <div class="flex justify-between items-center">
+                                <div>
+                                    <h2 class="block text-lg">
+                                        <span class="text-blue-700 font-bold"
+                                            >หมวดหมู่: </span
+                                        >{{
+                                            event.eventCategory
+                                                .eventCategoryName
+                                        }}
+                                    </h2>
+                                    <h2 class="block text-lg">
+                                        <span class="text-blue-500 font-bold"
+                                            >ชื่อการจอง: </span
+                                        >{{ event.bookingName }}
+                                    </h2>
+                                    <h3 class="block text-lg">
+                                        <span class="text-blue-500 font-bold"
+                                            >อีเมล:
+                                        </span>
+                                        {{ event.bookingEmail }}
+                                    </h3>
+                                    <h3 class="block text-lg">
+                                        <span class="text-blue-500 font-bold"
+                                            >ระยะเวลา:
+                                        </span>
+                                        {{ util.getHoursAndMinutes(event) }} ({{
+                                            event.eventDuration
+                                        }}
+                                        นาที)
+                                    </h3>
+                                </div>
+                                <div v-if="isFromFutureOrToday(event)">
+                                    <div class="block mb-2">
+                                        <button
+                                            class="bg-yellow-500 hover:bg-blue-light text-white font-extrabold py-2 px-4 border-b-4 border-yellow-600 rounded mr-2"
+                                            @click="editEvent(event)"
+                                        >
+                                            แก้ไขการจอง
+                                        </button>
+                                    </div>
+                                    <div class="block">
+                                        <button
+                                            class="bg-red-500 hover:bg-blue-light text-white font-extrabold py-2 px-4 border-b-4 border-red-600 hover:border-blue rounded"
+                                            @click="warningCancleEvent(event)"
+                                        >
+                                            ยกเลิกการจอง
+                                        </button>
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>

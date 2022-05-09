@@ -16,10 +16,6 @@ const props = defineProps({
     },
 });
 const emit = defineEmits(["close", "remove"]);
-
-function getHoursAndMinutes(dateTime) {
-    return dayjs(dateTime).format("HH:mm");
-}
 </script>
 
 <template>
@@ -29,7 +25,7 @@ function getHoursAndMinutes(dateTime) {
         v-show.transition.opacity="openModal"
     >
         <div
-            class="p-4 max-w-2xl mx-auto relative absolute left-0 right-0 overflow-hidden top-[25%]"
+            class="p-4 max-w-2xl mx-auto absolute left-0 right-0 overflow-hidden top-[5%] 2xl:top-[15%]"
         >
             <div
                 class="shadow absolute right-0 top-0 w-10 h-10 rounded-full bg-white text-gray-500 hover:text-gray-800 inline-flex items-center justify-center cursor-pointer"

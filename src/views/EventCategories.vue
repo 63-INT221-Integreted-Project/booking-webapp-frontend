@@ -159,7 +159,7 @@ async function deleteEventCategory(eventCategory) {
                                 >
                                     แก้ไข
                                 </button>
-                                <button
+                                <!-- <button
                                     class="bg-red-500 hover:bg-blue-light text-white font-extrabold py-2 px-4 border-b-4 border-red-600 hover:border-blue rounded"
                                     @click="
                                         modal.toggleWarningModal({
@@ -169,7 +169,7 @@ async function deleteEventCategory(eventCategory) {
                                     "
                                 >
                                     ลบ
-                                </button>
+                                </button> -->
                             </td>
                         </tr>
                     </tbody>
@@ -220,48 +220,6 @@ async function deleteEventCategory(eventCategory) {
                                     />
                                 </svg>
                             </button>
-                            <!-- <a
-                                href="#"
-                                aria-current="page"
-                                class="z-10 bg-indigo-50 border-indigo-500 text-indigo-600 relative inline-flex items-center px-4 py-2 border text-sm font-medium"
-                            >
-                                1
-                            </a>
-                            <a
-                                href="#"
-                                class="bg-white border-gray-300 text-gray-500 hover:bg-gray-50 relative inline-flex items-center px-4 py-2 border text-sm font-medium"
-                            >
-                                2
-                            </a>
-                            <a
-                                href="#"
-                                class="bg-white border-gray-300 text-gray-500 hover:bg-gray-50 hidden md:inline-flex relative items-center px-4 py-2 border text-sm font-medium"
-                            >
-                                3
-                            </a>
-                            <span
-                                class="relative inline-flex items-center px-4 py-2 border border-gray-300 bg-white text-sm font-medium text-gray-700"
-                            >
-                                ...
-                            </span>
-                            <a
-                                href="#"
-                                class="bg-white border-gray-300 text-gray-500 hover:bg-gray-50 hidden md:inline-flex relative items-center px-4 py-2 border text-sm font-medium"
-                            >
-                                8
-                            </a>
-                            <a
-                                href="#"
-                                class="bg-white border-gray-300 text-gray-500 hover:bg-gray-50 relative inline-flex items-center px-4 py-2 border text-sm font-medium"
-                            >
-                                9
-                            </a>
-                            <a
-                                href="#"
-                                class="bg-white border-gray-300 text-gray-500 hover:bg-gray-50 relative inline-flex items-center px-4 py-2 border text-sm font-medium"
-                            >
-                                10
-                            </a> -->
                             <button
                                 href="#"
                                 class="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
