@@ -48,9 +48,11 @@ async function search() {
 function createUniqueDate(events) {
     arrDate.value = [];
     for (let event of events) {
-        if (!arrDate.value.includes(util.getDate(event))) {
+        let startDate = dayjs(event.eventStartTime).format("DD/MM/YYYY");
+        //* กรณีที่ startDate เท่ากับใน Array หรือเปล่า
+        if (!arrDate.value.map((data) => data.text).includes(startDate)) {
             arrDate.value.push({
-                text: dayjs(event.eventStartTime).format("DD/MM/YYYY"),
+                text: startDate,
                 value: dayjs(event.eventStartTime).format("YYYY-MM-DD"),
             });
         }
@@ -83,7 +85,10 @@ async function submitCancleEvent(event) {
 }
 
 function isFromFutureOrToday(event) {
-    return dayjs(event.eventStartTime).add(1, "minute") >= dayjs();
+    return (
+        dayjs(event.eventStartTime).add(event.eventDuration, "minute") >=
+        dayjs()
+    );
 }
 
 function editEvent(event) {
