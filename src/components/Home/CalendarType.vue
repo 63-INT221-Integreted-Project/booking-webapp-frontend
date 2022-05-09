@@ -68,6 +68,16 @@ async function fetchEvents() {
             new Date(year.value, month.value, no_of_days.value.length)
         ).format("YYYY-MM-DD [23:59:59]")
     );
+    if (
+        month.value !== new Date().getMonth() &&
+        year.value !== new Date().getFullYear()
+    ) {
+        let eventToday = await EventService.findAllByBetweenDate(
+            dayjs().format("YYYY-MM-DD HH:mm:ss"),
+            dayjs().format("YYYY-MM-DD [23:59:59]")
+        );
+        events.value.push(eventToday);
+    }
 }
 
 function getNoOfDays() {
