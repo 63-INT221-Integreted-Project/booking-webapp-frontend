@@ -33,8 +33,8 @@ const search = async function (dateStart, dateEnd, name, word) {
                 `${BaseUrl.getUrl()}/events/search?category=${name}`
             ).then((res) => res.json());
         } else {
-            return await fetch(`${BaseUrl.getUrl()}/events/find/sort/`).then((res) =>
-                res.json()
+            return await fetch(`${BaseUrl.getUrl()}/events/find/sort/`).then(
+                (res) => res.json()
             );
         }
     } else if (word != "") {
@@ -63,14 +63,14 @@ const search = async function (dateStart, dateEnd, name, word) {
                 `${BaseUrl.getUrl()}/events/search?category=${name}&word=${word}`
             ).then((res) => res.json());
         } else {
-            return await fetch(`${BaseUrl.getUrl()}/events/find/sort/`).then((res) =>
-                res.json()
+            return await fetch(`${BaseUrl.getUrl()}/events/find/sort/`).then(
+                (res) => res.json()
             );
         }
     } else {
-        return await fetch(`${BaseUrl.getUrl()}/events/find/sort/`).then((res) =>
-        res.json()
-    );
+        return await fetch(`${BaseUrl.getUrl()}/events/find/sort/`).then(
+            (res) => res.json()
+        );
     }
     // โค้ดเดิมโจม
     // return await fetch(
@@ -102,10 +102,8 @@ const updateEvent = async function (eventId, event) {
             "Content-Type": "application/json",
         },
         body: JSON.stringify({
-            eventId: eventId,
             eventStartTime: event.eventStartTime,
             eventNotes: event.eventNotes,
-            eventCategoryId: event.eventCategoryId,
         }),
     });
 };
