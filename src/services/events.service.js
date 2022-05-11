@@ -1,4 +1,7 @@
+import dayjs from "dayjs";
 import BaseUrl from "../utils/BaseUrl";
+import utc from "dayjs/plugin/utc";
+dayjs.extend(utc);
 
 const findAllByBetweenDate = async function (date1, date2) {
     return await fetch(
