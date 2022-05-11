@@ -2,6 +2,7 @@
 import { ref } from "@vue/reactivity";
 import { computed, onMounted } from "@vue/runtime-core";
 import dayjs from "dayjs";
+import { useUtilStore } from "../../stores/utils";
 import InputAutocomplete from "../InputAutocomplete.vue";
 
 const props = defineProps({
@@ -38,6 +39,8 @@ const props = defineProps({
     },
 });
 const emit = defineEmits(["close", "onSave"]);
+
+const util = useUtilStore();
 
 const form = ref({
     eventId: props.event?.eventId || "",
@@ -90,6 +93,14 @@ const isEmailInvalid = computed(() => {
         return "กรุณากรอกรูปแบบอีเมล เช่น @gmail.com, @hotmail.com";
     return "";
 });
+const isEventDurationInvalid = computed(() => {
+    if (!form.value.eventDuration) return "กรุณากรอกระยะเวลาการจอง";
+    if (isNaN(form.value.eventDuration))
+        return "ระยะเวลาต้องเป็นตัวเลขเท่านั้น";
+    if (!(form.value.eventDuration >= 1 && form.value.eventDuration <= 480))
+        return "ช่วงระยะเวลาในการจองต้องอยู่ในช่วง 1 - 480 นาที";
+    return "";
+});
 </script>
 
 <template>
@@ -99,7 +110,7 @@ const isEmailInvalid = computed(() => {
         v-show.transition.opacity="openModal"
     >
         <div
-            class="p-4 max-w-xl mx-auto absolute left-0 right-0 overflow-hidden top-[5%] 2xl:top-[15%]"
+            class="p-4 max-w-xl mx-auto absolute left-0 right-0 top-0 2xl:top-[15%]"
         >
             <div
                 class="shadow absolute right-0 top-0 w-10 h-10 rounded-full bg-white text-gray-500 hover:text-gray-800 inline-flex items-center justify-center cursor-pointer"
@@ -115,9 +126,7 @@ const isEmailInvalid = computed(() => {
                     />
                 </svg>
             </div>
-            <div
-                class="shadow w-full rounded-lg bg-white overflow-hidden w-full block p-8"
-            >
+            <div class="shadow w-full rounded-lg bg-white block p-8">
                 <h2 class="font-bold text-2xl mb-6 text-gray-800 border-b pb-2">
                     {{ title }}
                 </h2>
@@ -247,6 +256,7 @@ const isEmailInvalid = computed(() => {
                         }"
                         v-model="form.eventDuration"
                         :readonly="!!form.eventId"
+                        @keypress="util.isNumberOnly"
                     />
                     <p
                         class="text-error text-xs text-red-600"
