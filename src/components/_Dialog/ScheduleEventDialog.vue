@@ -14,6 +14,7 @@ const props = defineProps({
     },
     events: {
         type: Array,
+        default: () => [],
     },
     date: {
         type: String,
@@ -27,6 +28,12 @@ const isFromFutureOrToday = computed(() => {
     return (
         dayjs(props.date).format("YYYY-MM-DD") >= dayjs().format("YYYY-MM-DD")
     );
+});
+
+const eventSortByDateASC = computed(() => {
+    return props.events.sort((a, b) => {
+        return dayjs(a.eventStartTime).diff(dayjs(b.eventStartTime));
+    });
 });
 </script>
 
@@ -86,7 +93,7 @@ const isFromFutureOrToday = computed(() => {
                 <div class="mt-4" v-else>
                     <div
                         class="p-6 my-2 border-1 rounded-xl shadow-2xl"
-                        v-for="event in props.events"
+                        v-for="event in eventSortByDateASC"
                     >
                         <div class="flex justify-between items-center">
                             <div>
