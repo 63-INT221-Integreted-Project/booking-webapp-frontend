@@ -21,19 +21,30 @@ onMounted(async () => {
 });
 
 async function saveEventCategory(eventCategory) {
-    let response;
+    let findExistCategoryName = eventCategories.value.find(
+        (ec) =>
+            ec.eventCategoryName === eventCategory.eventCategoryName &&
+            ec.eventCategoryId !== eventCategory.eventCategoryId
+    );
+    if (findExistCategoryName) {
+        modal.eventCategoryModal.isInvalid = true;
+        modal.eventCategoryModal.errorList = ["- ชื่อหมวดหมู่ซ้ำ"];
+        return;
+    }
     if (eventCategory.eventCategoryId) {
-        response = await EventCategoriesService.updateEventCategory(
+        await EventCategoriesService.updateEventCategory(
             eventCategory.eventCategoryId,
             eventCategory
         );
     } else {
-        response = await EventCategoriesService.createEventCategory(
-            eventCategory
-        );
+        await EventCategoriesService.createEventCategory(eventCategory);
     }
     eventCategories.value = await EventCategoriesService.findAll();
-    modal.toggleEventCategoryModal({ isOpen: false, item: null });
+    modal.toggleEventCategoryModal({
+        isOpen: false,
+        item: null,
+        isInvalid: false,
+    });
 }
 
 async function deleteEventCategory(eventCategory) {
@@ -52,8 +63,14 @@ async function deleteEventCategory(eventCategory) {
             :openModal="modal.eventCategoryModal.isOpen"
             :item="modal.eventCategoryModal.item"
             @close="
-                modal.toggleEventCategoryModal({ isOpen: false, item: null })
+                modal.toggleEventCategoryModal({
+                    isOpen: false,
+                    item: null,
+                    isInvalid: false,
+                })
             "
+            :isInvalid="modal.eventCategoryModal.isInvalid"
+            :errorList="modal.eventCategoryModal.errorList"
             @save="saveEventCategory"
         ></EventCategoryDialog>
         <WarningDialog
@@ -86,6 +103,7 @@ async function deleteEventCategory(eventCategory) {
                                 modal.toggleEventCategoryModal({
                                     isOpen: true,
                                     item: null,
+                                    isInvalid: false,
                                 })
                             "
                         >
@@ -154,6 +172,7 @@ async function deleteEventCategory(eventCategory) {
                                         modal.toggleEventCategoryModal({
                                             isOpen: true,
                                             item: event,
+                                            isInvalid: false,
                                         })
                                     "
                                 >
