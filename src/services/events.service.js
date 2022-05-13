@@ -92,7 +92,7 @@ const createEvent = async function (event) {
             bookingEmail: event.bookingEmail,
             eventStartTime: event.eventStartTime,
             eventDuration: +event.eventDuration,
-            eventNotes: event.eventNotes,
+            eventNotes: event.eventNotes || null,
             eventCategoryId: event.eventCategoryId,
         }),
     });
@@ -106,7 +106,7 @@ const updateEvent = async function (eventId, event) {
         },
         body: JSON.stringify({
             eventStartTime: event.eventStartTime,
-            eventNotes: event.eventNotes,
+            eventNotes: event.eventNotes || null,
         }),
     });
 };
