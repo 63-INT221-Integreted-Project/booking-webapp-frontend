@@ -9,72 +9,97 @@ const findAllByBetweenDate = async function (date1, date2) {
     ).then((res) => res.json());
 };
 
-const search = async function (dateStart, dateEnd, name, word) {
-    if (word == "") {
-        if (
-            dateStart != "Invalid Date" &&
-            dateEnd != "Invalid Date" &&
-            name != ""
-        ) {
-            return await fetch(
-                `${BaseUrl.getUrl()}/events/search?dateStart=${dateStart}&dateEnd=${dateEnd}&category=${name}`
-            ).then((res) => res.json());
-        } else if (
-            dateStart != "Invalid Date" &&
-            dateEnd != "Invalid Date" &&
-            name == ""
-        ) {
-            return await fetch(
-                `${BaseUrl.getUrl()}/events/search/?dateStart=${dateStart}&dateEnd=${dateEnd}`
-            ).then((res) => res.json());
-        } else if (
-            dateStart == "Invalid Date" &&
-            dateEnd == "Invalid Date" &&
-            name != ""
-        ) {
-            return await fetch(
-                `${BaseUrl.getUrl()}/events/search?category=${name}`
-            ).then((res) => res.json());
-        } else {
-            return await fetch(`${BaseUrl.getUrl()}/events/find/sort/`).then(
-                (res) => res.json()
-            );
-        }
-    } else if (word != "") {
-        if (
-            dateStart != "Invalid Date" &&
-            dateEnd != "Invalid Date" &&
-            name != ""
-        ) {
-            return await fetch(
-                `${BaseUrl.getUrl()}/events/search?dateStart=${dateStart}&dateEnd=${dateEnd}&category=${name}&word=${word}`
-            ).then((res) => res.json());
-        } else if (
-            dateStart != "Invalid Date" &&
-            dateEnd != "Invalid Date" &&
-            name == ""
-        ) {
-            return await fetch(
-                `${BaseUrl.getUrl()}/events/search/?dateStart=${dateStart}&dateEnd=${dateEnd}&word=${word}`
-            ).then((res) => res.json());
-        } else if (
-            dateStart == "Invalid Date" &&
-            dateEnd == "Invalid Date" &&
-            name != ""
-        ) {
-            return await fetch(
-                `${BaseUrl.getUrl()}/events/search?category=${name}&word=${word}`
-            ).then((res) => res.json());
-        } else {
-            return await fetch(`${BaseUrl.getUrl()}/events/find/sort/`).then(
-                (res) => res.json()
-            );
-        }
-    } else {
+const search = async function (dateStart, dateEnd, category, word) {
+    //* Find All
+    if (
+        !word &&
+        dateStart === "Invalid Date" &&
+        dateEnd === "Invalid Date" &&
+        !category
+    ) {
         return await fetch(`${BaseUrl.getUrl()}/events/find/sort/`).then(
             (res) => res.json()
         );
     }
+    let queryString = {};
+    if (category) queryString.category = category;
+    if (word) queryString.word = word;
+    if (dateStart !== "Invalid Date") queryString.dateStart = dateStart;
+    if (dateEnd !== "Invalid Date") queryString.dateEnd = dateEnd;
+    let url =
+        "/search?" +
+        Object.entries(queryString)
+            .map(([key, val]) => `${key}=${val}`)
+            .join("&");
+    return await fetch(`${BaseUrl.getUrl()}/events${url}`).then((res) =>
+        res.json()
+    );
+    //*Code Thiraphat
+    // if (word == "") {
+    //     if (
+    //         dateStart != "Invalid Date" &&
+    //         dateEnd != "Invalid Date" &&
+    //         name != ""
+    //     ) {
+    //         return await fetch(
+    //             `${BaseUrl.getUrl()}/events/search?dateStart=${dateStart}&dateEnd=${dateEnd}&category=${name}`
+    //         ).then((res) => res.json());
+    //     } else if (
+    //         dateStart != "Invalid Date" &&
+    //         dateEnd != "Invalid Date" &&
+    //         name == ""
+    //     ) {
+    //         return await fetch(
+    //             `${BaseUrl.getUrl()}/events/search/?dateStart=${dateStart}&dateEnd=${dateEnd}`
+    //         ).then((res) => res.json());
+    //     } else if (
+    //         dateStart == "Invalid Date" &&
+    //         dateEnd == "Invalid Date" &&
+    //         name != ""
+    //     ) {
+    // return await fetch(
+    //     `${BaseUrl.getUrl()}/events/search?category=${name}`
+    // ).then((res) => res.json());
+    //     } else {
+    //         return await fetch(`${BaseUrl.getUrl()}/events/find/sort/`).then(
+    //             (res) => res.json()
+    //         );
+    //     }
+    // } else if (word != "") {
+    //     if (
+    //         dateStart != "Invalid Date" &&
+    //         dateEnd != "Invalid Date" &&
+    //         name != ""
+    //     ) {
+    //         return await fetch(
+    //             `${BaseUrl.getUrl()}/events/search?dateStart=${dateStart}&dateEnd=${dateEnd}&category=${name}&word=${word}`
+    //         ).then((res) => res.json());
+    //     } else if (
+    //         dateStart != "Invalid Date" &&
+    //         dateEnd != "Invalid Date" &&
+    //         name == ""
+    //     ) {
+    //         return await fetch(
+    //             `${BaseUrl.getUrl()}/events/search/?dateStart=${dateStart}&dateEnd=${dateEnd}&word=${word}`
+    //         ).then((res) => res.json());
+    //     } else if (
+    //         dateStart == "Invalid Date" &&
+    //         dateEnd == "Invalid Date" &&
+    //         name != ""
+    //     ) {
+    //         return await fetch(
+    //             `${BaseUrl.getUrl()}/events/search?category=${name}&word=${word}`
+    //         ).then((res) => res.json());
+    //     } else {
+    //         return await fetch(`${BaseUrl.getUrl()}/events/find/sort/`).then(
+    //             (res) => res.json()
+    //         );
+    //     }
+    // } else {
+    // return await fetch(`${BaseUrl.getUrl()}/events/find/sort/`).then(
+    //     (res) => res.json()
+    // );
+    // }
     // โค้ดเดิมโจม
     // return await fetch(
     //     `${BaseUrl.getUrl()}/events/search/filter/test?dateStart=${dateStart}&dateEnd=${dateEnd}&name=${name}&word=${word}`
