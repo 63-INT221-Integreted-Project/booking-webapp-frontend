@@ -52,18 +52,11 @@ const showErrorList = computed(() => {
         errorType.push(isEventDurationInvalid.value);
     if (!form.value.eventCategoryName)
         errorType.push("กรุณากรอกชื่อหมวดหมู่การจอง");
-    if (!form.value.eventCategoryDescription)
-        errorType.push("กรุณากรอกรายละเอียดหมวดหมู่การจอง");
     return errorType.join("<br/>");
 });
 
 function onSubmit() {
-    if (
-        isEventDurationInvalid.value ||
-        !form.value.eventCategoryName ||
-        !form.value.eventCategoryDescription
-    )
-        return;
+    if (isEventDurationInvalid.value || !form.value.eventCategoryName) return;
     emit("save", form.value);
 }
 </script>
@@ -151,12 +144,6 @@ function onSubmit() {
                         }"
                         maxlength="500"
                     />
-                    <p
-                        class="text-error text-xs text-red-600"
-                        v-if="!form.eventCategoryDescription && props.isInvalid"
-                    >
-                        กรุณากรอกรายละเอียดหมวดหมู่การจอง
-                    </p>
                 </div>
                 <div class="mb-4">
                     <label
