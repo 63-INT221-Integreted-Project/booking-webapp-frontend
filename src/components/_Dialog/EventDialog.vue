@@ -158,6 +158,7 @@ const isEventDurationInvalid = computed(() => {
                         type="text"
                         v-model="form.bookingName"
                         :readonly="!!form.eventId"
+                        maxlength="100"
                     />
                     <p
                         class="text-error text-xs text-red-600"
@@ -181,6 +182,7 @@ const isEventDurationInvalid = computed(() => {
                         type="text"
                         v-model="form.bookingEmail"
                         :readonly="!!form.eventId"
+                        maxlength="50"
                     />
                     <p
                         class="text-error text-xs text-red-600"
@@ -273,6 +275,7 @@ const isEventDurationInvalid = computed(() => {
                     <textarea
                         class="bg-gray-200 appearance-none border-2 border-gray-200 rounded-lg w-full py-8 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-blue-500"
                         v-model="form.eventNotes"
+                        maxlength="500"
                     />
                 </div>
 
