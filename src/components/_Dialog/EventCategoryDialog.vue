@@ -41,7 +41,7 @@ const isEventDurationInvalid = computed(() => {
         return "ระยะเวลาต้องเป็นตัวเลขเท่านั้น";
     if (!(form.value.eventDuration >= 1 && form.value.eventDuration <= 480))
         return "ช่วงระยะเวลาในการจองต้องอยู่ในช่วง 1 - 480 นาที";
-    return "";
+    return null;
 });
 
 const showErrorList = computed(() => {
@@ -125,6 +125,7 @@ function onSubmit() {
                             'border-red-500 border-3':
                                 !form.eventCategoryName && props.isInvalid,
                         }"
+                        maxlength="100"
                     />
                     <p
                         class="text-error text-xs text-red-600"
@@ -148,6 +149,7 @@ function onSubmit() {
                                 !form.eventCategoryDescription &&
                                 props.isInvalid,
                         }"
+                        maxlength="500"
                     />
                     <p
                         class="text-error text-xs text-red-600"
