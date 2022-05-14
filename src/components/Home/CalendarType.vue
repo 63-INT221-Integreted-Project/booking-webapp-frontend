@@ -1,11 +1,10 @@
 <script setup>
 import { ref } from "@vue/reactivity";
 import { computed, onMounted, defineExpose } from "@vue/runtime-core";
-import EventService from "@/services/events.service";
-import EventCategoriesService from "@/services/event-categories.service";
-import EventDialog from "@/components/_Dialog/EventDialog.vue";
+import EventService from "../../services/events.service"
+import eventCategoriesService from "../../services/event-categories.service";
+import EventDialog from "../_Dialog/EventDialog.vue"
 import dayjs from "dayjs";
-
 import { useModalStore } from "../../stores/modal";
 import { useUtilStore } from "../../stores/utils";
 import ScheduleEventDialog from "../_Dialog/ScheduleEventDialog.vue";
