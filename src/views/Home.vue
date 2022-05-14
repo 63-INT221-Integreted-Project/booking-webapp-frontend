@@ -9,6 +9,8 @@ import EventCategoriesService from "../services/event-categories.service";
 import dayjs from "dayjs";
 import { useModalStore } from "../stores/modal";
 import WarningDialog from "../components/_Dialog/WarningDialog.vue";
+import utc from "dayjs/plugin/utc";
+dayjs.extend(utc);
 
 const calendarType = ref(null);
 const listType = ref(null);
@@ -84,30 +86,26 @@ function validate(form) {
 
 async function saveEvent(form) {
     if (!validate(form)) return;
+    let localTime = dayjs(form.eventStartTime).format("YYYY-MM-DDTHH:mm:ssZ");
+    let utcTime = dayjs.utc(localTime);
     let events = await EventService.findAllByBetweenDate(
-        dayjs(form.eventStartTime).format("YYYY-MM-DD HH:mm:ss"),
-        dayjs(form.eventStartTime)
-            .add(form.eventDuration, "minute")
-            .format("YYYY-MM-DD HH:mm:ss")
+        utcTime.format(),
+        utcTime.add(form.eventDuration, "minute").format()
     );
     let findIsInRange = events.find((event) => {
+        console.log(form.eventCategory);
         if (
             event.eventCategory.eventCategoryName !== form.eventCategory &&
             form.eventId === event.eventId
         )
             return undefined;
-        let startFromEvent = dayjs(event.eventStartTime).format(
-            "YYYY-MM-DD HH:mm"
-        );
-        let startFromForm = dayjs(form.eventStartTime).format(
-            "YYYY-MM-DD HH:mm"
-        );
-        let endFromEvent = dayjs(event.eventStartTime)
+        let startFromEvent = dayjs.utc(event.eventStartTime).format();
+        let startFromForm = utcTime.format();
+        let endFromEvent = dayjs
+            .utc(event.eventStartTime)
             .add(event.eventDuration, "minute")
-            .format("YYYY-MM-DD HH:mm");
-        let endFromForm = dayjs(form.eventStartTime)
-            .add(form.eventDuration, "minute")
-            .format("YYYY-MM-DD HH:mm");
+            .format();
+        let endFromForm = utcTime.add(form.eventDuration, "minute").format();
         return (
             (event.eventId !== form.eventId &&
                 startFromForm >= startFromEvent &&
@@ -122,9 +120,7 @@ async function saveEvent(form) {
     }
     if (form.eventId) {
         await EventService.updateEvent(form.eventId, {
-            eventStartTime: dayjs(form.eventStartTime).format(
-                "YYYY-MM-DD HH:mm:ss"
-            ),
+            eventStartTime: utcTime,
             eventNotes: form.eventNotes,
         });
     } else {
@@ -134,9 +130,7 @@ async function saveEvent(form) {
                 (eventCategory) =>
                     eventCategory.eventCategoryName === form.eventCategory
             ).eventCategoryId,
-            eventStartTime: dayjs(form.eventStartTime).format(
-                "YYYY-MM-DD HH:mm:ss"
-            ),
+            eventStartTime: utcTime,
         });
     }
     if (getTabItem.value === "calendar") await calendarType.value.fetchEvents();

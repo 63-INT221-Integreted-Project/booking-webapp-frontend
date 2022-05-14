@@ -10,6 +10,9 @@ import { useUtilStore } from "../../stores/utils";
 import ScheduleEventDialog from "../_Dialog/ScheduleEventDialog.vue";
 import WarningDialog from "../_Dialog/WarningDialog.vue";
 
+import utc from "dayjs/plugin/utc";
+dayjs.extend(utc);
+
 const modal = useModalStore();
 
 const util = useUtilStore();
@@ -60,20 +63,18 @@ function isToday(date) {
 
 async function fetchEvents() {
     events.value = await EventService.findAllByBetweenDate(
-        dayjs(new Date(year.value, month.value, 1)).format(
-            "YYYY-MM-DD HH:mm:ss"
-        ),
-        dayjs(
-            new Date(year.value, month.value, no_of_days.value.length)
-        ).format("YYYY-MM-DD [23:59:59]")
+        dayjs.utc().date(1).hour(0).minute(0).second(0).format(),
+        dayjs
+            .utc(new Date(year.value, month.value, no_of_days.value.length))
+            .format("YYYY-MM-DDT[23:59:59Z]")
     );
     if (
         month.value !== new Date().getMonth() &&
         year.value !== new Date().getFullYear()
     ) {
         let eventToday = await EventService.findAllByBetweenDate(
-            dayjs().format("YYYY-MM-DD HH:mm:ss"),
-            dayjs().format("YYYY-MM-DD [23:59:59]")
+            dayjs.utc().date(1).hour(0).minute(0).second(0).format(),
+            dayjs.utc().format("YYYY-MM-DD [23:59:59]")
         );
         events.value.push(eventToday);
     }
@@ -296,7 +297,7 @@ function openEventScheduleModal(date) {
                         <h3
                             class="font-semibold text-lg leading-tight truncate mb-4"
                         >
-                            หมวดหมู่ห้องประชุม
+                            หมวดหมู่ห้องประชุมที่จองในเดือนนี้
                         </h3>
                         <div
                             class="flex items-center space-x-4"

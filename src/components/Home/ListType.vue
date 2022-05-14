@@ -9,6 +9,9 @@ import { useUtilStore } from "../../stores/utils";
 import WarningDialog from "../_Dialog/WarningDialog.vue";
 import EventDialog from "../_Dialog/EventDialog.vue";
 
+import utc from "dayjs/plugin/utc";
+dayjs.extend(utc);
+
 const props = defineProps({
     eventCategories: [],
 });
@@ -35,9 +38,11 @@ const getNameEventCategories = computed(() =>
 );
 
 async function search() {
+    let localStartDateTime = dayjs(form.value.startDateTime).format();
+    let localEndDateTime = dayjs(form.value.endDateTime).format();
     let data = await EventService.search(
-        dayjs(form.value.startDateTime).format("YYYY-MM-DD HH:mm:ss"),
-        dayjs(form.value.endDateTime).format("YYYY-MM-DD HH:mm:ss"),
+        dayjs.utc(localStartDateTime).format(),
+        dayjs.utc(localEndDateTime).format(),
         form.value.eventCategory,
         form.value.search
     );

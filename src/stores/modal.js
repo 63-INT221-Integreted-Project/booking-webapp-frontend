@@ -24,6 +24,8 @@ export const useModalStore = defineStore("modal", {
             eventCategoryModal: {
                 isOpen: false,
                 item: null,
+                isInvalid: false,
+                errorList: [],
             },
         };
     },
@@ -83,10 +85,11 @@ export const useModalStore = defineStore("modal", {
                 item: data.item,
             };
         },
-        toggleEventCategoryModal({ isOpen, item }) {
+        toggleEventCategoryModal({ isOpen, item, isInvalid }) {
             this.eventCategoryModal = {
                 isOpen: isOpen,
                 item: item,
+                isInvalid: isInvalid,
             };
         },
     },

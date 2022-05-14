@@ -27,5 +27,10 @@ export const useUtilStore = defineStore("util", {
                     .format("DD/MM/YYYY")
             );
         },
+        isNumberOnly(evt) {
+            if (evt.which < 48 || evt.which > 57) {
+                evt.preventDefault();
+            }
+        },
     },
 });

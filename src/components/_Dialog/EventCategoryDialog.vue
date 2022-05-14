@@ -11,6 +11,14 @@ const props = defineProps({
         type: Object,
         default: null,
     },
+    isInvalid: {
+        type: Boolean,
+        default: false,
+    },
+    errorList: {
+        type: Array,
+        default: () => [],
+    },
 });
 const emit = defineEmits(["close", "save"]);
 
@@ -38,6 +46,8 @@ const isEventDurationInvalid = computed(() => {
 
 const showErrorList = computed(() => {
     let errorType = [];
+    if (!props.isInvalid) return [];
+    if (props.errorList.length) errorType.push(...props.errorList);
     if (isEventDurationInvalid.value)
         errorType.push(isEventDurationInvalid.value);
     if (!form.value.eventCategoryName)
@@ -113,12 +123,13 @@ function onSubmit() {
                         type="text"
                         v-model="form.eventCategoryName"
                         :class="{
-                            'border-red-500 border-3': !form.eventCategoryName,
+                            'border-red-500 border-3':
+                                !form.eventCategoryName && props.isInvalid,
                         }"
                     />
                     <p
                         class="text-error text-xs text-red-600"
-                        v-if="!form.eventCategoryName"
+                        v-if="!form.eventCategoryName && props.isInvalid"
                     >
                         กรุณากรอกชื่อหมวดหมู่การจอง
                     </p>
@@ -135,12 +146,13 @@ function onSubmit() {
                         v-model="form.eventCategoryDescription"
                         :class="{
                             'border-red-500 border-3':
-                                !form.eventCategoryDescription,
+                                !form.eventCategoryDescription &&
+                                props.isInvalid,
                         }"
                     />
                     <p
                         class="text-error text-xs text-red-600"
-                        v-if="!form.eventCategoryDescription"
+                        v-if="!form.eventCategoryDescription && props.isInvalid"
                     >
                         กรุณากรอกรายละเอียดหมวดหมู่การจอง
                     </p>
@@ -154,12 +166,13 @@ function onSubmit() {
                         class="bg-gray-200 appearance-none border-2 border-gray-200 rounded-lg w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-blue-500"
                         v-model="form.eventDuration"
                         :class="{
-                            'border-red-500 border-3': isEventDurationInvalid,
+                            'border-red-500 border-3':
+                                isEventDurationInvalid && props.isInvalid,
                         }"
                     />
                     <p
                         class="text-error text-xs text-red-600"
-                        v-if="isEventDurationInvalid"
+                        v-if="isEventDurationInvalid && props.isInvalid"
                     >
                         {{ isEventDurationInvalid }}
                     </p>
