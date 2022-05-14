@@ -5,7 +5,7 @@ import ListType from "../components/Home/ListType.vue";
 import EventService from "../services/events.service";
 import { computed, onMounted, ref } from "vue-demi";
 import EventDialog from "../components/_Dialog/EventDialog.vue";
-import EventCategoriesService from "@/services/event-categories.service";
+import EventCategoriesService from "../services/event-categories.service";
 import dayjs from "dayjs";
 import { useModalStore } from "../stores/modal";
 import WarningDialog from "../components/_Dialog/WarningDialog.vue";
