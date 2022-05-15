@@ -63,6 +63,17 @@ function checkFormValid(eventCategory) {
         errorList.push("- ชื่อหมวดหมู่ต้องไม่เกิน 100 ตัวอักษร");
     if (!eventCategory.eventCategoryDescription.length > 500)
         errorList.push("- คำอธิบายหมวดหมู่ต้องไม่เกิน 500 ตัวอักษร");
+    if (!eventCategory.eventDuration)
+        errorList.push("- กรุณากรอกระยะเวลาการจอง");
+    if (isNaN(eventCategory.eventDuration))
+        errorList.push("- ระยะเวลาต้องเป็นตัวเลขเท่านั้น");
+    if (
+        !(
+            eventCategory.eventDuration >= 1 &&
+            eventCategory.eventDuration <= 480
+        )
+    )
+        errorList.push("- ช่วงระยะเวลาในการจองต้องอยู่ในช่วง 1 - 480 นาที");
     return errorList;
 }
 

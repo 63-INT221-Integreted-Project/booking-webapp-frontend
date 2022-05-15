@@ -54,7 +54,6 @@ const showErrorList = computed(() => {
 });
 
 function onSubmit() {
-    if (isEventDurationInvalid.value || !form.value.eventCategoryName) return;
     emit("save", form.value);
 }
 </script>
