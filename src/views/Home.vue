@@ -87,7 +87,7 @@ function validate(form) {
 
 async function saveEvent(form) {
     if (!validate(form)) return;
-    if (dayjs().diff(dayjs(form.eventStartTime), "second") < 0) {
+    if (dayjs().diff(dayjs(form.eventStartTime), "seconds") <= 0) {
         modal.eventModal.isInvalid = true;
         modal.eventModal.errorType = ["- เวลาปัจจุบันน้อยกว่าเวลาเริ่มการจอง"];
         return;
