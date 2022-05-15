@@ -21,6 +21,14 @@ onMounted(async () => {
 });
 
 async function saveEventCategory(eventCategory) {
+    modal.eventCategoryModal.isInvalid = false;
+    let valid = checkFormValid(eventCategory);
+    if (valid.length) {
+        modal.eventCategoryModal.isInvalid = true;
+        modal.eventCategoryModal.errorList = valid;
+        return;
+    }
+
     let findExistCategoryName = eventCategories.value.find(
         (ec) =>
             ec.eventCategoryName === eventCategory.eventCategoryName &&
@@ -45,6 +53,17 @@ async function saveEventCategory(eventCategory) {
         item: null,
         isInvalid: false,
     });
+}
+
+function checkFormValid(eventCategory) {
+    let errorList = [];
+    if (!eventCategory.eventCategoryName)
+        errorList.push("- กรุณากรอกชื่อหมวดหมู่");
+    if (!eventCategory.eventCategoryName.length > 100)
+        errorList.push("- ชื่อหมวดหมู่ต้องไม่เกิน 100 ตัวอักษร");
+    if (!eventCategory.eventCategoryDescription.length > 500)
+        errorList.push("- คำอธิบายหมวดหมู่ต้องไม่เกิน 500 ตัวอักษร");
+    return errorList;
 }
 
 async function deleteEventCategory(eventCategory) {

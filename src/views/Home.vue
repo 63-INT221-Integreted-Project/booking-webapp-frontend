@@ -39,13 +39,14 @@ async function getEventCategories() {
 }
 
 function validate(form) {
+    modal.eventModal.isInvalid = false;
     modal.eventModal.errorType = [];
     if (
         !form.bookingName ||
         !form.bookingEmail ||
         !form.eventDuration ||
         !form.eventCategory ||
-        !form.eventStartTime ||
+        form.eventStartTime === "Invalid Date" ||
         !/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,5})+$/.test(form.bookingEmail)
     ) {
         if (!form.bookingName) {
@@ -61,7 +62,7 @@ function validate(form) {
         ) {
             modal.eventModal.errorType.push("- รูปแบบอีเมลไม่ถูกต้อง");
         }
-        if (!form.eventStartTime) {
+        if (form.eventStartTime === "Invalid Date") {
             modal.eventModal.errorType.push("- กรุณากรอกเวลาเริ่มการจอง");
         }
         if (!form.eventCategory) {
@@ -93,9 +94,8 @@ async function saveEvent(form) {
         utcTime.add(form.eventDuration, "minute").format()
     );
     let findIsInRange = events.find((event) => {
-        console.log(form.eventCategory);
         if (
-            event.eventCategory.eventCategoryName !== form.eventCategory &&
+            event.eventCategory.eventCategoryName === form.eventCategory &&
             form.eventId === event.eventId
         )
             return undefined;
