@@ -87,11 +87,6 @@ function validate(form) {
 
 async function saveEvent(form) {
     if (!validate(form)) return;
-    if (dayjs().diff(dayjs(form.eventStartTime), "seconds") <= 0) {
-        modal.eventModal.isInvalid = true;
-        modal.eventModal.errorType = ["- เวลาปัจจุบันน้อยกว่าเวลาเริ่มการจอง"];
-        return;
-    }
     let localTime = dayjs(form.eventStartTime).format("YYYY-MM-DDTHH:mm:ssZ");
     let utcTime = dayjs.utc(localTime);
     let events = await EventService.findAllByBetweenDate(
