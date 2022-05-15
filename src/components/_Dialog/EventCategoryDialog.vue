@@ -36,11 +36,11 @@ const modalTitle = computed(() => {
 });
 
 const isEventDurationInvalid = computed(() => {
-    if (!form.value.eventDuration) return "กรุณากรอกระยะเวลาการจอง";
+    if (!form.value.eventDuration) return "- กรุณากรอกระยะเวลาการจอง";
     if (isNaN(form.value.eventDuration))
-        return "ระยะเวลาต้องเป็นตัวเลขเท่านั้น";
+        return "- ระยะเวลาต้องเป็นตัวเลขเท่านั้น";
     if (!(form.value.eventDuration >= 1 && form.value.eventDuration <= 480))
-        return "ช่วงระยะเวลาในการจองต้องอยู่ในช่วง 1 - 480 นาที";
+        return "- ช่วงระยะเวลาในการจองต้องอยู่ในช่วง 1 - 480 นาที";
     return null;
 });
 
@@ -50,13 +50,10 @@ const showErrorList = computed(() => {
     if (props.errorList.length) errorType.push(...props.errorList);
     if (isEventDurationInvalid.value)
         errorType.push(isEventDurationInvalid.value);
-    if (!form.value.eventCategoryName)
-        errorType.push("กรุณากรอกชื่อหมวดหมู่การจอง");
     return errorType.join("<br/>");
 });
 
 function onSubmit() {
-    if (isEventDurationInvalid.value || !form.value.eventCategoryName) return;
     emit("save", form.value);
 }
 </script>
@@ -65,11 +62,10 @@ function onSubmit() {
     <div
         style="background-color: rgba(0, 0, 0, 0.8)"
         class="fixed z-40 top-0 right-0 left-0 bottom-0 h-full w-full"
-           v-show.transition.opacity="openModal"
-        @click.self.prevent.stop="emit('close', !openModal)"
+        v-show.transition.opacity="openModal"
     >
         <div
-            class="p-4 max-w-xl mx-auto absolute left-0 right-0 overflow-hidden mt-56 top-[5%] 2xl:top-[15%]"
+            class="p-4 max-w-xl mx-auto absolute left-0 right-0 overflow-hidden top-0 2xl:top-[15%]"
         >
             <div
                 class="shadow absolute right-0 top-0 w-10 h-10 rounded-full bg-white text-gray-500 hover:text-gray-800 inline-flex items-center justify-center cursor-pointer"
@@ -138,11 +134,6 @@ function onSubmit() {
                         class="bg-gray-200 appearance-none border-2 border-gray-200 rounded-lg w-full pt-4 pb-16 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-blue-500"
                         type="text"
                         v-model="form.eventCategoryDescription"
-                        :class="{
-                            'border-red-500 border-3':
-                                !form.eventCategoryDescription &&
-                                props.isInvalid,
-                        }"
                         maxlength="500"
                     />
                 </div>

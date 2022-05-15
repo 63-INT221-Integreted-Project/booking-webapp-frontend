@@ -106,7 +106,7 @@ const isEventDurationInvalid = computed(() => {
 <template>
     <div
         style="background-color: rgba(0, 0, 0, 0.8)"
-        class="fixed z-40 top-0 right-0 left-0 bottom-0 h-full w-full"
+        class="fixed z-40 top-0 right-0 left-0 bottom-0 h-full w-full overflow-scroll"
         v-show.transition.opacity="openModal"
     >
         <div
@@ -126,7 +126,9 @@ const isEventDurationInvalid = computed(() => {
                     />
                 </svg>
             </div>
-            <div class="shadow w-full rounded-lg bg-white block p-8">
+            <div
+                class="shadow w-full rounded-lg bg-white block p-8 overflow-scroll"
+            >
                 <h2 class="font-bold text-2xl mb-6 text-gray-800 border-b pb-2">
                     {{ title }}
                 </h2>
@@ -210,7 +212,7 @@ const isEventDurationInvalid = computed(() => {
                         :readonly="!!form.eventId"
                     />
                     <datalist id="eventCategoriesList">
-                        <template v-for="(ec,index) in getEventCategoriesName">
+                        <template v-for="(ec, index) in getEventCategoriesName">
                             <option :data-value="ec">{{ ec }}</option>
                         </template>
                     </datalist>
@@ -251,20 +253,20 @@ const isEventDurationInvalid = computed(() => {
                     >
                     <input
                         class="bg-gray-200 appearance-none border-2 border-gray-200 rounded-lg w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-blue-500"
-                       v-model="form.eventDuration"
-                       type="text"
+                        v-model="form.eventDuration"
+                        type="text"
                         :class="{
                             'border-red-500 border-3':
-                             isEventDurationInvalid,
-                                // isInvalid && isEventDurationInvalid,
+                                isInvalid && isEventDurationInvalid,
+                            // isInvalid && isEventDurationInvalid,
                         }"
-                       
                         :readonly="!!form.eventId"
                         @keypress="util.isNumberOnly"
                     />
                     <p
                         class="text-error text-xs text-red-600"
-                         v-if="isEventDurationInvalid">
+                        v-if="isInvalid && isEventDurationInvalid"
+                    >
                         <!-- v-if="isInvalid && isEventDurationInvalid"
                     > -->
                         {{ isEventDurationInvalid }}
