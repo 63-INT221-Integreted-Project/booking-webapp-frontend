@@ -5,7 +5,7 @@ const teams = ref([
     {
         name: "Karunpat Promvisut",
         id: "63130500002",
-        img: "/images/63130500002.png",
+        img: "/kp2/images/63130500002.png",
         ig: "https://www.instagram.com/jom_karunpat/",
         fb: "https://www.facebook.com/jomcootle",
         git: "https://github.com/AloneSpace",
@@ -13,7 +13,7 @@ const teams = ref([
     {
         name: "Thiraphat Itamonchai",
         id: "63130500060",
-        img: "/images/63130500060.jpeg",
+        img: "/kp2/images/63130500060.jpeg",
         ig: "https://www.instagram.com/futur3_3/?hl=en",
         fb: "https://www.facebook.com/FewThiraphat",
         git: "https://github.com/fewthiraphat",
