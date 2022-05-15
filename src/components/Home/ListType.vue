@@ -194,7 +194,7 @@ function editEvent(event) {
                         alt="calendar"
                         width="500"
                     />
-                    <h2 class="text-2xl text-center">ไม่มีการจองในวันนี้</h2>
+                    <h2 class="text-2xl text-center">ไม่มีข้อมูลการจอง</h2>
                 </div>
                 <div class="flex flex-col w-full" v-else>
                     <h2 class="block text-xl mb-4">
