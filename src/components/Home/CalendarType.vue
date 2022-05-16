@@ -320,17 +320,18 @@ function filterEvents(date) {
         </div>
         <div class="col-span-5 row-span-3">
             <div class="flex justify-between mb-2">
-                <Tab
-                    v-model="tabSelected"
-                    :tabList="['ทั้งหมด', 'อดีต', 'ปัจจุบันและอนาคต']"
-                ></Tab>
-                <button
-                    class="bg-indigo-500 text-white active:bg-indigo-600 text-sm font-bold uppercase p-3 rounded outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
+                 <button
+                    class="h-12 px-5 m-2  bg-indigo-500 text-white active:bg-indigo-600 text-sm font-bold uppercase p-3 rounded outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
                     type="button"
                     @click="openBookingEventModal"
                 >
                     + จองการประชุม
                 </button>
+                <Tab
+                    v-model="tabSelected"
+                    :tabList="['ทั้งหมด', 'อดีต', 'ปัจจุบันและอนาคต']"
+                ></Tab>
+               
             </div>
             <div>
                 <div class="bg-white rounded-lg shadow overflow-hidden">
