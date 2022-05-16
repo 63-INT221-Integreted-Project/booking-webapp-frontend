@@ -52,11 +52,11 @@ const form = ref({
     eventNotes: props.event?.eventNotes || "",
 });
 
-const today = ref(dayjs().format("YYYY-MM-DDTHH:mm"));
+const today = ref(dayjs().add(1, "minute").format("YYYY-MM-DDTHH:mm"));
 
 onMounted(() => {
     setInterval(() => {
-        today.value = dayjs().format("YYYY-MM-DDTHH:mm");
+        today.value = dayjs().add(1, "minute").format("YYYY-MM-DDTHH:mm");
         compareDate();
     }, 1000);
 });

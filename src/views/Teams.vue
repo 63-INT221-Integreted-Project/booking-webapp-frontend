@@ -22,7 +22,7 @@ const teams = ref([
     {
         name: "Natasia Yusuwapan",
         id: "63130500070",
-        img: "/images/63130500070.png",
+        img: "/kp2/images/63130500070.png",
         ig: "https://www.instagram.com/nata_zia/?hl=en",
         fb: "https://www.facebook.com/profile.php?id=100002876274183",
         git: "https://github.com/Natasia09",
