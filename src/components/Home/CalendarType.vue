@@ -77,14 +77,14 @@ async function fetchEvents() {
             .format("YYYY-MM-DDT[23:59:59Z]")
     );
     if (
-        month.value !== new Date().getMonth() &&
+        month.value !== new Date().getMonth() ||
         year.value !== new Date().getFullYear()
     ) {
         let eventToday = await EventService.findAllByBetweenDate(
-            dayjs.utc().date(1).hour(0).minute(0).second(0).format(),
-            dayjs.utc().format("YYYY-MM-DD [23:59:59]")
+            dayjs.utc().format("YYYY-MM-DDT[00:00:00Z]"),
+            dayjs.utc().format("YYYY-MM-DDT[23:59:59Z]")
         );
-        events.value.push(eventToday);
+        events.value.push(...eventToday);
     }
 }
 
@@ -320,8 +320,8 @@ function filterEvents(date) {
         </div>
         <div class="col-span-5 row-span-3">
             <div class="flex justify-between mb-2">
-                 <button
-                    class="h-12 px-5 m-2  bg-indigo-500 text-white active:bg-indigo-600 text-sm font-bold uppercase p-3 rounded outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
+                <button
+                    class="h-12 px-5 m-2 bg-indigo-500 text-white active:bg-indigo-600 text-sm font-bold uppercase p-3 rounded outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
                     type="button"
                     @click="openBookingEventModal"
                 >
@@ -331,7 +331,6 @@ function filterEvents(date) {
                     v-model="tabSelected"
                     :tabList="['ทั้งหมด', 'อดีต', 'ปัจจุบันและอนาคต']"
                 ></Tab>
-               
             </div>
             <div>
                 <div class="bg-white rounded-lg shadow overflow-hidden">
