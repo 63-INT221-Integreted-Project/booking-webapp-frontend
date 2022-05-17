@@ -22,10 +22,10 @@ const search = async function (dateStart, dateEnd, category, word) {
         );
     }
     let queryString = {};
-    if (category) queryString.category = category;
-    if (word) queryString.word = word;
-    if (dateStart !== "Invalid Date") queryString.dateStart = dateStart;
-    if (dateEnd !== "Invalid Date") queryString.dateEnd = dateEnd;
+    queryString.category = category || "";
+    queryString.word = word || "";
+    queryString.dateStart = dateStart !== "Invalid Date" ? dateStart : "";
+    queryString.dateEnd = dateEnd !== "Invalid Date" ? dateEnd : "";
     let url =
         "/search?" +
         Object.entries(queryString)
