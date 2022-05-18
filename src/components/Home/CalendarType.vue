@@ -133,7 +133,9 @@ const getEventInComing = computed(() => {
 });
 
 const bookingInThisMonth = computed(() => {
-    return events.value.length;
+    return events.value.filter((event) => {
+        return dayjs(event.eventStartTime).month() === month.value;
+    });
 });
 
 const getUniqueEventCategory = computed(() => {
