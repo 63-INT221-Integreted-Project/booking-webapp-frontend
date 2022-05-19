@@ -30,18 +30,18 @@ const teams = ref([
 ]);
 </script>
 <template>
-    <div class="flex w-full flex space-x-4 md:space-x-8 px-9 ">
+    <div class="flex w-full justify-around space-x-4 md:space-x-8 px-9">
         <div
             v-for="(team, index) in teams"
-            class="rounded-3xl bg-slate-200 my-3 p-24 relative "
+            class="rounded-3xl bg-slate-200 my-3 p-24 relative"
             :key="index"
         >
             <div
                 class="absolute top-[-5%] bottom-0 left-[50%] absolute inset-x-0 top-0 h-16"
             >
-                <img 
+                <img
                     :src="team.img"
-                    class="rounded-full border-radius 50% border-solid border-white border-2 -mt-8 w-32 translate-x-[-50%] "
+                    class="rounded-full border-radius 50% border-solid border-white border-2 -mt-8 w-32 translate-x-[-50%]"
                 />
                 <!-- src="https://as2.ftcdn.net/v2/jpg/04/93/60/27/1000_F_493602719_ofNXJoIi0ChXSGedE6OpF36sc0RxU5w2.jpg" -->
             </div>
@@ -50,12 +50,13 @@ const teams = ref([
             <p class="text-center text-s">{{ team.name }}</p>
             <div>
                 <div style="margin-top: 1.2em">
-                    <ul class="list-in-line flex items-stretch ">&emsp;&nbsp;&nbsp; 
+                    <ul class="list-in-line flex items-stretch">
+                        &emsp;&nbsp;&nbsp;
                         <li class="inline-block w-10">
                             <a :href="team.ig">
                                 <i
-                                    class="fa fa-instagram " 
-                                    style="font-size: 26px; color: black;"
+                                    class="fa fa-instagram"
+                                    style="font-size: 26px; color: black"
                                 ></i>
                             </a>
                         </li>

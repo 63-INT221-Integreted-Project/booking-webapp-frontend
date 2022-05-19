@@ -22,8 +22,8 @@ const search = async function (dateStart, dateEnd, category, word) {
         );
     }
     let queryString = {};
-    if (category) queryString.category = category;
-    if (word) queryString.word = word;
+    queryString.category = category || "";
+    queryString.word = word || "";
     queryString.dateStart = dateStart !== "Invalid Date" ? dateStart : "";
     queryString.dateEnd = dateEnd !== "Invalid Date" ? dateEnd : "";
     let url =

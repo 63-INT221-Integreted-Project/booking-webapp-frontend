@@ -89,11 +89,8 @@ async function submitCancleEvent(event) {
     await search();
 }
 
-function isFromFutureOrToday(event) {
-    return (
-        dayjs(event.eventStartTime).add(event.eventDuration, "minute") >=
-        dayjs()
-    );
+function isCanModifyEvent(event) {
+    return dayjs().diff(dayjs(event.eventStartTime), "second") <= 0;
 }
 
 function editEvent(event) {
@@ -243,7 +240,7 @@ function editEvent(event) {
                                         นาที)
                                     </h3>
                                 </div>
-                                <div v-if="isFromFutureOrToday(event)">
+                                <div v-if="isCanModifyEvent(event)">
                                     <div class="block mb-2">
                                         <button
                                             class="bg-yellow-500 hover:bg-blue-light text-white font-extrabold py-2 px-4 border-b-4 border-yellow-600 rounded mr-2"

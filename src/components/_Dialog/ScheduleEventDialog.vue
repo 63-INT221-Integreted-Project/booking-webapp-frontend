@@ -20,7 +20,12 @@ const props = defineProps({
         type: String,
     },
 });
-const emit = defineEmits(["close", "bookingThisDate", "cancleEvent"]);
+const emit = defineEmits([
+    "close",
+    "bookingThisDate",
+    "cancleEvent",
+    "editEvent",
+]);
 
 const util = useUtilStore();
 
@@ -35,6 +40,10 @@ const eventSortByDateASC = computed(() => {
         return dayjs(a.eventStartTime).diff(dayjs(b.eventStartTime));
     });
 });
+
+function isCanModifyEvent(event) {
+    return dayjs().diff(dayjs(event.eventStartTime), "second") <= 0;
+}
 </script>
 
 <template>
@@ -129,7 +138,7 @@ const eventSortByDateASC = computed(() => {
                                     {{ event.eventNotes || "-" }}
                                 </h3>
                             </div>
-                            <div v-if="isFromFutureOrToday">
+                            <div v-if="isCanModifyEvent(event)">
                                 <div class="block mb-2">
                                     <button
                                         class="bg-yellow-500 hover:bg-blue-light text-white font-extrabold py-2 px-4 border-b-4 border-yellow-600 rounded mr-2"

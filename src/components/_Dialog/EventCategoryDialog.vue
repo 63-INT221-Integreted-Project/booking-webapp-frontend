@@ -48,8 +48,6 @@ const showErrorList = computed(() => {
     let errorType = [];
     if (!props.isInvalid) return [];
     if (props.errorList.length) errorType.push(...props.errorList);
-    if (isEventDurationInvalid.value)
-        errorType.push(isEventDurationInvalid.value);
     return errorType.join("<br/>");
 });
 

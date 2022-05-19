@@ -90,7 +90,7 @@ const isEmailInvalid = computed(() => {
             form.value.bookingEmail
         )
     )
-        return "กรุณากรอกรูปแบบอีเมล เช่น @gmail.com, @hotmail.com";
+        return "รูปแบบอีเมลไม่ถูกต้อง";
     return "";
 });
 const isEventDurationInvalid = computed(() => {

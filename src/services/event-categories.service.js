@@ -13,7 +13,7 @@ const createEventCategory = async function (eventCategory) {
             "Content-Type": "application/json",
         },
         body: JSON.stringify({
-            eventCategoryName: eventCategory.eventCategoryName,
+            eventCategoryName: eventCategory.eventCategoryName.trim(),
             eventCategoryDescription:
                 eventCategory.eventCategoryDescription || "",
             eventDuration: eventCategory.eventDuration,
@@ -31,7 +31,7 @@ const updateEventCategory = async function (eventCategoryId, eventCategory) {
             },
             body: JSON.stringify({
                 eventCategoryId: eventCategoryId,
-                eventCategoryName: eventCategory.eventCategoryName,
+                eventCategoryName: eventCategory.eventCategoryName.trim(),
                 eventCategoryDescription:
                     eventCategory.eventCategoryDescription || "",
                 eventDuration: eventCategory.eventDuration,

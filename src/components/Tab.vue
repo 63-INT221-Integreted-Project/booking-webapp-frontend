@@ -2,60 +2,24 @@
 import { computed } from "vue-demi";
 
 const props = defineProps({
-  tabList: {
-    type: Array,
-  },
-  modelValue: {
-    type: Number,
-    default: 1,
-  },
+    tabList: {
+        type: Array,
+    },
 });
 
-const emit = defineEmits(["update:modelValue"]);
-
-const activeTab = computed({
-  get() {
-    return props.modelValue;
-  },
-  set(value) {
-    return emit("update:modelValue", value);
-  },
-});
+const emit = defineEmits(["update:modelValue", "backToDateNow"]);
 </script>
 
 <template>
-  <div>
-    <p class="text-black font-bold">
-      &emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;ประวัติการจอง
-    </p>
-    <ul
-      class="list-none bg-blue-900 bg-opacity-30 p-1 rounded-lg text-center overflow-auto whitespace-nowrap flex items-center mb-6"
-    >
-      <li
-        v-for="(tab, index) in tabList"
-        :key="index"
-        class="w-full px-4 py-1 rounded-lg"
-        :class="{
-          'text-blue-600 bg-white shadow-xl': index + 1 === activeTab,
-          'text-white': index + 1 !== activeTab,
-        }"
-      >
-        <label
-          :for="`tab-${index}`"
-          v-text="tab"
-          class="cursor-pointer block"
-        />
-        <input
-          :id="`tab-${index}`"
-          type="radio"
-          :name="`${index}-tab`"
-          :value="index + 1"
-          v-model="activeTab"
-          class="hidden"
-        />
-      </li>
-    </ul>
-  </div>
+    <div>
+        <button
+            class="h-12 px-5 m-2 bg-green-500 text-white active:bg-green-600 text-sm font-bold uppercase p-3 rounded outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150 w-full"
+            type="button"
+            @click="emit('backToDateNow')"
+        >
+            ย้อนกลับไปยังเดือนปัจจุบัน
+        </button>
+    </div>
 </template>
 
 <style></style>

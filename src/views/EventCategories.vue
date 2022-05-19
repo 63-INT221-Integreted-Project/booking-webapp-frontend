@@ -31,7 +31,8 @@ async function saveEventCategory(eventCategory) {
 
     let findExistCategoryName = eventCategories.value.find(
         (ec) =>
-            ec.eventCategoryName === eventCategory.eventCategoryName &&
+            ec.eventCategoryName.trim() ===
+                eventCategory.eventCategoryName.trim() &&
             ec.eventCategoryId !== eventCategory.eventCategoryId
     );
     if (findExistCategoryName) {

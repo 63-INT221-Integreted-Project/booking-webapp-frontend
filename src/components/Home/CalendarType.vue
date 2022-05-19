@@ -49,7 +49,6 @@ const year = ref(new Date().getFullYear());
 const no_of_days = ref([]);
 const blankdays = ref([]);
 const events = ref([]);
-const tabSelected = ref(1);
 
 onMounted(async () => {
     getNoOfDays();
@@ -61,6 +60,9 @@ function isToday(date) {
     const d = new Date(year.value, month.value, date);
 
     return today.toDateString() === d.toDateString();
+}
+function isEventPass(event) {
+    return dayjs(event.eventStartTime).diff(dayjs(), "seconds") < 0;
 }
 
 async function fetchEvents() {
@@ -77,14 +79,14 @@ async function fetchEvents() {
             .format("YYYY-MM-DDT[23:59:59Z]")
     );
     if (
-        month.value !== new Date().getMonth() &&
+        month.value !== new Date().getMonth() ||
         year.value !== new Date().getFullYear()
     ) {
         let eventToday = await EventService.findAllByBetweenDate(
-            dayjs.utc().date(1).hour(0).minute(0).second(0).format(),
-            dayjs.utc().format("YYYY-MM-DD [23:59:59]")
+            dayjs.utc().format("YYYY-MM-DDT[00:00:00Z]"),
+            dayjs.utc().format("YYYY-MM-DDT[23:59:59Z]")
         );
-        events.value.push(eventToday);
+        events.value.push(...eventToday);
     }
 }
 
@@ -115,9 +117,15 @@ function getNoOfDays() {
     no_of_days.value = daysArray;
 }
 
-const getEventToday = computed(() => {
+const getEventInComing = computed(() => {
     return events.value
-        .filter((event) => util.dateCompare(dayjs(), event.eventStartTime))
+        .filter((event) => {
+            //Create incoming event and ignore on-going and past about 1 hour event
+            return (
+                dayjs().diff(dayjs(event.eventStartTime), "second") <= 0 &&
+                dayjs(event.eventStartTime).diff(dayjs(), "second") <= 3600
+            );
+        })
         .sort(
             (a, b) =>
                 dayjs(a.eventStartTime).unix() - dayjs(b.eventStartTime).unix()
@@ -125,7 +133,9 @@ const getEventToday = computed(() => {
 });
 
 const bookingInThisMonth = computed(() => {
-    return events.value.length;
+    return events.value.filter((event) => {
+        return dayjs(event.eventStartTime).month() === month.value;
+    }).length;
 });
 
 const getUniqueEventCategory = computed(() => {
@@ -167,29 +177,12 @@ function openEventScheduleModal(date) {
         ),
     });
 }
-function filterEvents(date) {
-    let isBookingThisDate = function (event) {
-        return util.dateCompare(
-            dayjs(`${year.value}-${month.value + 1}-${date}`).format(
-                "YYYY-MM-DD"
-            ),
-            event.eventStartTime
-        );
-    };
-    let data = {
-        1: events.value.filter((e, i) => isBookingThisDate(e)),
-        2: events.value.filter(
-            (e, i) =>
-                isBookingThisDate(e) &&
-                e.eventStartTime < dayjs().format("YYYY-MM-DD")
-        ),
-        3: events.value.filter(
-            (e, i) =>
-                isBookingThisDate(e) &&
-                e.eventStartTime >= dayjs().format("YYYY-MM-DD")
-        ),
-    };
-    return data[tabSelected.value];
+
+async function backToDateNow() {
+    month.value = new Date().getMonth();
+    year.value = new Date().getFullYear();
+    getNoOfDays();
+    await fetchEvents();
 }
 </script>
 
@@ -217,26 +210,27 @@ function filterEvents(date) {
                             <h3
                                 class="font-semibold text-lg leading-tight truncate mb-4"
                             >
-                                การจองวันนี้
+                                การจองที่กำลังจะมาถึง
                             </h3>
                             <h3 class="text-lg leading-tight truncate mb-4">
                                 <span class="font-semibold text-green-700"
-                                    >{{ getEventToday.length }}
+                                    >{{ getEventInComing.length }}
                                 </span>
                                 จอง
                             </h3>
                         </div>
                         <div
                             class="flex items-center space-x-4"
-                            v-for="event in getEventToday"
+                            v-for="event in getEventInComing"
                         >
-                            <div class="flex-shrink-0">
+                            <div class="flex-shrink-0 text-red-500">
                                 ({{ util.getHoursAndMinutes(event) }})
                             </div>
                             <div class="flex-1 min-w-0">
                                 <p
                                     class="text-sm font-medium text-gray-900 truncate"
                                 >
+                                    <span class="font-bold">ชื่อ:</span>
                                     {{ event.bookingName }}
                                 </p>
                             </div>
@@ -320,18 +314,14 @@ function filterEvents(date) {
         </div>
         <div class="col-span-5 row-span-3">
             <div class="flex justify-between mb-2">
-                 <button
-                    class="h-12 px-5 m-2  bg-indigo-500 text-white active:bg-indigo-600 text-sm font-bold uppercase p-3 rounded outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
+                <button
+                    class="h-12 px-5 m-2 bg-indigo-500 text-white active:bg-indigo-600 text-sm font-bold uppercase p-3 rounded outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
                     type="button"
                     @click="openBookingEventModal"
                 >
                     + จองการประชุม
                 </button>
-                <Tab
-                    v-model="tabSelected"
-                    :tabList="['ทั้งหมด', 'อดีต', 'ปัจจุบันและอนาคต']"
-                ></Tab>
-               
+                <Tab @back-to-date-now="backToDateNow"></Tab>
             </div>
             <div>
                 <div class="bg-white rounded-lg shadow overflow-hidden">
@@ -428,12 +418,12 @@ function filterEvents(date) {
                             >
                                 <div
                                     style="width: 14.28%; height: 150px"
-                                    class="px-4 pt-2 border-r border-b relative"
+                                    class="px-4 pt-2 border-r border-b relative cursor-pointer"
+                                    @click="openEventScheduleModal(date)"
                                 >
                                     <div
-                                        @click="openEventScheduleModal(date)"
                                         v-text="date"
-                                        class="inline-flex w-8 h-8 items-center justify-center cursor-pointer text-center leading-none rounded-full transition ease-in-out duration-100"
+                                        class="inline-flex w-8 h-8 items-center justify-center text-center leading-none rounded-full transition ease-in-out duration-100"
                                         :class="{
                                             'bg-blue-500 text-white':
                                                 isToday(date),
@@ -452,10 +442,25 @@ function filterEvents(date) {
                                         <template
                                             v-for="(
                                                 event, index
-                                            ) in filterEvents(date)"
+                                            ) in events.filter((event) =>
+                                                util.dateCompare(
+                                                    dayjs(
+                                                        `${year}-${
+                                                            month + 1
+                                                        }-${date}`
+                                                    ).format('YYYY-MM-DD'),
+                                                    event.eventStartTime
+                                                )
+                                            )"
                                         >
                                             <div
-                                                class="px-2 py-1 rounded-lg mt-1 overflow-hidden border border-blue-200 text-blue-800 bg-blue-100"
+                                                class="px-2 py-1 rounded-lg mt-1 overflow-hidden border"
+                                                :class="{
+                                                    'text-gray-600 bg-gray-200 border-gray-300':
+                                                        isEventPass(event),
+                                                    'border-blue-200 text-blue-800 bg-blue-100':
+                                                        !isEventPass(event),
+                                                }"
                                                 v-if="index <= 1"
                                             >
                                                 <p

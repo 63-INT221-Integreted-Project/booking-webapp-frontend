@@ -50,7 +50,7 @@ function validate(form) {
         !/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,5})+$/.test(form.bookingEmail)
     ) {
         if (!form.bookingName) {
-            modal.eventModal.errorType.push("- กรุณากรอกชื่อผู้จอง");
+            modal.eventModal.errorType.push("- กรุณากรอกชื่อการจอง");
         }
         if (!form.bookingEmail) {
             modal.eventModal.errorType.push("- กรุณากรอกอีเมลผู้จอง");

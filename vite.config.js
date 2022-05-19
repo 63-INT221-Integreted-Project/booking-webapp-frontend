@@ -9,6 +9,12 @@ export default defineConfig({
         alias: [{ find: "@", replacement: path.resolve(__dirname, "/src") }],
     },
     plugins: [vue()],
+    preview: {
+        host: "0.0.0.0",
+        port: 3000,
+        strictPort: true,
+        open: true,
+    },
     build: {
         rollupOptions: {
             external: ["_svg"],
