@@ -132,7 +132,7 @@ const getEventInComing = computed(() => {
         );
 });
 
-const bookingInThisMonth = computed(() => {
+const numBookingInThisMonth = computed(() => {
     return events.value.filter((event) => {
         return dayjs(event.eventStartTime).month() === month.value;
     }).length;
@@ -141,7 +141,7 @@ const bookingInThisMonth = computed(() => {
 const getUniqueEventCategory = computed(() => {
     try {
         let uniqueEventCategory = [];
-        if (!events.value.length) return [];
+        if (!numBookingInThisMonth.value) return [];
         events.value
             .map((ev) => ev.eventCategory)
             .forEach((ec) => {
@@ -270,7 +270,7 @@ async function backToDateNow() {
                             จองภายในเดือนนี้
                         </h3>
                         <h2 class="font-bold text-2xl leading-tight truncate">
-                            {{ bookingInThisMonth }}
+                            {{ numBookingInThisMonth }}
                         </h2>
                     </div>
                     <p
