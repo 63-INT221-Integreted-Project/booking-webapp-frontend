@@ -141,6 +141,7 @@ const bookingInThisMonth = computed(() => {
 const getUniqueEventCategory = computed(() => {
     try {
         let uniqueEventCategory = [];
+        if (!events.value.length) return [];
         events.value
             .map((ev) => ev.eventCategory)
             .forEach((ec) => {
