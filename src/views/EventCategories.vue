@@ -187,7 +187,14 @@ async function deleteEventCategory(eventCategory) {
                             <td
                                 class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4"
                             >
-                                {{ event.eventCategoryDescription || "-"}}
+                                <span
+                                    v-if="!event.eventCategoryDescription"
+                                    class="text-gray-400 italic font-thin"
+                                    >ไม่มีคำอธิบาย</span
+                                >
+                                <span v-else>
+                                    {{ event.eventCategoryDescription }}
+                                </span>
                             </td>
                             <td
                                 class="border-t-0 px-6 align-center border-l-0 border-r-0 text-xs whitespace-nowrap p-4"

@@ -239,6 +239,19 @@ function editEvent(event) {
                                         }}
                                         นาที)
                                     </h3>
+                                    <h3 class="block text-lg">
+                                        <span class="text-blue-500 font-bold"
+                                            >หมายเหตุ:
+                                        </span>
+                                        <span
+                                            v-if="!event.eventNotes"
+                                            class="text-gray-400 italic font-thin"
+                                            >ไม่มีหมายเหตุ</span
+                                        >
+                                        <span v-else>
+                                            {{ event.eventNotes }}
+                                        </span>
+                                    </h3>
                                 </div>
                                 <div v-if="isCanModifyEvent(event)">
                                     <div class="block mb-2">

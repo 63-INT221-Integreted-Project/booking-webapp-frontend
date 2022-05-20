@@ -135,7 +135,14 @@ function isCanModifyEvent(event) {
                                     <span class="text-blue-500 font-bold"
                                         >หมายเหตุ:
                                     </span>
-                                    {{ event.eventNotes || "-" }}
+                                    <span
+                                        v-if="!event.eventNotes"
+                                        class="text-gray-400 italic font-thin"
+                                        >ไม่มีหมายเหตุ</span
+                                    >
+                                    <span v-else>
+                                        {{ event.eventNotes }}
+                                    </span>
                                 </h3>
                             </div>
                             <div v-if="isCanModifyEvent(event)">
