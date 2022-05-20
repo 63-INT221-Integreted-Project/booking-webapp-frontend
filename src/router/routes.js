@@ -60,4 +60,9 @@ const routes = [
     },
 ];
 const router = createRouter({ history, routes });
+router.beforeEach((to, from, next) => {
+    // @ts-ignore
+    document.title = to.meta.title;
+    next();
+});
 export default router;
