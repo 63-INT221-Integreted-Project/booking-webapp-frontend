@@ -38,16 +38,21 @@ const getNameEventCategories = computed(() =>
 );
 
 async function search() {
-    let localStartDateTime = dayjs(form.value.startDateTime).format();
-    let localEndDateTime = dayjs(form.value.endDateTime).format();
-    let data = await EventService.search(
-        dayjs.utc(localStartDateTime).format(),
-        dayjs.utc(localEndDateTime).format(),
-        form.value.eventCategory,
-        form.value.search
-    );
-    createUniqueDate(data);
-    events.value = data;
+    try {
+        let localStartDateTime = dayjs(form.value.startDateTime).format();
+        let localEndDateTime = dayjs(form.value.endDateTime).format();
+        let data = await EventService.search(
+            dayjs.utc(localStartDateTime).format(),
+            dayjs.utc(localEndDateTime).format(),
+            form.value.eventCategory,
+            form.value.search
+        );
+        createUniqueDate(data);
+        events.value = data;
+    } catch (error) {
+        arrDate.value = [];
+        events.value = [];
+    }
 }
 
 function createUniqueDate(events) {

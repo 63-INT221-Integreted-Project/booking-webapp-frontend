@@ -21,39 +21,47 @@ onMounted(async () => {
 });
 
 async function saveEventCategory(eventCategory) {
-    modal.eventCategoryModal.isInvalid = false;
-    let valid = checkFormValid(eventCategory);
-    if (valid.length) {
-        modal.eventCategoryModal.isInvalid = true;
-        modal.eventCategoryModal.errorList = valid;
-        return;
-    }
+    try {
+        modal.eventCategoryModal.isInvalid = false;
+        modal.eventCategoryModal.errorList = [];
+        let valid = checkFormValid(eventCategory);
+        if (valid.length) {
+            modal.eventCategoryModal.isInvalid = true;
+            modal.eventCategoryModal.errorList = valid;
+            return;
+        }
 
-    let findExistCategoryName = eventCategories.value.find(
-        (ec) =>
-            ec.eventCategoryName.trim() ===
-                eventCategory.eventCategoryName.trim() &&
-            ec.eventCategoryId !== eventCategory.eventCategoryId
-    );
-    if (findExistCategoryName) {
-        modal.eventCategoryModal.isInvalid = true;
-        modal.eventCategoryModal.errorList = ["- ชื่อหมวดหมู่ซ้ำ"];
-        return;
-    }
-    if (eventCategory.eventCategoryId) {
-        await EventCategoriesService.updateEventCategory(
-            eventCategory.eventCategoryId,
-            eventCategory
+        let findExistCategoryName = eventCategories.value.find(
+            (ec) =>
+                ec.eventCategoryName.trim() ===
+                    eventCategory.eventCategoryName.trim() &&
+                ec.eventCategoryId !== eventCategory.eventCategoryId
         );
-    } else {
-        await EventCategoriesService.createEventCategory(eventCategory);
+        if (findExistCategoryName) {
+            modal.eventCategoryModal.isInvalid = true;
+            modal.eventCategoryModal.errorList = ["- ชื่อหมวดหมู่ซ้ำ"];
+            return;
+        }
+        if (eventCategory.eventCategoryId) {
+            await EventCategoriesService.updateEventCategory(
+                eventCategory.eventCategoryId,
+                eventCategory
+            );
+        } else {
+            await EventCategoriesService.createEventCategory(eventCategory);
+        }
+        eventCategories.value = await EventCategoriesService.findAll();
+        modal.toggleEventCategoryModal({
+            isOpen: false,
+            item: null,
+            isInvalid: false,
+        });
+    } catch (error) {
+        modal.eventCategoryModal.isInvalid = true;
+        modal.eventCategoryModal.errorList = [
+            "- เกิดข้อพลาดบางอย่าง กรุณาลองใหม่อีกครั้ง",
+        ];
     }
-    eventCategories.value = await EventCategoriesService.findAll();
-    modal.toggleEventCategoryModal({
-        isOpen: false,
-        item: null,
-        isInvalid: false,
-    });
 }
 
 function checkFormValid(eventCategory) {
@@ -174,7 +182,23 @@ async function deleteEventCategory(eventCategory) {
                     </thead>
 
                     <tbody>
+                        <tr v-if="!eventCategories.length">
+                            <td
+                                colspan="4"
+                                class="px-6 py-16 text-center text-blueGray-700"
+                            >
+                                <div class="flex justify-center items-center">
+                                    <img
+                                        src="/images/_svg/no-data.svg"
+                                        alt="no-data"
+                                        width="300"
+                                    />
+                                </div>
+                                <h2 class="text-xl text-center">ไม่มีข้อมูล</h2>
+                            </td>
+                        </tr>
                         <tr
+                            v-else
                             v-for="(event, index) in eventCategories"
                             :key="index"
                             class="text-black font-normal"
@@ -232,7 +256,7 @@ async function deleteEventCategory(eventCategory) {
                     </tbody>
                 </table>
             </div>
-            <div class="w-full">
+            <!-- <div class="w-full">
                 <div
                     class="hidden sm:flex sm:items-center sm:justify-between px-6 py-8"
                 >
@@ -262,7 +286,6 @@ async function deleteEventCategory(eventCategory) {
                                 :disabled="pagination.page === 1"
                             >
                                 <span>Previous</span>
-                                <!-- Heroicon name: solid/chevron-left -->
                                 <svg
                                     class="h-5 w-5 sr-only"
                                     xmlns="http://www.w3.org/2000/svg"
@@ -291,7 +314,6 @@ async function deleteEventCategory(eventCategory) {
                                 "
                             >
                                 <span>Next</span>
-                                <!-- Heroicon name: solid/chevron-right -->
                                 <svg
                                     class="h-5 w-5 sr-only"
                                     xmlns="http://www.w3.org/2000/svg"
@@ -309,7 +331,7 @@ async function deleteEventCategory(eventCategory) {
                         </nav>
                     </div>
                 </div>
-            </div>
+            </div> -->
         </div>
     </div>
 </template>

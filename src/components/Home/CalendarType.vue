@@ -66,27 +66,37 @@ function isEventPass(event) {
 }
 
 async function fetchEvents() {
-    events.value = await EventService.findAllByBetweenDate(
-        dayjs
-            .utc(new Date(year.value, month.value, no_of_days.value.length))
-            .date(1)
-            .hour(0)
-            .minute(0)
-            .second(0)
-            .format(),
-        dayjs
-            .utc(new Date(year.value, month.value, no_of_days.value.length + 1))
-            .format("YYYY-MM-DDT[23:59:59Z]")
-    );
-    if (
-        month.value !== new Date().getMonth() ||
-        year.value !== new Date().getFullYear()
-    ) {
-        let eventToday = await EventService.findAllByBetweenDate(
-            dayjs.utc().format("YYYY-MM-DDT[00:00:00Z]"),
-            dayjs.utc().format("YYYY-MM-DDT[23:59:59Z]")
+    try {
+        events.value = await EventService.findAllByBetweenDate(
+            dayjs
+                .utc(new Date(year.value, month.value, no_of_days.value.length))
+                .date(1)
+                .hour(0)
+                .minute(0)
+                .second(0)
+                .format(),
+            dayjs
+                .utc(
+                    new Date(
+                        year.value,
+                        month.value,
+                        no_of_days.value.length + 1
+                    )
+                )
+                .format("YYYY-MM-DDT[23:59:59Z]")
         );
-        events.value.push(...eventToday);
+        if (
+            month.value !== new Date().getMonth() ||
+            year.value !== new Date().getFullYear()
+        ) {
+            let eventToday = await EventService.findAllByBetweenDate(
+                dayjs.utc().format("YYYY-MM-DDT[00:00:00Z]"),
+                dayjs.utc().format("YYYY-MM-DDT[23:59:59Z]")
+            );
+            events.value.push(...eventToday);
+        }
+    } catch (error) {
+        events.value = [];
     }
 }
 

@@ -87,55 +87,69 @@ function validate(form) {
 
 async function saveEvent(form) {
     if (!validate(form)) return;
-    let localTime = dayjs(form.eventStartTime).format("YYYY-MM-DDTHH:mm:ssZ");
-    let utcTime = dayjs.utc(localTime);
-    let events = await EventService.findAllByBetweenDate(
-        utcTime.format(),
-        utcTime.add(form.eventDuration, "minute").format()
-    );
-    let findIsInRange = events.find((event) => {
-        if (
-            event.eventCategory.eventCategoryName === form.eventCategory &&
-            form.eventId === event.eventId
-        )
-            return undefined;
-        let startFromEvent = dayjs.utc(event.eventStartTime).format();
-        let startFromForm = utcTime.format();
-        let endFromEvent = dayjs
-            .utc(event.eventStartTime)
-            .add(event.eventDuration, "minute")
-            .format();
-        let endFromForm = utcTime.add(form.eventDuration, "minute").format();
-        return (
-            (event.eventId !== form.eventId &&
-                startFromForm >= startFromEvent &&
-                startFromForm <= endFromEvent) ||
-            (endFromForm >= startFromEvent && endFromForm <= endFromEvent)
+    try {
+        let localTime = dayjs(form.eventStartTime).format(
+            "YYYY-MM-DDTHH:mm:ssZ"
         );
-    });
-    if (findIsInRange) {
+        let utcTime = dayjs.utc(localTime);
+        let events = await EventService.findAllByBetweenDate(
+            utcTime.format(),
+            utcTime.add(form.eventDuration, "minute").format()
+        );
+        let findIsInRange = events.find((event) => {
+            if (
+                event.eventCategory.eventCategoryName === form.eventCategory &&
+                form.eventId === event.eventId
+            )
+                return undefined;
+            let startFromEvent = dayjs.utc(event.eventStartTime).format();
+            let startFromForm = utcTime.format();
+            let endFromEvent = dayjs
+                .utc(event.eventStartTime)
+                .add(event.eventDuration, "minute")
+                .format();
+            let endFromForm = utcTime
+                .add(form.eventDuration, "minute")
+                .format();
+            return (
+                (event.eventId !== form.eventId &&
+                    startFromForm >= startFromEvent &&
+                    startFromForm <= endFromEvent) ||
+                (endFromForm >= startFromEvent && endFromForm <= endFromEvent)
+            );
+        });
+        if (findIsInRange) {
+            modal.eventModal.isInvalid = true;
+            modal.eventModal.errorType = [
+                "- หมวดหมู่นี่มีการจองในช่วงเวลานี้แล้ว",
+            ];
+            return;
+        }
+        if (form.eventId) {
+            let res = await EventService.updateEvent(form.eventId, {
+                eventStartTime: utcTime,
+                eventNotes: form.eventNotes,
+            });
+        } else {
+            await EventService.createEvent({
+                ...form,
+                eventCategoryId: eventCategories.value.find(
+                    (eventCategory) =>
+                        eventCategory.eventCategoryName === form.eventCategory
+                ).eventCategoryId,
+                eventStartTime: utcTime,
+            });
+        }
+        if (getTabItem.value === "calendar")
+            await calendarType.value.fetchEvents();
+        if (getTabItem.value === "list") await listType.value.search();
+        modal.clearEventModal();
+    } catch (error) {
         modal.eventModal.isInvalid = true;
-        modal.eventModal.errorType = ["- หมวดหมู่นี่มีการจองในช่วงเวลานี้แล้ว"];
-        return;
+        modal.eventModal.errorType = [
+            "- เกิดข้อผิดพลาดบางอย่าง กรุณาลองใหม่อีกครั้ง",
+        ];
     }
-    if (form.eventId) {
-        await EventService.updateEvent(form.eventId, {
-            eventStartTime: utcTime,
-            eventNotes: form.eventNotes,
-        });
-    } else {
-        await EventService.createEvent({
-            ...form,
-            eventCategoryId: eventCategories.value.find(
-                (eventCategory) =>
-                    eventCategory.eventCategoryName === form.eventCategory
-            ).eventCategoryId,
-            eventStartTime: utcTime,
-        });
-    }
-    if (getTabItem.value === "calendar") await calendarType.value.fetchEvents();
-    if (getTabItem.value === "list") await listType.value.search();
-    modal.clearEventModal();
 }
 
 function warningCancleEvent(event) {
