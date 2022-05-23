@@ -286,13 +286,13 @@ const isEventDurationInvalid = computed(() => {
                     </p>
                 </div>
                 <div class="mb-4">
-                    <p class="text-center font-bold text-lg">
+                    <p class="text-center font-bold">
                         เวลาการจอง
                         <span class="text-green-800" v-if="datePreview">
                             {{ datePreview }}
                         </span>
                         <span class="text-red-500" v-else>
-                            กรุณาเลือกช่วงเวลาการจองและระยะเวลาการจอง
+                            กรุณาเลือกช่วงเวลาและระยะเวลาการจอง
                         </span>
                     </p>
                 </div>
