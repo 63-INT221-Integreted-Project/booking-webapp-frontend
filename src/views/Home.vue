@@ -191,7 +191,7 @@ async function submitCancleEvent(event) {
             :isInvalid="modal.eventModal.isInvalid"
             @close="modal.eventModal.open = false"
             @onSave="saveEvent"
-        />
+        ></EventDialog>
         <div class="flex justify-center">
             <ul
                 class="flex flex-wrap text-sm font-medium text-center text-gray-500 dark:text-gray-400"

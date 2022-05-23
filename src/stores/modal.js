@@ -62,7 +62,7 @@ export const useModalStore = defineStore("modal", {
                       }),
                 isInvalid: false,
                 errorType: [],
-                title: `เพิ่ม Event`,
+                title: event ? `แก้ไข Event` : `เพิ่ม Event`,
             };
         },
         openScheduleModal(scheduleModal) {
