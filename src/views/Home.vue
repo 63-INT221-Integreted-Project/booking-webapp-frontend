@@ -93,8 +93,8 @@ async function saveEvent(form) {
         );
         let utcTime = dayjs.utc(localTime);
         let events = await EventService.findAllByBetweenDate(
-            utcTime.format(),
-            utcTime.add(form.eventDuration, "minute").format()
+            utcTime.hour(0).minute(0).second(0).format(),
+            utcTime.hour(23).minute(59).second(59).format()
         );
 
         let findIsInRange = events.find((event) => {
