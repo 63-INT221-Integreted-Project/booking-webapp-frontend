@@ -96,6 +96,7 @@ async function saveEvent(form) {
             utcTime.format(),
             utcTime.add(form.eventDuration, "minute").format()
         );
+
         let findIsInRange = events.find((event) => {
             if (
                 event.eventCategory.eventCategoryName === form.eventCategory &&

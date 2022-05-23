@@ -65,6 +65,19 @@ const getEventCategoriesName = computed(() => {
     return props.eventCategories?.map((ec) => ec.eventCategoryName) || [];
 });
 
+const datePreview = computed(() => {
+    if (!form.value.eventStartTime || !form.value.eventDuration) {
+        return "";
+    }
+    return (
+        dayjs(form.value.eventStartTime).format("HH:mm") +
+        " - " +
+        dayjs(form.value.eventStartTime)
+            .add(form.value.eventDuration, "minute")
+            .format("HH:mm")
+    );
+});
+
 function checkIfEventCategoryExists() {
     let exist = getEventCategoriesName.value.includes(form.value.eventCategory);
     if (!exist) return (form.value.eventCategory = "");
@@ -226,7 +239,7 @@ const isEventDurationInvalid = computed(() => {
                 <div class="mb-4">
                     <label
                         class="text-gray-800 block mb-1 font-bold text-sm tracking-wide"
-                        >ช่วงเวลาเริ่มต้น</label
+                        >ช่วงเวลาการจอง</label
                     >
                     <input
                         class="bg-gray-200 appearance-none border-2 border-gray-200 rounded-lg w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-blue-500"
@@ -249,7 +262,7 @@ const isEventDurationInvalid = computed(() => {
                 <div class="mb-4">
                     <label
                         class="text-gray-800 block mb-1 font-bold text-sm tracking-wide"
-                        >ระยะเวลา</label
+                        >ระยะเวลา (หน่วย นาที)</label
                     >
                     <input
                         class="bg-gray-200 appearance-none border-2 border-gray-200 rounded-lg w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-blue-500"
@@ -270,6 +283,17 @@ const isEventDurationInvalid = computed(() => {
                         <!-- v-if="isInvalid && isEventDurationInvalid"
                     > -->
                         {{ isEventDurationInvalid }}
+                    </p>
+                </div>
+                <div class="mb-4">
+                    <p class="text-center font-bold text-lg">
+                        เวลาการจอง
+                        <span class="text-green-800" v-if="datePreview">
+                            {{ datePreview }}
+                        </span>
+                        <span class="text-red-500" v-else>
+                            {{ datePreview }}
+                        </span>
                     </p>
                 </div>
                 <div class="mb-4">

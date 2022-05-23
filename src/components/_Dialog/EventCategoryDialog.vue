@@ -138,7 +138,7 @@ function onSubmit() {
                 <div class="mb-4">
                     <label
                         class="text-gray-800 block mb-1 font-bold text-sm tracking-wide"
-                        >ระยะเวลา</label
+                        >ระยะเวลา (หน่วย นาที)</label
                     >
                     <input
                         class="bg-gray-200 appearance-none border-2 border-gray-200 rounded-lg w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-blue-500"

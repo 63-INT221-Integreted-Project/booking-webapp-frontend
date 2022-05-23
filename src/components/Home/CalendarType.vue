@@ -189,6 +189,22 @@ function openEventScheduleModal(date) {
     });
 }
 
+function getCardEvents(date) {
+    return events.value
+        .filter((event) =>
+            util.dateCompare(
+                dayjs(`${year.value}-${month.value + 1}-${date}`).format(
+                    "YYYY-MM-DD"
+                ),
+                event.eventStartTime
+            )
+        )
+        .sort(
+            (a, b) =>
+                dayjs(a.eventStartTime).unix() - dayjs(b.eventStartTime).unix()
+        );
+}
+
 async function backToDateNow() {
     month.value = new Date().getMonth();
     year.value = new Date().getFullYear();
@@ -221,7 +237,7 @@ async function backToDateNow() {
                             <h3
                                 class="font-semibold text-lg leading-tight truncate mb-4"
                             >
-                                การจองที่กำลังจะมาถึง
+                                การจองที่กำลังจะมาถึงใน 1 ชั่วโมง
                             </h3>
                             <h3 class="text-lg leading-tight truncate mb-4">
                                 <span class="font-semibold text-green-700"
@@ -453,16 +469,7 @@ async function backToDateNow() {
                                         <template
                                             v-for="(
                                                 event, index
-                                            ) in events.filter((event) =>
-                                                util.dateCompare(
-                                                    dayjs(
-                                                        `${year}-${
-                                                            month + 1
-                                                        }-${date}`
-                                                    ).format('YYYY-MM-DD'),
-                                                    event.eventStartTime
-                                                )
-                                            )"
+                                            ) in getCardEvents(date)"
                                         >
                                             <div
                                                 class="px-2 py-1 rounded-lg mt-1 overflow-hidden border"
