@@ -60,9 +60,10 @@ const emit = defineEmits(["close", "remove"]);
                     <div class="text-center p-12">
                         <div class="text-gray-800 text-2xl">
                             คุณต้องการจะลบ
-                            <span class="underline text-red-500">{{
-                                name
-                            }}</span>
+                            <span
+                                class="underline text-red-500 text-ellipsis"
+                                >{{ name }}</span
+                            >
                             หรือไม่ ?
                         </div>
                         <div class="text-gray-600 text-lg mt-2">
