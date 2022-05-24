@@ -101,6 +101,16 @@ function isCanModifyEvent(event) {
 function editEvent(event) {
     modal.editBookingEventModal(event);
 }
+
+function compareDateSearch() {
+    if (!form.value.startDateTime && !form.value.endDateTime) return;
+    if (
+        form.value.endDateTime < form.value.startDateTime &&
+        form.value.endDateTime
+    ) {
+        form.value.endDateTime = form.value.startDateTime;
+    }
+}
 </script>
 
 <template>
@@ -147,12 +157,15 @@ function editEvent(event) {
                             placeholder="วันที่"
                             v-model="form.startDateTime"
                             type="datetime-local"
+                            @input="compareDateSearch()"
                         />
                         <input
                             class="bg-gray-200 appearance-none border-2 border-gray-200 rounded-lg w-1/2 py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-blue-500 ml-2"
                             v-model="form.endDateTime"
                             placeholder="สิ้นสุด"
                             type="datetime-local"
+                            :min="form.startDateTime"
+                            @input="compareDateSearch()"
                         />
                     </div>
                 </div>
