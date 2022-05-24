@@ -33,6 +33,7 @@ export const useModalStore = defineStore("modal", {
         clearEventModal() {
             this.eventModal = {
                 open: false,
+                title: "",
                 event: {},
                 isInvalid: false,
                 errorType: [],
@@ -89,6 +90,7 @@ export const useModalStore = defineStore("modal", {
             this.eventCategoryModal = {
                 isOpen: isOpen,
                 item: item,
+                errorList: [],
                 isInvalid: isInvalid,
             };
         },

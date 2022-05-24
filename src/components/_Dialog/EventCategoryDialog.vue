@@ -32,7 +32,7 @@ const form = ref({
 const modalTitle = computed(() => {
     return !form.value.eventCategoryId
         ? "เพิ่มหมวดหมู่การจอง"
-        : `แก้ไขหมวดหมู่การจอง ${form.value.eventCategoryId}`;
+        : `แก้ไขหมวดหมู่การจอง (${props.item?.eventCategoryName})`;
 });
 
 const isEventDurationInvalid = computed(() => {
