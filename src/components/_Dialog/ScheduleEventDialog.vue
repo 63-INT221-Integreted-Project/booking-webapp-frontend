@@ -53,7 +53,7 @@ function isCanModifyEvent(event) {
         v-show.transition.opacity="openModal"
     >
         <div
-            class="p-4 max-w-3xl mx-auto absolute left-0 right-0 overflow-hidden top-[5%] 2xl:top-[15%]"
+            class="p-4 max-w-6xl mx-auto absolute left-0 right-0 overflow-hidden top-[5%] 2xl:top-[15%]"
         >
             <div
                 class="shadow absolute right-0 top-0 w-10 h-10 rounded-full bg-white text-gray-500 hover:text-gray-800 inline-flex items-center justify-center cursor-pointer"
@@ -102,10 +102,10 @@ function isCanModifyEvent(event) {
                 <div class="mt-4" v-else>
                     <div
                         class="p-6 my-2 border-1 rounded-xl shadow-2xl"
-                        v-for="event in eventSortByDateASC"
+                        v-for="(event,index) in eventSortByDateASC"  :key="index"
                     >
                         <div class="flex justify-between items-center">
-                            <div class="text-ellipsis">
+                            <div class="text-ellipsis overflow-auto w-[80%]">
                                 <h2 class="block text-lg">
                                     <span class="text-blue-700 font-bold"
                                         >หมวดหมู่: </span
