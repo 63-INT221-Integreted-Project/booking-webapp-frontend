@@ -55,6 +55,9 @@ const form = ref({
 const today = ref(dayjs().add(1, "minute").format("YYYY-MM-DDTHH:mm"));
 
 onMounted(() => {
+    if (dayjs(form.value.eventStartTime).format() === "Invalid Date") {
+        form.value.eventStartTime = today.value;
+    }
     setInterval(() => {
         today.value = dayjs().add(1, "minute").format("YYYY-MM-DDTHH:mm");
         compareDate();
@@ -87,9 +90,6 @@ function checkIfEventCategoryExists() {
 }
 
 function compareDate() {
-    if (dayjs(form.value.eventStartTime).format() === "Invalid Date") {
-        form.value.eventStartTime = today.value;
-    }
     if (dayjs(form.value.eventStartTime).isBefore(today.value)) {
         form.value.eventStartTime = today.value;
     }
@@ -165,7 +165,7 @@ const isEventDurationInvalid = computed(() => {
                 <div class="mb-4">
                     <label
                         class="text-gray-800 block mb-1 font-bold text-sm tracking-wide"
-                        >ชื่อการจอง</label
+                        >ชื่อการจอง <span class="text-red-800">*</span></label
                     >
                     <input
                         class="bg-gray-200 appearance-none border-2 border-gray-200 rounded-lg w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-blue-500"
@@ -221,7 +221,7 @@ const isEventDurationInvalid = computed(() => {
                 <div class="mb-4">
                     <label
                         class="text-gray-800 block mb-1 font-bold text-sm tracking-wide"
-                        >หมวดหมู่การจอง
+                        >หมวดหมู่การจอง <span class="text-red-800">*</span>
                     </label>
 
                     <input
@@ -251,7 +251,8 @@ const isEventDurationInvalid = computed(() => {
                 <div class="mb-4">
                     <label
                         class="text-gray-800 block mb-1 font-bold text-sm tracking-wide"
-                        >ช่วงเวลาการจอง</label
+                        >ช่วงเวลาการจอง
+                        <span class="text-red-800">*</span></label
                     >
                     <input
                         class="bg-gray-200 appearance-none border-2 border-gray-200 rounded-lg w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-blue-500"
@@ -274,7 +275,8 @@ const isEventDurationInvalid = computed(() => {
                 <div class="mb-4">
                     <label
                         class="text-gray-800 block mb-1 font-bold text-sm tracking-wide"
-                        >ระยะเวลา (หน่วย นาที)</label
+                        >ระยะเวลา (หน่วย นาที)
+                        <span class="text-red-800">*</span></label
                     >
                     <input
                         class="bg-gray-200 appearance-none border-2 border-gray-200 rounded-lg w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-blue-500"
