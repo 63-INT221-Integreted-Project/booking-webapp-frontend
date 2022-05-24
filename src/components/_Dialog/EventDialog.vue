@@ -175,12 +175,21 @@ const isEventDurationInvalid = computed(() => {
                         :readonly="!!form.eventId"
                         maxlength="100"
                     />
-                    <p
-                        class="text-error text-xs text-red-600"
-                        v-if="isInvalid && !form.bookingName"
-                    >
-                        กรุณากรอกชื่อการจอง
-                    </p>
+                    <div class="flex justify-between">
+                        <div>
+                            <p
+                                class="text-left text-error text-xs text-red-600"
+                                v-if="isInvalid && !form.bookingName"
+                            >
+                                กรุณากรอกชื่อการจอง
+                            </p>
+                        </div>
+                        <div>
+                            <p class="text-right text-sm text-gray-600">
+                                {{ form.bookingName.length }} / 100
+                            </p>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="mb-4">
@@ -306,6 +315,11 @@ const isEventDurationInvalid = computed(() => {
                         v-model="form.eventNotes"
                         maxlength="500"
                     />
+                    <div class="flex justify-end">
+                        <span class="text-sm text-gray-600">
+                            {{ form.eventNotes.length }} / 500
+                        </span>
+                    </div>
                 </div>
 
                 <div class="mt-8 text-right">

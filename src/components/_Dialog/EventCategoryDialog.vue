@@ -115,12 +115,23 @@ function onSubmit() {
                         }"
                         maxlength="100"
                     />
-                    <p
-                        class="text-error text-xs text-red-600"
-                        v-if="!form.eventCategoryName && props.isInvalid"
-                    >
-                        กรุณากรอกชื่อหมวดหมู่การจอง
-                    </p>
+                    <div class="flex justify-between">
+                        <div>
+                            <p
+                                class="text-error text-sm text-red-600"
+                                v-if="
+                                    !form.eventCategoryName && props.isInvalid
+                                "
+                            >
+                                กรุณากรอกชื่อหมวดหมู่การจอง
+                            </p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-600">
+                                {{ form.eventCategoryName.length }} / 100
+                            </p>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="mb-4">
@@ -134,6 +145,11 @@ function onSubmit() {
                         v-model="form.eventCategoryDescription"
                         maxlength="500"
                     />
+                    <div class="flex justify-end">
+                        <p class="text-sm text-gray-600">
+                            {{ form.eventCategoryDescription.length }} / 500
+                        </p>
+                    </div>
                 </div>
                 <div class="mb-4">
                     <label
