@@ -105,7 +105,7 @@ function isCanModifyEvent(event) {
                         v-for="event in eventSortByDateASC"
                     >
                         <div class="flex justify-between items-center">
-                            <div>
+                            <div class="text-ellipsis">
                                 <h2 class="block text-lg">
                                     <span class="text-blue-700 font-bold"
                                         >หมวดหมู่: </span
