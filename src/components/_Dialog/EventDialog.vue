@@ -87,6 +87,9 @@ function checkIfEventCategoryExists() {
 }
 
 function compareDate() {
+    if (dayjs(form.value.eventStartTime).format() === "Invalid Date") {
+        form.value.eventStartTime = today.value;
+    }
     if (dayjs(form.value.eventStartTime).isBefore(today.value)) {
         form.value.eventStartTime = today.value;
     }
