@@ -165,6 +165,7 @@ function compareDateSearch() {
                             placeholder="สิ้นสุด"
                             type="datetime-local"
                             :min="form.startDateTime"
+                            :disabled="!form.startDateTime"
                             @input="compareDateSearch()"
                         />
                     </div>
