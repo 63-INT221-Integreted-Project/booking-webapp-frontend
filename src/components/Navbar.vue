@@ -11,6 +11,11 @@ const navItems = ref([
         text: "หน้าหลัก",
     },
     {
+        name: "Users",
+        path: "/kp2/users",
+        text: "ผู้ใช้งาน",
+    },
+    {
         name: "EventCategories",
         path: "/kp2/event-categories",
         text: "หมวดหมู่การจอง",
