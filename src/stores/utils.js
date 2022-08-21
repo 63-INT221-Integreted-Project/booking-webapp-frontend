@@ -18,6 +18,9 @@ export const useUtilStore = defineStore("util", {
                 dayjs(dateEvent).format("YYYY-MM-DD")
             );
         },
+        formatDate(date) {
+            return dayjs(date).format("DD/MM/YYYY HH:mm");
+        },
         getDate(event) {
             return (
                 dayjs(event.eventStartTime).format("DD/MM/YYYY") +

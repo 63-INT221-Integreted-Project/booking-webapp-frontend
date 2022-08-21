@@ -1,5 +1,6 @@
 export default {
     getUrl() {
-        return "/kp2/api";
+        // @ts-ignore
+        return "/api";
     },
 };

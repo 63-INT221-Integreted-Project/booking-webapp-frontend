@@ -2,6 +2,7 @@ import { createRouter, createWebHistory } from "vue-router";
 import Home from "../views/Home.vue";
 import EventCategories from "../views/EventCategories.vue";
 import Teams from "../views/Teams.vue";
+import Users from "../views/Users.vue";
 const history = createWebHistory("/kp2/");
 const routes = [
     {
@@ -28,6 +29,24 @@ const routes = [
         component: EventCategories,
         meta: {
             title: "OASIP - Event Category",
+            metaTags: [
+                {
+                    name: "description",
+                    content: "Event category of OASIP.",
+                },
+                {
+                    property: "og:description",
+                    content: "Event category of OASIP.",
+                },
+            ],
+        },
+    },
+    {
+        path: "/users",
+        name: "Users",
+        component: Users,
+        meta: {
+            title: "OASIP - User",
             metaTags: [
                 {
                     name: "description",

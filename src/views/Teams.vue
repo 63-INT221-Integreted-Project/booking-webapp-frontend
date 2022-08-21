@@ -36,9 +36,7 @@ const teams = ref([
             class="rounded-3xl bg-slate-200 my-3 p-24 relative"
             :key="index"
         >
-            <div
-                class="absolute top-[-5%] bottom-0 left-[50%] absolute inset-x-0 top-0 h-16"
-            >
+            <div class="absolute top-[-5%] bottom-0 left-[50%] inset-x-0 h-16">
                 <img
                     :src="team.img"
                     class="rounded-full border-radius 50% border-solid border-white border-2 -mt-8 w-32 translate-x-[-50%]"
