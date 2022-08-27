@@ -141,6 +141,7 @@ const modal = ref({
     isOpen: false,
     user: null,
     isInvalid: false,
+    errorList: [],
 });
 
 function toggleModal({ isOpen, user, isInvalid }) {
@@ -157,10 +158,20 @@ async function fetchUsers() {
 
 async function saveUser(user) {
     try {
+        if (!user.email) {
+            throw Error("Email is required");
+        }
+        if (!user.name) {
+            throw Error("Name is required");
+        }
+        if (!user.role) {
+            throw Error("Role is required");
+        }
         modal.value.isInvalid = false;
         if (!user.userId) await UserService.createUser(user);
         if (user.userId) await UserService.updateUser(user.userId, user);
     } catch (error) {
+        modal.value.isInvalid = true;
     } finally {
         await fetchUsers();
         toggleModal({

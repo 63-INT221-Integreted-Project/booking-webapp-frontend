@@ -35,5 +35,11 @@ export const useUtilStore = defineStore("util", {
                 evt.preventDefault();
             }
         },
+        isEmailInvalid(email) {
+            if (!email) return "กรุณากรอกอีเมล";
+            if (!/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(email))
+                return "รูปแบบอีเมลไม่ถูกต้อง";
+            return null;
+        },
     },
 });

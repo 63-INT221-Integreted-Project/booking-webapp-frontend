@@ -1,6 +1,9 @@
 <script setup>
 import { ref } from "@vue/reactivity";
 import { computed, onMounted } from "@vue/runtime-core";
+import { useUtilStore } from "../../stores/utils";
+
+const util = useUtilStore();
 
 onMounted(() => {
     if (form.value.userId) {
@@ -36,7 +39,8 @@ const form = ref({
     name: props.item?.name || "",
     email: props.item?.email || "",
     role: props.item?.role || "",
-    password:props.item?.password || "",
+    password: "",
+    confirmPassword: "",
 });
 
 const roleList = ref([
@@ -60,20 +64,17 @@ const modalTitle = computed(() => {
         : `แก้ไขผู้ใช้งาน (${props.item?.name})`;
 });
 
-const isEventDurationInvalid = computed(() => {
-    if (!form.value.eventDuration) return "- กรุณากรอกระยะเวลาการจอง";
-    if (isNaN(form.value.eventDuration))
-        return "- ระยะเวลาต้องเป็นตัวเลขเท่านั้น";
-    if (!(form.value.eventDuration >= 1 && form.value.eventDuration <= 480))
-        return "- ช่วงระยะเวลาในการจองต้องอยู่ในช่วง 1 - 480 นาที";
-    return null;
-});
-
 const showErrorList = computed(() => {
     let errorType = [];
     if (!props.isInvalid) return [];
     if (props.errorList.length) errorType.push(...props.errorList);
     return errorType.join("<br/>");
+});
+
+const isPasswordMatched = computed(() => {
+    if (!form.value.password) return true;
+    if (!form.value.confirmPassword) return true;
+    return form.value.password === form.value.confirmPassword;
 });
 
 function onSubmit() {
@@ -170,14 +171,17 @@ function onSubmit() {
                         v-model="form.email"
                         :class="{
                             'border-red-500 border-3':
-                                isEventDurationInvalid && props.isInvalid,
+                                util.isEmailInvalid(form.email) &&
+                                props.isInvalid,
                         }"
                     />
                     <p
                         class="text-error text-xs text-red-600"
-                        v-if="isEventDurationInvalid && props.isInvalid"
+                        v-if="
+                            util.isEmailInvalid(form.email) && props.isInvalid
+                        "
                     >
-                        {{ isEventDurationInvalid }}
+                        กรุณากรอกอีเมลล์
                     </p>
                 </div>
 
@@ -211,19 +215,17 @@ function onSubmit() {
                     </p>
                 </div>
 
-
-                 <div class="mb-4">
+                <div class="mb-4">
                     <label
                         class="text-gray-800 block mb-1 font-bold text-sm tracking-wide"
                         >รหัสผ่าน <span class="text-red-800">*</span></label
                     >
                     <input
                         class="bg-gray-200 appearance-none border-2 border-gray-200 rounded-lg w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-blue-500"
-                       type="password" 
+                        type="password"
                         v-model="form.password"
                         :class="{
-                            'border-red-500 border-3':
-                                !form.password && props.isInvalid,
+                            'border-red-500 border-3': !isPasswordMatched,
                         }"
                         maxlength="14"
                     />
@@ -231,14 +233,45 @@ function onSubmit() {
                         <div>
                             <p
                                 class="text-error text-sm text-red-600"
-                                v-if="!form.name && props.isInvalid"
+                                v-if="!isPasswordMatched"
                             >
                                 กรุณากรอกรหัสผ่าน
                             </p>
                         </div>
                         <div>
                             <p class="text-sm text-gray-600">
-                                {{ form.password.length }} / 14
+                                {{ form.password.length }} / 25
+                            </p>
+                        </div>
+                    </div>
+                </div>
+                <div class="mb-4">
+                    <label
+                        class="text-gray-800 block mb-1 font-bold text-sm tracking-wide"
+                        >ยืนยันรหัสผ่าน
+                        <span class="text-red-800">*</span></label
+                    >
+                    <input
+                        class="bg-gray-200 appearance-none border-2 border-gray-200 rounded-lg w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-blue-500"
+                        type="password"
+                        v-model="form.confirmPassword"
+                        :class="{
+                            'border-red-500 border-3': !isPasswordMatched,
+                        }"
+                        maxlength="14"
+                    />
+                    <div class="flex justify-between">
+                        <div>
+                            <p
+                                class="text-error text-sm text-red-600"
+                                v-if="!isPasswordMatched"
+                            >
+                                กรุณากรอกยืนยันรหัสผ่าน
+                            </p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-600">
+                                {{ form.confirmPassword.length }} / 14
                             </p>
                         </div>
                     </div>
