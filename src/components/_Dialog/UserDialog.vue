@@ -36,6 +36,7 @@ const form = ref({
     name: props.item?.name || "",
     email: props.item?.email || "",
     role: props.item?.role || "",
+    password:props.item?.password || "",
 });
 
 const roleList = ref([
@@ -210,19 +211,37 @@ function onSubmit() {
                     </p>
                 </div>
 
-                <div class="mb-4">
+
+                 <div class="mb-4">
                     <label
                         class="text-gray-800 block mb-1 font-bold text-sm tracking-wide"
-                        >รหัสผ่าน <span class="text-red-800">*</span>
-                    </label>
-
+                        >รหัสผ่าน <span class="text-red-800">*</span></label
+                    >
                     <input
                         class="bg-gray-200 appearance-none border-2 border-gray-200 rounded-lg w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-blue-500"
-                        type="password"
-            
+                       type="password" 
+                        v-model="form.password"
+                        :class="{
+                            'border-red-500 border-3':
+                                !form.password && props.isInvalid,
+                        }"
+                        maxlength="14"
                     />
-                    
-                   
+                    <div class="flex justify-between">
+                        <div>
+                            <p
+                                class="text-error text-sm text-red-600"
+                                v-if="!form.name && props.isInvalid"
+                            >
+                                กรุณากรอกรหัสผ่าน
+                            </p>
+                        </div>
+                        <div>
+                            <p class="text-sm text-gray-600">
+                                {{ form.password.length }} / 14
+                            </p>
+                        </div>
+                    </div>
                 </div>
 
                 <div class="mt-8 text-right">
