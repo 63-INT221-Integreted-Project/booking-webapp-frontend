@@ -25,6 +25,11 @@ const navItems = ref([
         path: "/kp2/teams",
         text: "ทีมของเรา",
     },
+    {
+        name: "Login",
+        path: "/kp2/login",
+        text: "เข้าสู่ระบบ",
+    },
 ]);
 
 function getActiveNavbar(path) {

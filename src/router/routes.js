@@ -3,6 +3,8 @@ import Home from "../views/Home.vue";
 import EventCategories from "../views/EventCategories.vue";
 import Teams from "../views/Teams.vue";
 import Users from "../views/Users.vue";
+import Login from "../views/Login.vue";
+
 const history = createWebHistory("/kp2/");
 const routes = [
     {
@@ -65,6 +67,24 @@ const routes = [
         component: Teams,
         meta: {
             title: "OASIP - Teams",
+            metaTags: [
+                {
+                    name: "description",
+                    content: "Teams create of OASIP.",
+                },
+                {
+                    property: "og:description",
+                    content: "Teams create of OASIP.",
+                },
+            ],
+        },
+    },
+    {
+        path: "/login",
+        name: "Login",
+        component: Login,
+        meta: {
+            title: "OASIP - Login",
             metaTags: [
                 {
                     name: "description",
