@@ -6,10 +6,12 @@ import EventCategoriesService from "../services/event-categories.service";
 import EventCategoryDialog from "../components/_Dialog/EventCategoryDialog.vue";
 import WarningDialog from "../components/_Dialog/WarningDialog.vue";
 import { useModalStore } from "../stores/modal";
-
+import { SweetAlert } from "sweetalert2/dist/sweetalert2";
+import { useUserStore } from "../stores/user";
 const route = useRoute();
 const eventCategories = ref([]);
 const modal = useModalStore();
+const userStore = useUserStore();
 
 const pagination = ref({
     page: 1,
@@ -17,7 +19,15 @@ const pagination = ref({
 });
 
 onMounted(async () => {
-    eventCategories.value = await EventCategoriesService.findAll();
+    try {
+        eventCategories.value = await EventCategoriesService.findAll();
+    } catch (error) {
+        SweetAlert.fire({
+            icon: "error",
+            title: "Oops...",
+            text: "Something went wrong!",
+        });
+    }
 });
 
 async function saveEventCategory(eventCategory) {
@@ -134,6 +144,7 @@ async function deleteEventCategory(eventCategory) {
                     </div>
                     <div
                         class="relative w-full px-4 max-w-full flex-grow flex-1 text-right"
+                        v-if="userStore.isAdmin()"
                     >
                         <button
                             class="bg-indigo-500 text-white active:bg-indigo-600 text-sm font-bold uppercase px-3 py-3 rounded outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
@@ -175,6 +186,12 @@ async function deleteEventCategory(eventCategory) {
                             </th>
                             <th
                                 class="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left"
+                            >
+                                เจ้าของหมวดหมู่
+                            </th>
+                            <th
+                                class="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left"
+                                v-if="userStore.isAdmin()"
                             >
                                 เพิ่มเติม
                             </th>
@@ -226,7 +243,13 @@ async function deleteEventCategory(eventCategory) {
                                 {{ event.eventDuration }} mins
                             </td>
                             <td
+                                class="border-t-0 px-6 align-center border-l-0 border-r-0 text-xs whitespace-nowrap p-4"
+                            >
+                                {{ event.eventDuration }} mins
+                            </td>
+                            <td
                                 class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4"
+                                v-if="userStore.isAdmin()"
                             >
                                 <button
                                     class="bg-yellow-500 hover:bg-blue-light text-white font-extrabold py-2 px-4 border-b-4 border-yellow-600 hover:border-blue rounded mr-2"

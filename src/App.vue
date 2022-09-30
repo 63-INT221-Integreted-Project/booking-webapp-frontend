@@ -1,10 +1,28 @@
 <script setup>
 import Navbar from "./components/Navbar.vue";
+import LoadingOverlay from "./components/LoadingOverlay.vue";
+
+import { useUtilStore } from "./stores/utils";
+import { computed } from "@vue/reactivity";
+import { onMounted } from "vue";
+import { useUserStore } from "./stores/user";
+const userStore = useUserStore();
+
+const util = useUtilStore();
+
+onMounted(async () => {
+    await userStore.fetchUser();
+});
+
+const getOverlay = computed(() => {
+    return util.loadingOverlay;
+});
 </script>
 
 <template>
     <Navbar></Navbar>
     <div class="container mt-16 flex mx-auto">
+        <LoadingOverlay v-if="getOverlay"></LoadingOverlay>
         <router-view></router-view>
     </div>
 </template>

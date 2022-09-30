@@ -1,39 +1,67 @@
 <script setup>
 import { ref } from "@vue/reactivity";
+import { onMounted } from "vue";
 import { useRoute } from "vue-router";
+import { useUserStore } from "../stores/user";
 
 const route = useRoute();
+const userStore = useUserStore();
+
+const dropdownOpen = ref(false);
+
+onMounted(() => {
+    listenClickOutside();
+});
 
 const navItems = ref([
     {
         name: "Home",
         path: "/kp2",
         text: "หน้าหลัก",
+        showMode: ["admin", "student", "lecturer", "guest"],
     },
     {
         name: "Users",
         path: "/kp2/users",
         text: "ผู้ใช้งาน",
+        showMode: ["admin"],
     },
     {
         name: "EventCategories",
         path: "/kp2/event-categories",
         text: "หมวดหมู่การจอง",
+        showMode: ["admin", "student", "lecturer", "guest"],
     },
     {
         name: "Teams",
         path: "/kp2/teams",
         text: "ทีมของเรา",
+        showMode: ["admin", "student", "lecturer", "guest"],
     },
     {
         name: "Login",
         path: "/kp2/login",
         text: "เข้าสู่ระบบ",
+        showMode: ["guest"],
     },
 ]);
 
 function getActiveNavbar(path) {
     return route.name === path;
+}
+
+function isShowNavbar(navItem) {
+    let role = userStore?.getUserRole();
+    if (!role) return navItem.showMode.includes("guest");
+    return navItem.showMode.includes(userStore?.getUserRole());
+}
+
+function listenClickOutside() {
+    document.addEventListener("click", (e) => {
+        if (!["dropdown-button", "dropdown-menu"].includes(e.target.id)) {
+            dropdownOpen.value = false;
+        }
+    });
 }
 </script>
 
@@ -46,89 +74,90 @@ function getActiveNavbar(path) {
         </div>
         <!-- left header section -->
         <div class="items-center hidden space-x-8 lg:flex">
-            <a
-                v-for="item in navItems"
-                :key="item.name"
-                :href="item.path"
-                class="text-black font-bold hover:text-blue-600"
-                :class="{
-                    'px-4 py-2 bg-blue-100 rounded-md': getActiveNavbar(
-                        item.name
-                    ),
-                }"
-            >
-                {{ item.text }}
-            </a>
-            <!-- <a
-                href=""
-                :class="
-                    getActiveNavbar('Home')
-                        ? 'px-4 py-2 bg-blue-100 rounded-md'
-                        : ''
-                "
-                >ตารางการจอง</a
-            >
-            <a href="">เกี่ยวกับเรา</a>
-            <a href="">ทีมของเรา</a>
-            <a href="">ติดต่อพวกเรา</a> -->
+            <template v-for="item in navItems">
+                <a
+                    :href="item.path"
+                    class="text-black font-bold hover:text-blue-600"
+                    :class="{
+                        'px-4 py-2 bg-blue-100 rounded-md': getActiveNavbar(
+                            item.name
+                        ),
+                    }"
+                    v-if="isShowNavbar(item)"
+                >
+                    {{ item.text }}
+                </a>
+            </template>
+            <div class="max-w-lg mx-auto" v-if="userStore?.getUserRole()">
+                <button
+                    class="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:ring-blue-300 font-medium rounded-lg text-sm px-4 py-2.5 text-center inline-flex items-center"
+                    type="button"
+                    @click="dropdownOpen = !dropdownOpen"
+                    id="dropdown-button"
+                >
+                    {{ userStore?.getUserName() }}
+                    <svg
+                        class="w-4 h-4 ml-2"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg"
+                    >
+                        <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M19 9l-7 7-7-7"
+                        ></path>
+                    </svg>
+                </button>
+
+                <!-- Dropdown menu -->
+                <div
+                    class="bg-white text-base z-50 list-none divide-y divide-gray-100 rounded shadow my-4 fixed"
+                    v-if="dropdownOpen"
+                >
+                    <div class="px-4 py-3" id="dropdown-menu">
+                        <div class="inline">
+                            <div class="flex justify-center">
+                                <svg
+                                    xmlns="http://www.w3.org/2000/svg"
+                                    fill="none"
+                                    viewBox="0 0 24 24"
+                                    stroke-width="1.5"
+                                    stroke="currentColor"
+                                    class="w-12 h-12"
+                                >
+                                    <path
+                                        stroke-linecap="round"
+                                        stroke-linejoin="round"
+                                        d="M17.982 18.725A7.488 7.488 0 0012 15.75a7.488 7.488 0 00-5.982 2.975m11.963 0a9 9 0 10-11.963 0m11.963 0A8.966 8.966 0 0112 21a8.966 8.966 0 01-5.982-2.275M15 9.75a3 3 0 11-6 0 3 3 0 016 0z"
+                                    />
+                                </svg>
+                            </div>
+                            <span class="text-sm font-bold">
+                                {{ userStore?.getUserName() }}</span
+                            >
+                        </div>
+                        <span
+                            class="block text-sm font-medium text-gray-900 truncate"
+                        >
+                            {{ userStore?.getUserEmail() }}</span
+                        >
+                    </div>
+                    <ul class="py-1" aria-labelledby="dropdown">
+                        <li class="p-3">
+                            <p
+                                @click="userStore?.logout()"
+                                class="text-sm hover:bg-red-400 hover:text-white hover:rounded-md text-gray-700 block px-3 py-2 cursor-pointer"
+                            >
+                                Sign out
+                            </p>
+                        </li>
+                    </ul>
+                </div>
+            </div>
         </div>
-        <!-- right header section -->
-        <!-- <div class="flex items-center space-x-2">
-            <a href="#">
-                <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    class="w-6 h-6 text-gray-400"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                >
-                    <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
-                    />
-                </svg>
-            </a>
-            <a href="#">
-                <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    class="w-6 h-6 text-gray-400"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                >
-                    <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
-                    />
-                    <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                    />
-                </svg>
-            </a>
-            <a href="#" class="p-2 rounded-full bg-blue-50">
-                <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    class="w-6 h-6 text-gray-200"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                >
-                    <path
-                        stroke-linecap="round"
-                        stroke-linejoin="round"
-                        stroke-width="2"
-                        d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
-                    />
-                </svg>
-            </a>
-        </div> -->
     </nav>
 </template>
 

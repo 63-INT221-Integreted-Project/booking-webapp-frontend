@@ -13,7 +13,7 @@ export default defineConfig({
         host: "0.0.0.0",
         port: 3000,
         strictPort: true,
-        open: true,
+        open: false,
     },
     build: {
         rollupOptions: {
@@ -22,7 +22,7 @@ export default defineConfig({
     },
     server: {
         proxy: {
-            "/api": "http://localhost:8080",
+            "/api": "http://oasip-backend:8080",
         },
     },
 });
