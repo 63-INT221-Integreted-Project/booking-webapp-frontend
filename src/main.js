@@ -4,4 +4,7 @@ import "./assets/css/index.css";
 import router from "./router/routes";
 import { createPinia } from "pinia";
 
-createApp(App).use(router).use(createPinia()).mount("#app");
+import VueSweetalert2 from "vue-sweetalert2";
+import "sweetalert2/dist/sweetalert2.min.css";
+
+createApp(App).use(router).use(VueSweetalert2).use(createPinia()).mount("#app");
