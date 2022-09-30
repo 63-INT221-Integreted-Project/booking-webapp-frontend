@@ -1,7 +1,11 @@
 import BaseUrl from "../utils/BaseUrl";
 
 const findAll = async function () {
-    return await fetch(`${BaseUrl.getUrl()}/users`).then((res) => res.json());
+    return await fetch(`${BaseUrl.getUrl()}/users`, {
+        headers: {
+            Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+        },
+    }).then((res) => res.json());
 };
 
 const createUser = async function (user) {

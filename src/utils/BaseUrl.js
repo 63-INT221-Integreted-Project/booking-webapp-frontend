@@ -1,6 +1,6 @@
 export default {
     getUrl() {
         // @ts-ignore
-        return "/api";
+        return import.meta.env.VITE_BASE_URL;
     },
 };

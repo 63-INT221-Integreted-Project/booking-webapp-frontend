@@ -1,9 +1,11 @@
 import BaseUrl from "../utils/BaseUrl";
 
 const findAll = async function () {
-    return await fetch(`${BaseUrl.getUrl()}/event-categories/`).then((res) =>
-        res.json()
-    );
+    return await fetch(`${BaseUrl.getUrl()}/event-categories/`, {
+        headers: {
+            Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+        },
+    }).then((res) => res.json());
 };
 
 const createEventCategory = async function (eventCategory) {
@@ -11,6 +13,7 @@ const createEventCategory = async function (eventCategory) {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${localStorage.getItem("access_token")}`,
         },
         body: JSON.stringify({
             eventCategoryName: eventCategory.eventCategoryName.trim(),
@@ -28,6 +31,7 @@ const updateEventCategory = async function (eventCategoryId, eventCategory) {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json",
+                Authorization: `Bearer ${localStorage.getItem("access_token")}`,
             },
             body: JSON.stringify({
                 eventCategoryId: eventCategoryId,
@@ -43,6 +47,9 @@ const updateEventCategory = async function (eventCategoryId, eventCategory) {
 const deleteEventCategory = async function (eventCategoryId) {
     await fetch(`${BaseUrl.getUrl()}/event-categories/${eventCategoryId}`, {
         method: "DELETE",
+        headers: {
+            Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+        },
     });
 };
 

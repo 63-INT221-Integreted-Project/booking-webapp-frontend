@@ -2,7 +2,16 @@ import { defineStore } from "pinia";
 import dayjs from "dayjs";
 
 export const useUtilStore = defineStore("util", {
+    state: () => ({
+        loadingOverlay: false,
+    }),
     actions: {
+        setLoadingOverlay(loadingOverlay) {
+            this.loadingOverlay = loadingOverlay;
+        },
+        timeout(ms) {
+            return new Promise((resolve) => setTimeout(resolve, ms));
+        },
         getHoursAndMinutes(event) {
             return (
                 dayjs(event.eventStartTime).format("HH:mm") +
