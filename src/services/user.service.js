@@ -1,11 +1,14 @@
+import axios from "axios";
 import BaseUrl from "../utils/BaseUrl";
 
 const findAll = async function () {
-    return await fetch(`${BaseUrl.getUrl()}/users`, {
-        headers: {
-            Authorization: `Bearer ${localStorage.getItem("access_token")}`,
-        },
-    }).then((res) => res.json());
+    let { data } = await axios.get(`${BaseUrl.getUrl()}/users`, {});
+    return data;
+    // return await fetch(`${BaseUrl.getUrl()}/users`, {
+    //     headers: {
+    //         Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+    //     },
+    // }).then((res) => res.json());
 };
 
 const createUser = async function (user) {

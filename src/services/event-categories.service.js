@@ -1,11 +1,14 @@
+import axios from "axios";
 import BaseUrl from "../utils/BaseUrl";
 
 const findAll = async function () {
-    return await fetch(`${BaseUrl.getUrl()}/event-categories/`, {
-        headers: {
-            Authorization: `Bearer ${localStorage.getItem("access_token")}`,
-        },
-    }).then((res) => res.json());
+    let { data } = await axios.get(`${BaseUrl.getUrl()}/event-categories/`);
+    return data;
+    // return await fetch(`${BaseUrl.getUrl()}/event-categories/`, {
+    //     headers: {
+    //         Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+    //     },
+    // }).then((res) => res.json());
 };
 
 const createEventCategory = async function (eventCategory) {

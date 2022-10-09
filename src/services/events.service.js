@@ -1,12 +1,17 @@
 import dayjs from "dayjs";
 import BaseUrl from "../utils/BaseUrl";
 import utc from "dayjs/plugin/utc";
+import axios from "axios";
 dayjs.extend(utc);
 
 const findAllByBetweenDate = async function (date1, date2) {
-    return await fetch(
+    let { data } = await axios.get(
         `${BaseUrl.getUrl()}/events/check-between?date1=${date1}&date2=${date2}`
-    ).then((res) => res.json());
+    );
+    return data;
+    // return await fetch(
+    //     `${BaseUrl.getUrl()}/events/check-between?date1=${date1}&date2=${date2}`
+    // ).then((res) => res.json());
 };
 
 const search = async function (dateStart, dateEnd, category, word) {
@@ -107,20 +112,31 @@ const search = async function (dateStart, dateEnd, category, word) {
 };
 
 const createEvent = async function (event) {
-    return await fetch(`${BaseUrl.getUrl()}/events/`, {
-        method: "POST",
-        headers: {
-            "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
+    try {
+        let response = await axios.post(`${BaseUrl.getUrl()}/events/`, {
             bookingName: event.bookingName,
             bookingEmail: event.bookingEmail,
             eventStartTime: event.eventStartTime,
             eventDuration: +event.eventDuration,
             eventNotes: event.eventNotes || null,
             eventCategoryId: event.eventCategoryId,
-        }),
-    });
+        });
+        return response.data;
+    } catch (error) {}
+    // return await fetch(`${BaseUrl.getUrl()}/events/`, {
+    //     method: "POST",
+    //     headers: {
+    //         "Content-Type": "application/json",
+    //     },
+    //     body: JSON.stringify({
+    // bookingName: event.bookingName,
+    // bookingEmail: event.bookingEmail,
+    // eventStartTime: event.eventStartTime,
+    // eventDuration: +event.eventDuration,
+    // eventNotes: event.eventNotes || null,
+    // eventCategoryId: event.eventCategoryId,
+    //     }),
+    // });
 };
 
 const updateEvent = async function (eventId, event) {
