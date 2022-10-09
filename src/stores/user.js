@@ -45,6 +45,7 @@ export const useUserStore = defineStore("user", {
             this.user = null;
             this.token = null;
             localStorage.removeItem("access_token");
+            localStorage.removeItem("refresh_token");
             window.location.reload();
         },
     },
