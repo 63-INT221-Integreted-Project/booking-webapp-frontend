@@ -3,7 +3,7 @@ import App from "./App.vue";
 import "./assets/css/index.css";
 import router from "./router/routes";
 import { createPinia } from "pinia";
-
+import "./utils/axios.interceptor";
 import VueSweetalert2 from "vue-sweetalert2";
 import "sweetalert2/dist/sweetalert2.min.css";
 
