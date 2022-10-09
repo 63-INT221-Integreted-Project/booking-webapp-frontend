@@ -5,7 +5,7 @@ import Teams from "../views/Teams.vue";
 import Users from "../views/Users.vue";
 import Login from "../views/Login.vue";
 
-const history = createWebHistory("/kp2/");
+const history = createWebHistory("/kp2");
 const routes = [
     {
         path: "/",

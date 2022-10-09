@@ -10,6 +10,8 @@ import dayjs from "dayjs";
 import { useModalStore } from "../stores/modal";
 import WarningDialog from "../components/_Dialog/WarningDialog.vue";
 import utc from "dayjs/plugin/utc";
+import Sweetalert from "sweetalert2";
+
 dayjs.extend(utc);
 
 const calendarType = ref(null);
@@ -132,6 +134,12 @@ async function saveEvent(form) {
                 eventNotes: form.eventNotes,
             });
         } else {
+            Sweetalert.fire({
+                icon: "success",
+                title: "บันทึกสำเร็จ",
+                showConfirmButton: false,
+                timer: 1500,
+            });
             await EventService.createEvent({
                 ...form,
                 eventCategoryId: eventCategories.value.find(

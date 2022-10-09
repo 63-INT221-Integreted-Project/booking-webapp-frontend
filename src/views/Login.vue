@@ -176,22 +176,21 @@ async function onSubmitLogin() {
             return;
         }
         let res = await AuthService.login({ email, password });
-        if (!res.access_token) {
-            await Sweetalert.fire({
-                icon: "error",
-                title: "Oops...",
-                text: "Email or password is incorrect!",
-            });
-            return;
-        }
         localStorage.setItem("access_token", res.access_token);
+        localStorage.setItem("refresh_token", res.refresh_token);
         await Sweetalert.fire({
             icon: "success",
             title: "Success",
             text: "Login Success",
         });
-        window.open("/kp2/", "_self");
+        window.open("/kp2/event-categories", "_self");
     } catch (error) {
+        console.log(error);
+        await Sweetalert.fire({
+            icon: "error",
+            title: "Oops...",
+            text: "Email or password is incorrect!",
+        });
     } finally {
         util.setLoadingOverlay(false);
     }

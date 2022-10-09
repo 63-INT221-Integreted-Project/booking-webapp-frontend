@@ -12,11 +12,14 @@ import WarningDialog from "../_Dialog/WarningDialog.vue";
 import Tab from "../Tab.vue";
 
 import utc from "dayjs/plugin/utc";
+import { useUserStore } from "../../stores/user";
 dayjs.extend(utc);
 
 const modal = useModalStore();
 
 const util = useUtilStore();
+
+const userStore = useUserStore();
 
 defineExpose({ fetchEvents });
 
@@ -44,8 +47,12 @@ const MONTH_NAMES = [
     "ธันวาคม",
 ];
 const DAYS = ["อา", "จ", "อ", "พ", "พฤ", "ศ", "ส"];
+//TODO: Reminded to change this to dayjs
 const month = ref(new Date().getMonth());
 const year = ref(new Date().getFullYear());
+//TODO: Reminded to change this to dayjs
+// const year = ref(2022);
+// const month = ref(8);
 const no_of_days = ref([]);
 const blankdays = ref([]);
 const events = ref([]);
@@ -56,7 +63,8 @@ onMounted(async () => {
 });
 
 function isToday(date) {
-    const today = new Date();
+    //TODO: Reminded to change this to dayjs
+    const today = dayjs().toDate();
     const d = new Date(year.value, month.value, date);
 
     return today.toDateString() === d.toDateString();
@@ -345,6 +353,7 @@ async function backToDateNow() {
                     class="h-12 px-5 m-2 bg-indigo-500 text-white active:bg-indigo-600 text-sm font-bold uppercase p-3 rounded outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
                     type="button"
                     @click="openBookingEventModal"
+                    v-if="userStore.getUserRole() !== 'lecturer'"
                 >
                     + จองการประชุม
                 </button>

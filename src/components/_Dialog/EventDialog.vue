@@ -4,6 +4,9 @@ import { computed, onMounted } from "@vue/runtime-core";
 import dayjs from "dayjs";
 import { useUtilStore } from "../../stores/utils";
 import InputAutocomplete from "../InputAutocomplete.vue";
+import Sweetalert from "sweetalert2";
+import { useUserStore } from "../../stores/user";
+const userStore = useUserStore();
 
 const props = defineProps({
     openModal: {
@@ -49,12 +52,19 @@ const form = ref({
     eventStartTime: props.event?.eventStartTime || "",
     eventDuration: props.event?.eventDuration || "",
     eventCategory: props.event?.eventCategory || "",
+    eventFile: props.event?.eventFile || "",
     eventNotes: props.event?.eventNotes || "",
 });
 
 const today = ref(dayjs().add(1, "minute").format("YYYY-MM-DDTHH:mm"));
+// const today = ref(
+//     dayjs("2022-09-29 22:25").add(1, "minute").format("YYYY-MM-DDTHH:mm")
+// );
 
 onMounted(() => {
+    if (!props.event.bookingEmail) {
+        form.value.bookingEmail = userStore.getUserEmail();
+    }
     if (dayjs(form.value.eventStartTime).format() === "Invalid Date") {
         form.value.eventStartTime = today.value;
     }
@@ -117,6 +127,19 @@ const isEventDurationInvalid = computed(() => {
         return "ช่วงระยะเวลาในการจองต้องอยู่ในช่วง 1 - 480 นาที";
     return "";
 });
+
+function onFileChange(e) {
+    const file = e.target.files[0];
+    //*Convert file size to MB
+    const fileSize = file.size / 1024 / 1024;
+    if (fileSize > 10) {
+        return Sweetalert.fire({
+            icon: "error",
+            title: "ขนาดไฟล์ใหญ่เกินไป",
+            text: "กรุณาอัพโหลดไฟล์ขนาดไม่เกิน 10 MB",
+        });
+    }
+}
 </script>
 
 <template>
@@ -210,6 +233,7 @@ const isEventDurationInvalid = computed(() => {
                         v-model="form.bookingEmail"
                         :readonly="!!form.eventId"
                         maxlength="50"
+                        :disabled="userStore.getUserEmail()"
                     />
                     <p
                         class="text-error text-xs text-red-600"
@@ -326,6 +350,19 @@ const isEventDurationInvalid = computed(() => {
                         </span>
                     </div>
                 </div>
+                <!-- <div class="mb-4">
+                    <label
+                        class="text-gray-800 block mb-1 font-bold text-sm tracking-wide"
+                        >Upload file (Maximum:
+                        <span class="text-red-600">10 MB</span>)</label
+                    >
+                    <input
+                        class="block w-full p-2 bg-gray-200 appearance-none border-2 border-gray-200 rounded-lg text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-blue-500"
+                        id="file_input"
+                        type="file"
+                        @input="onFileChange"
+                    />
+                </div> -->
 
                 <div class="mt-8 text-right">
                     <button

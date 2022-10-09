@@ -1,6 +1,7 @@
 <script setup>
 import { ref } from "@vue/reactivity";
 import { computed } from "@vue/runtime-core";
+import MySelect from "../MySelect.vue";
 
 const props = defineProps({
     openModal: {
@@ -171,6 +172,13 @@ function onSubmit() {
                     >
                         {{ isEventDurationInvalid }}
                     </p>
+                </div>
+                <div class="mb-4">
+                    <label
+                        class="text-gray-800 block mb-1 font-bold text-sm tracking-wide"
+                        >เจ้าของหมวดหมู่
+                    </label>
+                    <MySelect></MySelect>
                 </div>
 
                 <div class="mt-8 text-right">

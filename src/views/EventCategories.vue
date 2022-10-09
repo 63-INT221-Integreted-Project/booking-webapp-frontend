@@ -96,6 +96,12 @@ function checkFormValid(eventCategory) {
     return errorList;
 }
 
+function displayEventCategoryOwner(owner) {
+    if (!owner.length) return "ไม่พบเจ้าของ";
+    let displayList = owner.map((o) => o.name);
+    return displayList.join(", ");
+}
+
 async function deleteEventCategory(eventCategory) {
     await EventCategoriesService.deleteEventCategory(
         eventCategory.eventCategoryId
@@ -163,7 +169,7 @@ async function deleteEventCategory(eventCategory) {
                 </div>
             </div>
 
-            <div class="block w-full overflow-x-auto">
+            <div class="block w-full overflow-x-auto p-6">
                 <table
                     class="items-center bg-transparent w-full border-collapse"
                 >
@@ -245,7 +251,15 @@ async function deleteEventCategory(eventCategory) {
                             <td
                                 class="border-t-0 px-6 align-center border-l-0 border-r-0 text-xs whitespace-nowrap p-4"
                             >
-                                {{ event.eventDuration }} mins
+                                <span
+                                    v-if="!event.owner.length"
+                                    class="font-normal"
+                                >
+                                    {{ displayEventCategoryOwner(event.owner) }}
+                                </span>
+                                <span v-else class="font-bold text-green-800">
+                                    {{ displayEventCategoryOwner(event.owner) }}
+                                </span>
                             </td>
                             <td
                                 class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4"
