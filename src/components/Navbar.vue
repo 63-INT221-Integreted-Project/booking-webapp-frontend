@@ -44,6 +44,12 @@ const navItems = ref([
         text: "เข้าสู่ระบบ",
         showMode: ["guest"],
     },
+    {
+        name: "Signup",
+        path: "/kp2/signup",
+        text: "สมัครสมาชิก",
+        showMode: ["guest"],
+    },
 ]);
 
 function getActiveNavbar(path) {
