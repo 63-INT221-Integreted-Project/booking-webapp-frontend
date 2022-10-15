@@ -1,0 +1,35 @@
+name: ci
+
+on:
+    push:
+        branches:
+            - oasip-frontend
+
+jobs:
+    ci:
+        runs-on: self-hosted
+
+        steps:
+            - name: Checkout 🛎
+              uses: actions/checkout@master
+              with:
+                  path: "oasip-frontend/"
+
+            - name: Setup env 🛠
+              env:
+                  VITE_BASE_URL: ${{ secrets.VITE_BASE_URL }}
+              run: |
+                  touch oasip-frontend/.env
+                  echo VITE_BASE_URL="VITE_BASE_URL" >> oasip-frontend/.env
+
+            - name: Stop docker container 🛑
+              run: docker stop oasip-frontend
+
+            - name: Build Docker Image 🐳
+              run: docker build oasip-frontend/ -t alonespace/node-converrpage-oasip-frontend
+
+            - name: Remove exist container 🏺
+              run: docker rm -f oasip-frontend
+
+            - name: Run Docker Container 🏺
+              run: docker run -p 127.0.0.1:3000:3000 --network backend --name oasip-frontend -d alonespace/node-converrpage-oasip-frontend
