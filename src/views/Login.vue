@@ -183,7 +183,7 @@ async function onSubmitLogin() {
             title: "Success",
             text: "Login Success",
         });
-        window.open("/kp2/event-categories", "_self");
+        window.open("/kp2/", "_self");
     } catch (error) {
         console.log(error);
         await Sweetalert.fire({
