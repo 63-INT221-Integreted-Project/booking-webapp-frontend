@@ -21,8 +21,8 @@ jobs:
                   VITE_FILE_BASE_URL: ${{ secrets.VITE_FILE_BASE_URL }}
               run: |
                   touch oasip-frontend/.env.production
-                  echo VITE_BASE_URL="VITE_BASE_URL" >> oasip-frontend/.env.production
-                  echo VITE_FILE_BASE_URL="VITE_FILE_BASE_URL" >> oasip-frontend/.env.production
+                  echo VITE_BASE_URL="$VITE_BASE_URL" >> oasip-frontend/.env.production
+                  echo VITE_FILE_BASE_URL="$VITE_FILE_BASE_URL" >> oasip-frontend/.env.production
 
             - name: Stop docker container 🛑
               run: docker stop oasip-frontend
