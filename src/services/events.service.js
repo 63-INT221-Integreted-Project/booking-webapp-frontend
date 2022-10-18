@@ -111,18 +111,35 @@ const search = async function (dateStart, dateEnd, category, word) {
     // ).then((res) => res.json());
 };
 
-const createEvent = async function (event) {
+const createEvent = async function (event, file) {
     try {
-        let response = await axios.post(`${BaseUrl.getUrl()}/events/`, {
-            bookingName: event.bookingName,
-            bookingEmail: event.bookingEmail,
-            eventStartTime: event.eventStartTime,
-            eventDuration: +event.eventDuration,
-            eventNotes: event.eventNotes || null,
-            eventCategoryId: event.eventCategoryId,
+        let formData = new FormData();
+        const blob = new Blob([JSON.stringify(event)], {
+            type: "application/json",
         });
+        formData.append("event", blob);
+        formData.append("file", file);
+        let response = await axios.post(
+            `${BaseUrl.getUrl()}/events/`,
+            formData,
+            {
+                headers: {
+                    "Content-Type": "multipart/form-data",
+                },
+            }
+        );
+        // let response = await axios.post(`${BaseUrl.getUrl()}/events/`, {
+        //     bookingName: event.bookingName,
+        //     bookingEmail: event.bookingEmail,
+        //     eventStartTime: event.eventStartTime,
+        //     eventDuration: +event.eventDuration,
+        //     eventNotes: event.eventNotes || null,
+        //     eventCategoryId: event.eventCategoryId,
+        // });
         return response.data;
-    } catch (error) {}
+    } catch (error) {
+        throw error;
+    }
     // return await fetch(`${BaseUrl.getUrl()}/events/`, {
     //     method: "POST",
     //     headers: {
@@ -153,9 +170,10 @@ const updateEvent = async function (eventId, event) {
 };
 
 const cancleEvent = async function (eventId) {
-    return await fetch(`${BaseUrl.getUrl()}/events/${eventId}`, {
-        method: "DELETE",
-    });
+    return await axios.delete(`${BaseUrl.getUrl()}/events/${eventId}`);
+    // return await fetch(`${BaseUrl.getUrl()}/events/${eventId}`, {
+    //     method: "DELETE",
+    // });
 };
 
 export default {

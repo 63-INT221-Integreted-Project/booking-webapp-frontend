@@ -1,0 +1,37 @@
+name: ci
+
+on:
+    push:
+        branches:
+            - main
+
+jobs:
+    ci:
+        runs-on: self-hosted
+
+        steps:
+            - name: Checkout 🛎
+              uses: actions/checkout@master
+              with:
+                  path: "oasip-frontend/"
+
+            - name: Setup env 🛠
+              env:
+                  VITE_BASE_URL: ${{ secrets.VITE_BASE_URL }}
+                  VITE_FILE_BASE_URL: ${{ secrets.VITE_FILE_BASE_URL }}
+              run: |
+                  touch oasip-frontend/.env.production
+                  echo VITE_BASE_URL="VITE_BASE_URL" >> oasip-frontend/.env.production
+                  echo VITE_FILE_BASE_URL="VITE_FILE_BASE_URL" >> oasip-frontend/.env.production
+
+            - name: Stop docker container 🛑
+              run: docker stop oasip-frontend
+
+            - name: Build Docker Image 🐳
+              run: docker build oasip-frontend/ -t plaintechlab/node-oasip-frontend
+
+            - name: Remove exist container 🏺
+              run: docker rm -f oasip-frontend
+
+            - name: Run Docker Container 🏺
+              run: docker run --network backend --name oasip-frontend -d plaintechlab/node-oasip-frontend

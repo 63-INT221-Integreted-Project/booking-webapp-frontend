@@ -11,8 +11,11 @@ import { useModalStore } from "../stores/modal";
 import WarningDialog from "../components/_Dialog/WarningDialog.vue";
 import utc from "dayjs/plugin/utc";
 import Sweetalert from "sweetalert2";
+import { useUtilStore } from "../stores/utils";
 
 dayjs.extend(utc);
+
+const util = useUtilStore();
 
 const calendarType = ref(null);
 const listType = ref(null);
@@ -87,9 +90,10 @@ function validate(form) {
     return true;
 }
 
-async function saveEvent(form) {
+async function saveEvent({ event: form, file }) {
     if (!validate(form)) return;
     try {
+        util.setLoadingOverlay(true);
         let localTime = dayjs(form.eventStartTime).format(
             "YYYY-MM-DDTHH:mm:ssZ"
         );
@@ -134,19 +138,23 @@ async function saveEvent(form) {
                 eventNotes: form.eventNotes,
             });
         } else {
-            Sweetalert.fire({
+            await EventService.createEvent(
+                {
+                    ...form,
+                    eventCategoryId: eventCategories.value.find(
+                        (eventCategory) =>
+                            eventCategory.eventCategoryName ===
+                            form.eventCategory
+                    ).eventCategoryId,
+                    eventStartTime: utcTime,
+                },
+                file
+            );
+            await Sweetalert.fire({
                 icon: "success",
                 title: "บันทึกสำเร็จ",
                 showConfirmButton: false,
                 timer: 1500,
-            });
-            await EventService.createEvent({
-                ...form,
-                eventCategoryId: eventCategories.value.find(
-                    (eventCategory) =>
-                        eventCategory.eventCategoryName === form.eventCategory
-                ).eventCategoryId,
-                eventStartTime: utcTime,
             });
         }
         if (getTabItem.value === "calendar")
@@ -158,6 +166,8 @@ async function saveEvent(form) {
         modal.eventModal.errorType = [
             "- เกิดข้อผิดพลาดบางอย่าง กรุณาลองใหม่อีกครั้ง",
         ];
+    } finally {
+        util.setLoadingOverlay(false);
     }
 }
 

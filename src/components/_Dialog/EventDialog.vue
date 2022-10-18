@@ -45,6 +45,8 @@ const emit = defineEmits(["close", "onSave"]);
 
 const util = useUtilStore();
 
+const file = ref(null);
+
 const form = ref({
     eventId: props.event?.eventId || "",
     bookingName: props.event?.bookingName || "",
@@ -129,9 +131,9 @@ const isEventDurationInvalid = computed(() => {
 });
 
 function onFileChange(e) {
-    const file = e.target.files[0];
+    file.value = e.target.files[0];
     //*Convert file size to MB
-    const fileSize = file.size / 1024 / 1024;
+    const fileSize = file.value.size / 1024 / 1024;
     if (fileSize > 10) {
         return Sweetalert.fire({
             icon: "error",
@@ -140,12 +142,17 @@ function onFileChange(e) {
         });
     }
 }
+
+function filePath(file) {
+    if (!file) return "";
+    return `${import.meta.env.VITE_FILE_BASE_URL}${file.filePath}`;
+}
 </script>
 
 <template>
     <div
         style="background-color: rgba(0, 0, 0, 0.8)"
-        class="fixed z-40 top-0 right-0 left-0 bottom-0 h-full w-full overflow-scroll"
+        class="fixed z-10 top-0 right-0 left-0 bottom-0 h-full w-full overflow-scroll"
         v-show.transition.opacity="openModal"
     >
         <div
@@ -350,7 +357,27 @@ function onFileChange(e) {
                         </span>
                     </div>
                 </div>
-                <!-- <div class="mb-4">
+                <div class="mb-4" v-if="event.file">
+                    <label
+                        class="text-gray-800 block mb-1 font-bold text-sm tracking-wide"
+                        >File</label
+                    >
+                    <!-- Create outlined button tailwind here -->
+                    <a
+                        class="border-2 font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                        :class="{
+                            'border-blue-500 hover:border-blue-700 text-blue-700':
+                                event.file,
+                            'border-red-500 hover:border-red-700 text-red-700':
+                                !event.file,
+                        }"
+                        type="button"
+                        :href="filePath(event.file)"
+                    >
+                        {{ event.file ? "View file" : "No file here" }}
+                    </a>
+                </div>
+                <div class="mb-4">
                     <label
                         class="text-gray-800 block mb-1 font-bold text-sm tracking-wide"
                         >Upload file (Maximum:
@@ -362,7 +389,7 @@ function onFileChange(e) {
                         type="file"
                         @input="onFileChange"
                     />
-                </div> -->
+                </div>
 
                 <div class="mt-8 text-right">
                     <button
@@ -375,7 +402,7 @@ function onFileChange(e) {
                     <button
                         type="button"
                         class="bg-green-700 hover:bg-green-800 text-white font-semibold py-2 px-4 border border-green-700 rounded-lg shadow-sm"
-                        @click="emit('onSave', form)"
+                        @click="emit('onSave', { event: form, file: file })"
                     >
                         บันทึก
                     </button>
