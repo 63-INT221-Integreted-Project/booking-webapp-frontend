@@ -3,7 +3,7 @@ name: ci
 on:
     push:
         branches:
-            - oasip-frontend
+            - main
 
 jobs:
     ci:
@@ -18,18 +18,20 @@ jobs:
             - name: Setup env 🛠
               env:
                   VITE_BASE_URL: ${{ secrets.VITE_BASE_URL }}
+                  VITE_FILE_BASE_URL: ${{ secrets.VITE_FILE_BASE_URL }}
               run: |
-                  touch oasip-frontend/.env
-                  echo VITE_BASE_URL="VITE_BASE_URL" >> oasip-frontend/.env
+                  touch oasip-frontend/.env.production
+                  echo VITE_BASE_URL="VITE_BASE_URL" >> oasip-frontend/.env.production
+                  echo VITE_FILE_BASE_URL="VITE_FILE_BASE_URL" >> oasip-frontend/.env.production
 
             - name: Stop docker container 🛑
               run: docker stop oasip-frontend
 
             - name: Build Docker Image 🐳
-              run: docker build oasip-frontend/ -t alonespace/node-converrpage-oasip-frontend
+              run: docker build oasip-frontend/ -t plaintechlab/node-oasip-frontend
 
             - name: Remove exist container 🏺
               run: docker rm -f oasip-frontend
 
             - name: Run Docker Container 🏺
-              run: docker run -p 127.0.0.1:3000:3000 --network backend --name oasip-frontend -d alonespace/node-converrpage-oasip-frontend
+              run: docker run --network backend --name oasip-frontend -d plaintechlab/node-oasip-frontend
