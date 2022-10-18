@@ -34,4 +34,4 @@ jobs:
               run: docker rm -f oasip-frontend
 
             - name: Run Docker Container 🏺
-              run: docker run --network oasip-backend --name oasip-frontend -d plaintechlab/node-oasip-frontend
+              run: docker run --network oasip-network --name oasip-frontend -d plaintechlab/node-oasip-frontend
