@@ -126,6 +126,9 @@ async function onSubmitLogin() {
                             </a>
                         </li>
                     </ul>
+                    <router-link tag="li" active-class="active" to="/login-azure" exact>
+                    <img :src="LoginAzureImg" />
+                    </router-link>
                     <a
                         href="javascript:void(0)"
                         class="text-base inline-block mb-2 text-[#adadad] hover:underline hover:text-primary"
@@ -154,6 +157,7 @@ import AuthService from "../services/auth.service";
 import Sweetalert from "sweetalert2";
 import { BreedingRhombusSpinner } from "epic-spinners";
 import { useUtilStore } from "../stores/utils";
+import LoginAzureImg from "/kp2/images/loginazure.png";
 
 const util = useUtilStore();
 
