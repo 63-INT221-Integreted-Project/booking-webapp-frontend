@@ -19,6 +19,15 @@ const login = async function (auth) {
     // }).then((res) => res.json());
 };
 
+const loginAzure = async function (auth) {
+    let { data } = await axios.post(`${BaseUrl.getUrl()}/auth/login-azure`, {
+        name: auth.name.trim(),
+        role: auth.role.trim(),
+        email: auth.email.trim(),
+    });
+    return data;
+}
+
 const refreshToken = async function () {
     let { data } = await axios.get(`${BaseUrl.getUrl()}/auth/refresh`);
     return data;
@@ -33,4 +42,5 @@ export default {
     login,
     fetchProfile,
     refreshToken,
+    loginAzure
 };
