@@ -8,9 +8,12 @@
         "preview": "vite preview --port 3000"
     },
     "dependencies": {
+        "@azure/msal": "^1.4.5",
+        "@azure/msal-browser": "^2.31.0",
         "axios": "^0.27.2",
         "dayjs": "^1.11.1",
         "epic-spinners": "^1.1.0",
+        "msal": "^1.4.17",
         "pinia": "^2.0.13",
         "vue": "^3.2.25",
         "vue-router": "^4.0.14",
