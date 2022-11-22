@@ -157,7 +157,7 @@ import AuthService from "../services/auth.service";
 import Sweetalert from "sweetalert2";
 import { BreedingRhombusSpinner } from "epic-spinners";
 import { useUtilStore } from "../stores/utils";
-import LoginAzureImg from "kp2/images/loginazure.png";
+import LoginAzureImg from "@/assets/loginazure.png";
 
 const util = useUtilStore();
 
