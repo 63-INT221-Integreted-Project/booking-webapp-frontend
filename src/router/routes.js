@@ -5,7 +5,6 @@ import Teams from "../views/Teams.vue";
 import Users from "../views/Users.vue";
 import Login from "../views/Login.vue";
 import LoginAzure from '../views/LoginAzure.vue';
-import Test from '../views/Test.vue';
 
 const history = createWebHistory("/kp2");
 const routes = [
@@ -81,14 +80,6 @@ const routes = [
             ],
         },
     },
-    {
-        path: '/test',
-        name: 'Test',
-        component: Test,
-        meta: {
-            requiresAuth: true
-        }
-      },
     {
         path: '/login-azure',
         name: 'LoginAzure',
