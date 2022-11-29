@@ -9,7 +9,7 @@ const config: Configuration = {
   auth: {
     clientId: '4c791376-4828-4a7d-8f75-507a29faebdf',
     authority: 'https://login.microsoftonline.com/6f4432dc-20d2-441d-b1db-ac3380ba633d',
-    redirectUri: 'http://localhost:3000/kp2/test',
+    redirectUri: 'https://intproj21.sit.kmutt.ac.th/kp2/azure',
   },
 };
 
@@ -22,7 +22,7 @@ export const msalConfig = {
   auth: {
     clientId: '4c791376-4828-4a7d-8f75-507a29faebdf',
     authority: 'https://login.microsoftonline.com/6f4432dc-20d2-441d-b1db-ac3380ba633d',
-    redirectUri: 'http://localhost:3000/kp2/test', // Must be registered as a SPA redirectURI on your app registration
+    redirectUri: 'https://intproj21.sit.kmutt.ac.th/kp2/azure', // Must be registered as a SPA redirectURI on your app registration
     postLogoutRedirectUri: '/' // Must be registered as a SPA redirectURI on your app registration
   },
   cache: {
