@@ -21,6 +21,7 @@ export default defineConfig({
         },
     },
     server: {
+        open: true,
         proxy: {
             "/api": "http://oasip-backend:8080",
         },
