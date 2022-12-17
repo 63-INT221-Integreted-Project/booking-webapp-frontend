@@ -2,7 +2,7 @@ import axios from "axios";
 import BaseUrl from "../utils/BaseUrl";
 
 const findAll = async function () {
-    let { data } = await axios.get(`${BaseUrl.getUrl()}/event-categories/`);
+    let { data } = await axios.get(`${BaseUrl.getUrl()}/event-categories`);
     return data;
     // return await fetch(`${BaseUrl.getUrl()}/event-categories/`, {
     //     headers: {
@@ -22,7 +22,7 @@ const findAllGuest = async function () {
 };
 
 const createEventCategory = async function (eventCategory) {
-    return await fetch(`${BaseUrl.getUrl()}/event-categories/`, {
+    return await fetch(`${BaseUrl.getUrl()}/event-categories`, {
         method: "POST",
         headers: {
             "Content-Type": "application/json",

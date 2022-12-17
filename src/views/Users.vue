@@ -100,7 +100,8 @@ import { ref, onMounted } from "vue-demi";
 import { useUtilStore } from "../stores/utils";
 import WarningDialog from "../components/_Dialog/WarningDialog.vue";
 import { useModalStore } from "../stores/modal";
-
+import { useRouter } from "vue-router";
+const router = useRouter();
 const util = useUtilStore();
 const dialog = useModalStore();
 
@@ -153,7 +154,11 @@ function toggleModal({ isOpen, user, isInvalid }) {
 }
 
 async function fetchUsers() {
-    users.value = await UserService.findAll();
+    try {
+        users.value = await UserService.findAll();
+    } catch (error) {
+        router.push("/");
+    }
 }
 
 async function saveUser(user) {

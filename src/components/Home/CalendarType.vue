@@ -348,12 +348,25 @@ async function backToDateNow() {
             </div>
         </div>
         <div class="col-span-5 row-span-3">
-            <div class="flex justify-between mb-2">
+            <div
+                class="flex mb-2"
+                :class="{
+                    'justify-between':
+                        userStore.getUserRole() &&
+                        userStore.getUserRole() !== 'lecturer',
+                    'justify-end':
+                        !userStore.getUserRole() ||
+                        userStore.getUserRole() === 'lecturer',
+                }"
+            >
                 <button
                     class="h-12 px-5 m-2 bg-indigo-500 text-white active:bg-indigo-600 text-sm font-bold uppercase p-3 rounded outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
                     type="button"
                     @click="openBookingEventModal"
-                    v-if="userStore.getUserRole() !== 'lecturer'"
+                    v-if="
+                        userStore.getUserRole() &&
+                        userStore.getUserRole() !== 'lecturer'
+                    "
                 >
                     + จองการประชุม
                 </button>

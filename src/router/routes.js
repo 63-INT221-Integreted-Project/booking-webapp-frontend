@@ -4,7 +4,8 @@ import EventCategories from "../views/EventCategories.vue";
 import Teams from "../views/Teams.vue";
 import Users from "../views/Users.vue";
 import Login from "../views/Login.vue";
-import LoginAzure from '../views/LoginAzure.vue';
+import SignUp from "../views/SignUp.vue";
+import LoginAzure from "../views/LoginAzure.vue";
 
 const history = createWebHistory("/kp2");
 const routes = [
@@ -81,13 +82,13 @@ const routes = [
         },
     },
     {
-        path: '/login-azure',
-        name: 'LoginAzure',
+        path: "/login-azure",
+        name: "LoginAzure",
         component: LoginAzure,
         meta: {
-            requiresAuth: true
-        }
-      },
+            requiresAuth: true,
+        },
+    },
     {
         path: "/login",
         name: "Login",
@@ -97,11 +98,29 @@ const routes = [
             metaTags: [
                 {
                     name: "description",
-                    content: "Teams create of OASIP.",
+                    content: "Login for OASIP.",
                 },
                 {
                     property: "og:description",
-                    content: "Teams create of OASIP.",
+                    content: "Login for OASIP.",
+                },
+            ],
+        },
+    },
+    {
+        path: "/signup",
+        name: "Signup",
+        component: SignUp,
+        meta: {
+            title: "OASIP - Sigup",
+            metaTags: [
+                {
+                    name: "description",
+                    content: "Signup of OASIP.",
+                },
+                {
+                    property: "og:description",
+                    content: "Signup of OASIP.",
                 },
             ],
         },
@@ -113,6 +132,5 @@ router.beforeEach((to, from, next) => {
     document.title = to.meta.title;
     next();
 });
-
 
 export default router;
