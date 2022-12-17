@@ -15,12 +15,14 @@ const createUser = async function (user) {
     return await fetch(`${BaseUrl.getUrl()}/users`, {
         method: "POST",
         headers: {
+            Authorization: `Bearer ${localStorage.getItem("access_token")}`,
             "Content-Type": "application/json",
         },
         body: JSON.stringify({
             name: user.name.trim(),
             email: user.email.trim(),
             role: user.role,
+            password: user.password
         }),
     }).then((res) => res.json());
 };
@@ -29,6 +31,7 @@ const updateUser = async function (userId, user) {
     return await fetch(`${BaseUrl.getUrl()}/users/${userId}`, {
         method: "PATCH",
         headers: {
+            Authorization: `Bearer ${localStorage.getItem("access_token")}`,
             "Content-Type": "application/json",
         },
         body: JSON.stringify({

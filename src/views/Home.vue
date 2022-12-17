@@ -12,6 +12,7 @@ import WarningDialog from "../components/_Dialog/WarningDialog.vue";
 import utc from "dayjs/plugin/utc";
 import Sweetalert from "sweetalert2";
 import { useUtilStore } from "../stores/utils";
+import { useUserStore } from "../stores/user";
 
 dayjs.extend(utc);
 
@@ -21,6 +22,7 @@ const calendarType = ref(null);
 const listType = ref(null);
 
 const route = useRoute();
+const userStore = useUserStore()
 
 const modal = useModalStore();
 
@@ -134,9 +136,18 @@ async function saveEvent({ event: form, file }) {
         }
         if (form.eventId) {
             let res = await EventService.updateEvent(form.eventId, {
+                
+            // {
+            //     eventStartTime: utcTime,
+            //     eventNotes: form.eventNotes,
+            // }{
                 eventStartTime: utcTime,
                 eventNotes: form.eventNotes,
-            });
+                },
+                file
+            
+            );
+            
         } else {
             await EventService.createEvent(
                 {
@@ -226,7 +237,7 @@ async function submitCancleEvent(event) {
                         >แบบปฏิทิน</a
                     >
                 </li>
-                <li class="mr-2">
+                <li class="mr-2" v-if="userStore.isAdmin()">
                     <a
                         href="#list"
                         class="inline-block py-3 px-4 rounded-lg hover:text-gray-900 hover:bg-gray-100 dark:hover:bg-gray-800 dark:hover:text-white"

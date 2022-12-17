@@ -11,6 +11,16 @@ const findAll = async function () {
     // }).then((res) => res.json());
 };
 
+const findAllGuest = async function () {
+    let { data } = await axios.get(`${BaseUrl.getUrl()}/event-categories/guest`);
+    return data;
+    // return await fetch(`${BaseUrl.getUrl()}/event-categories/`, {
+    //     headers: {
+    //         Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+    //     },
+    // }).then((res) => res.json());
+};
+
 const createEventCategory = async function (eventCategory) {
     return await fetch(`${BaseUrl.getUrl()}/event-categories`, {
         method: "POST",
@@ -58,6 +68,7 @@ const deleteEventCategory = async function (eventCategoryId) {
 
 export default {
     findAll,
+    findAllGuest,
     createEventCategory,
     updateEventCategory,
     deleteEventCategory,
