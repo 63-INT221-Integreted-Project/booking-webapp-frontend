@@ -41,6 +41,9 @@ export const useUserStore = defineStore("user", {
         isStudent() {
             return this.user?.role === "student" || false;
         },
+        isLecturer() {
+            return this.user?.role === "lecturer" || false;
+        },
         logout() {
             this.user = null;
             this.token = null;
