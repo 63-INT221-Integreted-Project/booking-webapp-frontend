@@ -163,6 +163,7 @@ async function fetchUsers() {
 }
 
 async function deleteUser(user) {
+    console.log(user);
     try {
         await UserService.deleteUser(user.userId);
     } catch (error) {
@@ -174,7 +175,7 @@ async function deleteUser(user) {
             });
         }
     }
-    modal.toggleWarningModal({ isOpen: false, item: null });
+    toggleWarningModal({ isOpen: false, item: null });
     users.value = await UserService.findAll();
 }
 
