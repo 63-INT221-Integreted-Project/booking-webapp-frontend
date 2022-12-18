@@ -22,7 +22,7 @@ const createUser = async function (user) {
             name: user.name.trim(),
             email: user.email.trim(),
             role: user.role,
-            password: user.password
+            password: user.password,
         }),
     }).then((res) => res.json());
 };
@@ -43,8 +43,11 @@ const updateUser = async function (userId, user) {
 };
 
 const deleteUser = async function (userId) {
-    await fetch(`${BaseUrl.getUrl()}/users/${userId}`, {
-        method: "DELETE",
+    return await axios.delete(`${BaseUrl.getUrl()}/users/${userId}`, {
+        headers: {
+            Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+            "Content-Type": "application/json",
+        },
     });
 };
 
