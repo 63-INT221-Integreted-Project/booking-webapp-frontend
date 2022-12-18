@@ -19,7 +19,7 @@
             v-if="dialog.warningModal.isOpen"
             :openModal="dialog.warningModal.isOpen"
             :item="dialog.warningModal.item"
-            @remove="deleteEventCategory"
+            @remove="deleteUser"
             @close="dialog.toggleWarningModal({ isOpen: false, item: null })"
             :name="dialog.getNameWarningModal('event-category')"
         ></WarningDialog>
@@ -101,6 +101,7 @@ import { useUtilStore } from "../stores/utils";
 import WarningDialog from "../components/_Dialog/WarningDialog.vue";
 import { useModalStore } from "../stores/modal";
 import { useRouter } from "vue-router";
+import Sweetalert from "sweetalert2";
 const router = useRouter();
 const util = useUtilStore();
 const dialog = useModalStore();
@@ -159,6 +160,22 @@ async function fetchUsers() {
     } catch (error) {
         router.push("/");
     }
+}
+
+async function deleteUser(user) {
+    try {
+        await UserService.deleteUser(user.userId);
+    } catch (error) {
+        if (error.response.status === 400) {
+            await Sweetalert.fire({
+                icon: "error",
+                title: "ไม่สามารถลบได้",
+                text: "เนื่องจากอาจารย์ท่านนี้เป็นเจ้าของ Category อยู่",
+            });
+        }
+    }
+    modal.toggleWarningModal({ isOpen: false, item: null });
+    users.value = await UserService.findAll();
 }
 
 async function saveUser(user) {
