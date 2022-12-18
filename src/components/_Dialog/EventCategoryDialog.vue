@@ -20,6 +20,10 @@ const props = defineProps({
         type: Array,
         default: () => [],
     },
+    users: {
+        type: Array,
+        default: () => [],
+    },
 });
 const emit = defineEmits(["close", "save"]);
 
@@ -28,6 +32,16 @@ const form = ref({
     eventCategoryName: props.item?.eventCategoryName || "",
     eventCategoryDescription: props.item?.eventCategoryDescription || "",
     eventDuration: props.item?.eventDuration || "",
+    owner: props.item?.owner.map((user) => user.userId) || [],
+});
+
+const options = computed(() => {
+    return props.users.map((user) => {
+        return {
+            value: user.userId,
+            label: `${user.name} - ${user.email}`,
+        };
+    });
 });
 
 const modalTitle = computed(() => {
@@ -173,12 +187,17 @@ function onSubmit() {
                         {{ isEventDurationInvalid }}
                     </p>
                 </div>
-                <div class="mb-4">
+                <div class="mb-4 w-full">
                     <label
                         class="text-gray-800 block mb-1 font-bold text-sm tracking-wide"
                         >เจ้าของหมวดหมู่
                     </label>
-                    <MySelect></MySelect>
+                    <a-select
+                        v-model:value="form.owner"
+                        class="bg-gray-200 appearance-none border-2 border-gray-200 rounded-lg w-full py-2 px-4 text-gray-700 leading-tight focus:outline-none focus:bg-white focus:border-blue-500"
+                        mode="multiple"
+                        :options="options"
+                    ></a-select>
                 </div>
 
                 <div class="mt-8 text-right">

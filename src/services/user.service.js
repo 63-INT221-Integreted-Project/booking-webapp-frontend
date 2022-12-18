@@ -11,6 +11,19 @@ const findAll = async function () {
     // }).then((res) => res.json());
 };
 
+const findByRole = async function (role) {
+    let { data } = await axios.get(
+        `${BaseUrl.getUrl()}/users?role=${role}`,
+        {}
+    );
+    return data;
+    // return await fetch(`${BaseUrl.getUrl()}/users`, {
+    //     headers: {
+    //         Authorization: `Bearer ${localStorage.getItem("access_token")}`,
+    //     },
+    // }).then((res) => res.json());
+};
+
 const createUser = async function (user) {
     return await fetch(`${BaseUrl.getUrl()}/users`, {
         method: "POST",
@@ -56,4 +69,5 @@ export default {
     createUser,
     updateUser,
     deleteUser,
+    findByRole,
 };

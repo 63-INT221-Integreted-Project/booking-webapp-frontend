@@ -12,7 +12,9 @@ const findAll = async function () {
 };
 
 const findAllGuest = async function () {
-    let { data } = await axios.get(`${BaseUrl.getUrl()}/event-categories/guest`);
+    let { data } = await axios.get(
+        `${BaseUrl.getUrl()}/event-categories/guest`
+    );
     return data;
     // return await fetch(`${BaseUrl.getUrl()}/event-categories/`, {
     //     headers: {
@@ -33,6 +35,7 @@ const createEventCategory = async function (eventCategory) {
             eventCategoryDescription:
                 eventCategory.eventCategoryDescription || "",
             eventDuration: eventCategory.eventDuration,
+            userId: eventCategory.owner,
         }),
     }).then((res) => res.json());
 };
@@ -52,6 +55,7 @@ const updateEventCategory = async function (eventCategoryId, eventCategory) {
                 eventCategoryDescription:
                     eventCategory.eventCategoryDescription || "",
                 eventDuration: eventCategory.eventDuration,
+                userId: eventCategory.owner,
             }),
         }
     ).then((res) => res.json());

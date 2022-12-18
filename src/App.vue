@@ -29,9 +29,6 @@ const getOverlay = computed(() => {
 
 <style>
 @import url("https://fonts.googleapis.com/css2?family=Kanit:wght@500&display=swap");
-body {
-    background-color: rgb(249 250 251 / 1);
-}
 #app {
     font-family: "Kanit", sans-serif;
     -webkit-font-smoothing: antialiased;

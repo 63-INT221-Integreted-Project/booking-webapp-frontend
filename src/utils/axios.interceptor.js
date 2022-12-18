@@ -20,7 +20,10 @@ axios.interceptors.response.use(
         return response;
     },
     async (error) => {
-        if (error.response.status === 401) {
+        if (
+            error.response.status === 401 &&
+            !error.config.url.includes("refresh")
+        ) {
             const refreshToken = localStorage.getItem("refresh_token");
             if (refreshToken) {
                 try {

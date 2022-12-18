@@ -59,14 +59,16 @@ async function onSubmitLogin() {
                             />
                         </div>
                         <div class="mb-10">
-                            <input
+                            <button
                                 @click.prevent="onSubmitLogin"
                                 type="submit"
                                 class="w-full rounded-md border bordder-primary py-3 px-5 bg-blue-500 text-base text-white cursor-pointer hover:bg-opacity-90 transition"
-                            />
+                            >
+                                Login
+                            </button>
                         </div>
                     </form>
-                    <p class="text-base mb-6 text-[#adadad]">Connect With</p>
+                    <!-- <p class="text-base mb-6 text-[#adadad]">Connect With</p>
                     <ul class="flex justify-between -mx-2 mb-12">
                         <li class="px-2 w-full">
                             <a
@@ -125,11 +127,16 @@ async function onSubmitLogin() {
                                 </svg>
                             </a>
                         </li>
-                    </ul>
-                    <router-link tag="li" active-class="active" to="/login-azure" exact>
-                    <img :src="LoginAzureImg" />
+                    </ul> -->
+                    <router-link
+                        tag="li"
+                        active-class="active"
+                        to="/login-azure"
+                        exact
+                    >
+                        <img :src="LoginAzureImg" />
                     </router-link>
-                    <a
+                    <!-- <a
                         href="javascript:void(0)"
                         class="text-base inline-block mb-2 text-[#adadad] hover:underline hover:text-primary"
                     >
@@ -143,7 +150,7 @@ async function onSubmitLogin() {
                         >
                             Sign Up
                         </a>
-                    </p>
+                    </p> -->
                 </div>
             </div>
         </div>

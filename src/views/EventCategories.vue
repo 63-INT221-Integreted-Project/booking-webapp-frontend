@@ -3,419 +3,311 @@ import { ref } from "@vue/reactivity";
 import { onMounted } from "@vue/runtime-core";
 import { useRoute } from "vue-router";
 import EventCategoriesService from "../services/event-categories.service";
+import UserService from "../services/user.service";
 import EventCategoryDialog from "../components/_Dialog/EventCategoryDialog.vue";
 import WarningDialog from "../components/_Dialog/WarningDialog.vue";
 import { useModalStore } from "../stores/modal";
 import { SweetAlert } from "sweetalert2/dist/sweetalert2";
 import { useUserStore } from "../stores/user";
+
 const route = useRoute();
 const eventCategories = ref([]);
+const users = ref([]);
 const modal = useModalStore();
 const userStore = useUserStore();
 
 const pagination = ref({
-  page: 1,
-  perPage: 10,
+    page: 1,
+    perPage: 10,
 });
 
 onMounted(async () => {
-    
-  try {
-    await userStore.fetchUser()
-    if (userStore.isAdmin()) {
-      eventCategories.value = await EventCategoriesService.findAll();
-    } else if (userStore.isStudent()) {
-      eventCategories.value = await EventCategoriesService.findAll();
-    } else if (userStore.isLecturer()) {
-      eventCategories.value = await EventCategoriesService.findAll();
-    } else {
-      eventCategories.value = await EventCategoriesService.findAllGuest();
+    try {
+        await userStore.fetchUser();
+        await getUsers();
+        if (
+            userStore.isAdmin() ||
+            userStore.isLecturer() ||
+            userStore.isStudent()
+        ) {
+            eventCategories.value = await EventCategoriesService.findAll();
+        } else {
+            eventCategories.value = await EventCategoriesService.findAllGuest();
+        }
+
+        // if (userStore.isAdmin()) {
+        //   eventCategories.value = await EventCategoriesService.findAll();
+        // } else if (userStore.isStudent()) {
+        //   eventCategories.value = await EventCategoriesService.findAll();
+        // } else if (userStore.isLecturer()) {
+        //   eventCategories.value = await EventCategoriesService.findAll();
+        // } else {
+        //   eventCategories.value = await EventCategoriesService.findAllGuest();
+        // }
+    } catch (error) {
+        SweetAlert.fire({
+            icon: "error",
+            title: "Oops...",
+            text: "Something went wrong!",
+        });
     }
-  } catch (error) {
-    SweetAlert.fire({
-      icon: "error",
-      title: "Oops...",
-      text: "Something went wrong!",
-    });
-  }
 });
 
-async function saveEventCategory(eventCategory) {
-  try {
-    modal.eventCategoryModal.isInvalid = false;
-    modal.eventCategoryModal.errorList = [];
-    let valid = checkFormValid(eventCategory);
-    if (valid.length) {
-      modal.eventCategoryModal.isInvalid = true;
-      modal.eventCategoryModal.errorList = valid;
-      return;
-    }
+async function getUsers() {
+    try {
+        users.value = await UserService.findByRole("lecturer");
+    } catch (error) {}
+}
 
-    let findExistCategoryName = eventCategories.value.find(
-      (ec) =>
-        ec.eventCategoryName.trim() ===
-          eventCategory.eventCategoryName.trim() &&
-        ec.eventCategoryId !== eventCategory.eventCategoryId
-    );
-    if (findExistCategoryName) {
-      modal.eventCategoryModal.isInvalid = true;
-      modal.eventCategoryModal.errorList = ["- ชื่อหมวดหมู่ซ้ำ"];
-      return;
+async function saveEventCategory(eventCategory) {
+    try {
+        modal.eventCategoryModal.isInvalid = false;
+        modal.eventCategoryModal.errorList = [];
+        let valid = checkFormValid(eventCategory);
+        if (valid.length) {
+            modal.eventCategoryModal.isInvalid = true;
+            modal.eventCategoryModal.errorList = valid;
+            return;
+        }
+
+        let findExistCategoryName = eventCategories.value.find(
+            (ec) =>
+                ec.eventCategoryName.trim() ===
+                    eventCategory.eventCategoryName.trim() &&
+                ec.eventCategoryId !== eventCategory.eventCategoryId
+        );
+        if (findExistCategoryName) {
+            modal.eventCategoryModal.isInvalid = true;
+            modal.eventCategoryModal.errorList = ["- ชื่อหมวดหมู่ซ้ำ"];
+            return;
+        }
+        if (eventCategory.eventCategoryId) {
+            await EventCategoriesService.updateEventCategory(
+                eventCategory.eventCategoryId,
+                eventCategory
+            );
+        } else {
+            await EventCategoriesService.createEventCategory(eventCategory);
+        }
+        eventCategories.value = await EventCategoriesService.findAll();
+        modal.toggleEventCategoryModal({
+            isOpen: false,
+            item: null,
+            isInvalid: false,
+        });
+    } catch (error) {
+        modal.eventCategoryModal.isInvalid = true;
+        modal.eventCategoryModal.errorList = [
+            "- เกิดข้อพลาดบางอย่าง กรุณาลองใหม่อีกครั้ง",
+        ];
     }
-    if (eventCategory.eventCategoryId) {
-      await EventCategoriesService.updateEventCategory(
-        eventCategory.eventCategoryId,
-        eventCategory
-      );
-    } else {
-      await EventCategoriesService.createEventCategory(eventCategory);
-    }
-    eventCategories.value = await EventCategoriesService.findAll();
-    modal.toggleEventCategoryModal({
-      isOpen: false,
-      item: null,
-      isInvalid: false,
-    });
-  } catch (error) {
-    modal.eventCategoryModal.isInvalid = true;
-    modal.eventCategoryModal.errorList = [
-      "- เกิดข้อพลาดบางอย่าง กรุณาลองใหม่อีกครั้ง",
-    ];
-  }
 }
 
 function checkFormValid(eventCategory) {
-  let errorList = [];
-  if (!eventCategory.eventCategoryName)
-    errorList.push("- กรุณากรอกชื่อหมวดหมู่");
-  if (!eventCategory.eventCategoryName.length > 100)
-    errorList.push("- ชื่อหมวดหมู่ต้องไม่เกิน 100 ตัวอักษร");
-  if (!eventCategory.eventCategoryDescription.length > 500)
-    errorList.push("- คำอธิบายหมวดหมู่ต้องไม่เกิน 500 ตัวอักษร");
-  if (!eventCategory.eventDuration) errorList.push("- กรุณากรอกระยะเวลาการจอง");
-  if (isNaN(eventCategory.eventDuration))
-    errorList.push("- ระยะเวลาต้องเป็นตัวเลขเท่านั้น");
-  if (!(eventCategory.eventDuration >= 1 && eventCategory.eventDuration <= 480))
-    errorList.push("- ช่วงระยะเวลาในการจองต้องอยู่ในช่วง 1 - 480 นาที");
-  return errorList;
+    let errorList = [];
+    if (!eventCategory.eventCategoryName)
+        errorList.push("- กรุณากรอกชื่อหมวดหมู่");
+    if (!eventCategory.eventCategoryName.length > 100)
+        errorList.push("- ชื่อหมวดหมู่ต้องไม่เกิน 100 ตัวอักษร");
+    if (!eventCategory.eventCategoryDescription.length > 500)
+        errorList.push("- คำอธิบายหมวดหมู่ต้องไม่เกิน 500 ตัวอักษร");
+    if (!eventCategory.eventDuration)
+        errorList.push("- กรุณากรอกระยะเวลาการจอง");
+    if (isNaN(eventCategory.eventDuration))
+        errorList.push("- ระยะเวลาต้องเป็นตัวเลขเท่านั้น");
+    if (
+        !(
+            eventCategory.eventDuration >= 1 &&
+            eventCategory.eventDuration <= 480
+        )
+    )
+        errorList.push("- ช่วงระยะเวลาในการจองต้องอยู่ในช่วง 1 - 480 นาที");
+    return errorList;
 }
 
 function displayEventCategoryOwner(owner) {
-  if (!owner.length) return "ไม่พบเจ้าของ";
-  let displayList = owner.map((o) => o.name);
-  return displayList.join(", ");
+    if (!owner.length) return "ไม่พบเจ้าของ";
+    let displayList = owner.map((o) => o.name);
+    return displayList.join(", ");
 }
 
 async function deleteEventCategory(eventCategory) {
-  await EventCategoriesService.deleteEventCategory(
-    eventCategory.eventCategoryId
-  );
-  modal.toggleWarningModal({ isOpen: false, item: null });
-  eventCategories.value = await EventCategoriesService.findAll();
+    await EventCategoriesService.deleteEventCategory(
+        eventCategory.eventCategoryId
+    );
+    modal.toggleWarningModal({ isOpen: false, item: null });
+    eventCategories.value = await EventCategoriesService.findAll();
 }
 </script>
 
 <template>
-  <div class="w-full px-4 mx-auto">
-    <EventCategoryDialog
-      v-if="modal.eventCategoryModal.isOpen"
-      :openModal="modal.eventCategoryModal.isOpen"
-      :item="modal.eventCategoryModal.item"
-      @close="
-        modal.toggleEventCategoryModal({
-          isOpen: false,
-          item: null,
-          isInvalid: false,
-        })
-      "
-      :isInvalid="modal.eventCategoryModal.isInvalid"
-      :errorList="modal.eventCategoryModal.errorList"
-      @save="saveEventCategory"
-    ></EventCategoryDialog>
-    <WarningDialog
-      v-if="modal.warningModal.isOpen"
-      :openModal="modal.warningModal.isOpen"
-      :item="modal.warningModal.item"
-      @remove="deleteEventCategory"
-      @close="modal.toggleWarningModal({ isOpen: false, item: null })"
-      :name="modal.getNameWarningModal('event-category')"
-    ></WarningDialog>
-    <div
-      class="
-        relative
-        flex flex-col
-        min-w-0
-        break-words
-        bg-white
-        w-full
-        mb-6
-        shadow-lg
-        rounded
-      "
-    >
-      <div class="rounded-t mb-0 px-4 py-8 border-0">
-        <div class="flex flex-wrap items-center">
-          <div class="relative w-full px-4 max-w-full flex-grow flex-1">
-            <h3 class="font-semibold text-xl text-blueGray-700">
-              หมวดหมู่การจอง
-            </h3>
-          </div>
-          <div
-            class="relative w-full px-4 max-w-full flex-grow flex-1 text-right"
-            v-if="userStore.isAdmin()"
-          >
-            <button
-              class="
-                bg-indigo-500
-                text-white
-                active:bg-indigo-600
-                text-sm
-                font-bold
-                uppercase
-                px-3
-                py-3
-                rounded
-                outline-none
-                focus:outline-none
-                mr-1
-                mb-1
-                ease-linear
-                transition-all
-                duration-150
-              "
-              type="button"
-              @click="
+    <div class="w-full px-4 mx-auto">
+        <EventCategoryDialog
+            v-if="modal.eventCategoryModal.isOpen"
+            :openModal="modal.eventCategoryModal.isOpen"
+            :item="modal.eventCategoryModal.item"
+            @close="
                 modal.toggleEventCategoryModal({
-                  isOpen: true,
-                  item: null,
-                  isInvalid: false,
+                    isOpen: false,
+                    item: null,
+                    isInvalid: false,
                 })
-              "
-            >
-              เพิ่มหมวดหมู่การจอง
-            </button>
-          </div>
-        </div>
-      </div>
-
-      <div class="block w-full overflow-x-auto p-6">
-        <table class="items-center bg-transparent w-full border-collapse">
-          <thead>
-            <tr>
-              <th
-                class="
-                  px-6
-                  bg-blueGray-50
-                  text-blueGray-500
-                  align-middle
-                  border border-solid border-blueGray-100
-                  py-3
-                  text-xs
-                  uppercase
-                  border-l-0 border-r-0
-                  whitespace-nowrap
-                  font-semibold
-                  text-left
-                "
-              >
-                ชื่อหมวดหมู่
-              </th>
-              <th
-                class="
-                  px-6
-                  bg-blueGray-50
-                  text-blueGray-500
-                  align-middle
-                  border border-solid border-blueGray-100
-                  py-3
-                  text-xs
-                  uppercase
-                  border-l-0 border-r-0
-                  whitespace-nowrap
-                  font-semibold
-                  text-left
-                "
-              >
-                รายละเอียดหมวดหมู่
-              </th>
-              <th
-                class="
-                  px-6
-                  bg-blueGray-50
-                  text-blueGray-500
-                  align-middle
-                  border border-solid border-blueGray-100
-                  py-3
-                  text-xs
-                  uppercase
-                  border-l-0 border-r-0
-                  whitespace-nowrap
-                  font-semibold
-                  text-left
-                "
-              >
-                ระยะเวลา
-              </th>
-              <th
-                class="
-                  px-6
-                  bg-blueGray-50
-                  text-blueGray-500
-                  align-middle
-                  border border-solid border-blueGray-100
-                  py-3
-                  text-xs
-                  uppercase
-                  border-l-0 border-r-0
-                  whitespace-nowrap
-                  font-semibold
-                  text-left
-                "
-              >
-                เจ้าของหมวดหมู่
-              </th>
-              <th
-                class="
-                  px-6
-                  bg-blueGray-50
-                  text-blueGray-500
-                  align-middle
-                  border border-solid border-blueGray-100
-                  py-3
-                  text-xs
-                  uppercase
-                  border-l-0 border-r-0
-                  whitespace-nowrap
-                  font-semibold
-                  text-left
-                "
-                v-if="userStore.isAdmin()"
-              >
-                เพิ่มเติม
-              </th>
-            </tr>
-          </thead>
-
-          <tbody>
-            <tr v-if="!eventCategories.length">
-              <td colspan="4" class="px-6 py-16 text-center text-blueGray-700">
-                <div class="flex justify-center items-center">
-                  <img
-                    src="/images/_svg/no-data.svg"
-                    alt="no-data"
-                    width="300"
-                  />
+            "
+            :isInvalid="modal.eventCategoryModal.isInvalid"
+            :errorList="modal.eventCategoryModal.errorList"
+            :users="users"
+            @save="saveEventCategory"
+        ></EventCategoryDialog>
+        <WarningDialog
+            v-if="modal.warningModal.isOpen"
+            :openModal="modal.warningModal.isOpen"
+            :item="modal.warningModal.item"
+            @remove="deleteEventCategory"
+            @close="modal.toggleWarningModal({ isOpen: false, item: null })"
+            :name="modal.getNameWarningModal('event-category')"
+        ></WarningDialog>
+        <div
+            class="relative flex flex-col min-w-0 break-words bg-white w-full mb-6 shadow-lg rounded"
+        >
+            <div class="rounded-t mb-0 px-4 py-8 border-0">
+                <div class="flex flex-wrap items-center">
+                    <div
+                        class="relative w-full px-4 max-w-full flex-grow flex-1"
+                    >
+                        <h3 class="font-semibold text-xl text-blueGray-700">
+                            หมวดหมู่การจอง
+                        </h3>
+                    </div>
+                    <div
+                        class="relative w-full px-4 max-w-full flex-grow flex-1 text-right"
+                        v-if="userStore.isAdmin()"
+                    >
+                        <button
+                            class="bg-indigo-500 text-white active:bg-indigo-600 text-sm font-bold uppercase px-3 py-3 rounded outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
+                            type="button"
+                            @click="
+                                modal.toggleEventCategoryModal({
+                                    isOpen: true,
+                                    item: null,
+                                    isInvalid: false,
+                                })
+                            "
+                        >
+                            เพิ่มหมวดหมู่การจอง
+                        </button>
+                    </div>
                 </div>
-                <h2 class="text-xl text-center">ไม่มีข้อมูล</h2>
-              </td>
-            </tr>
-            <tr
-              v-else
-              v-for="(event, index) in eventCategories"
-              :key="index"
-              class="text-black font-normal"
-            >
-              <th
-                class="
-                  border-t-0
-                  px-6
-                  align-middle
-                  border-l-0 border-r-0
-                  text-xs
-                  whitespace-nowrap
-                  p-4
-                  text-left
-                "
-              >
-                {{ event.eventCategoryName }}
-              </th>
-              <td
-                class="
-                  border-t-0
-                  px-6
-                  align-middle
-                  border-l-0 border-r-0
-                  text-xs
-                  whitespace-nowrap
-                  p-4
-                "
-              >
-                <span
-                  v-if="!event.eventCategoryDescription"
-                  class="text-gray-400 italic font-thin"
-                  >ไม่มีคำอธิบาย</span
+            </div>
+
+            <div class="block w-full overflow-x-auto p-6">
+                <table
+                    class="items-center bg-transparent w-full border-collapse"
                 >
-                <span v-else>
-                  {{ event.eventCategoryDescription }}
-                </span>
-              </td>
-              <td
-                class="
-                  border-t-0
-                  px-6
-                  align-center
-                  border-l-0 border-r-0
-                  text-xs
-                  whitespace-nowrap
-                  p-4
-                "
-              >
-                {{ event.eventDuration }} mins
-              </td>
-              <td
-                class="
-                  border-t-0
-                  px-6
-                  align-center
-                  border-l-0 border-r-0
-                  text-xs
-                  whitespace-nowrap
-                  p-4
-                "
-              >
-                <span v-if="!event.owner.length" class="font-normal">
-                  {{ displayEventCategoryOwner(event.owner) }}
-                </span>
-                <span v-else class="font-bold text-green-800">
-                  {{ displayEventCategoryOwner(event.owner) }}
-                </span>
-              </td>
-              <td
-                class="
-                  border-t-0
-                  px-6
-                  align-middle
-                  border-l-0 border-r-0
-                  text-xs
-                  whitespace-nowrap
-                  p-4
-                "
-                v-if="userStore.isAdmin()"
-              >
-                <button
-                  class="
-                    bg-yellow-500
-                    hover:bg-blue-light
-                    text-white
-                    font-extrabold
-                    py-2
-                    px-4
-                    border-b-4 border-yellow-600
-                    hover:border-blue
-                    rounded
-                    mr-2
-                  "
-                  @click="
-                    modal.toggleEventCategoryModal({
-                      isOpen: true,
-                      item: event,
-                      isInvalid: false,
-                    })
-                  "
-                >
-                  แก้ไข
-                </button>
-                <!-- <button
+                    <thead>
+                        <tr>
+                            <th
+                                class="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left"
+                            >
+                                ชื่อหมวดหมู่
+                            </th>
+                            <th
+                                class="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left"
+                            >
+                                รายละเอียดหมวดหมู่
+                            </th>
+                            <th
+                                class="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left"
+                            >
+                                ระยะเวลา
+                            </th>
+                            <th
+                                class="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left"
+                            >
+                                เจ้าของหมวดหมู่
+                            </th>
+                            <th
+                                class="px-6 bg-blueGray-50 text-blueGray-500 align-middle border border-solid border-blueGray-100 py-3 text-xs uppercase border-l-0 border-r-0 whitespace-nowrap font-semibold text-left"
+                                v-if="userStore.isAdmin()"
+                            >
+                                เพิ่มเติม
+                            </th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <tr v-if="!eventCategories.length">
+                            <td
+                                colspan="4"
+                                class="px-6 py-16 text-center text-blueGray-700"
+                            >
+                                <div class="flex justify-center items-center">
+                                    <img
+                                        src="/images/_svg/no-data.svg"
+                                        alt="no-data"
+                                        width="300"
+                                    />
+                                </div>
+                                <h2 class="text-xl text-center">ไม่มีข้อมูล</h2>
+                            </td>
+                        </tr>
+                        <tr
+                            v-else
+                            v-for="(event, index) in eventCategories"
+                            :key="index"
+                            class="text-black font-normal"
+                        >
+                            <th
+                                class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4 text-left"
+                            >
+                                {{ event.eventCategoryName }}
+                            </th>
+                            <td
+                                class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4"
+                            >
+                                <span
+                                    v-if="!event.eventCategoryDescription"
+                                    class="text-gray-400 italic font-thin"
+                                    >ไม่มีคำอธิบาย</span
+                                >
+                                <span v-else>
+                                    {{ event.eventCategoryDescription }}
+                                </span>
+                            </td>
+                            <td
+                                class="border-t-0 px-6 align-center border-l-0 border-r-0 text-xs whitespace-nowrap p-4"
+                            >
+                                {{ event.eventDuration }} mins
+                            </td>
+                            <td
+                                class="border-t-0 px-6 align-center border-l-0 border-r-0 text-xs whitespace-nowrap p-4"
+                            >
+                                <span
+                                    v-if="!event.owner.length"
+                                    class="font-normal"
+                                >
+                                    {{ displayEventCategoryOwner(event.owner) }}
+                                </span>
+                                <span v-else class="font-bold text-green-800">
+                                    {{ displayEventCategoryOwner(event.owner) }}
+                                </span>
+                            </td>
+                            <td
+                                class="border-t-0 px-6 align-middle border-l-0 border-r-0 text-xs whitespace-nowrap p-4"
+                                v-if="userStore.isAdmin()"
+                            >
+                                <button
+                                    class="bg-yellow-500 hover:bg-blue-light text-white font-extrabold py-2 px-4 border-b-4 border-yellow-600 hover:border-blue rounded mr-2"
+                                    @click="
+                                        modal.toggleEventCategoryModal({
+                                            isOpen: true,
+                                            item: event,
+                                            isInvalid: false,
+                                        })
+                                    "
+                                >
+                                    แก้ไข
+                                </button>
+                                <!-- <button
                                     class="bg-red-500 hover:bg-blue-light text-white font-extrabold py-2 px-4 border-b-4 border-red-600 hover:border-blue rounded"
                                     @click="
                                         modal.toggleWarningModal({
@@ -426,12 +318,12 @@ async function deleteEventCategory(eventCategory) {
                                 >
                                     ลบ
                                 </button> -->
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-      <!-- <div class="w-full">
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+            <!-- <div class="w-full">
                 <div
                     class="hidden sm:flex sm:items-center sm:justify-between px-6 py-8"
                 >
@@ -507,8 +399,8 @@ async function deleteEventCategory(eventCategory) {
                     </div>
                 </div>
             </div> -->
+        </div>
     </div>
-  </div>
 </template>
 
 <style></style>
