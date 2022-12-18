@@ -101,12 +101,16 @@ async function saveEvent({ event: form, file }) {
         );
         let utcTime = dayjs.utc(localTime);
         let events = await EventService.findAllByBetweenDate(
-            utcTime.hour(0).minute(0).second(0).format("YYYY-MM-DDTHH:mm:ssZ"),
+            utcTime
+                .hour(0)
+                .minute(0)
+                .second(0)
+                .format("YYYY-MM-DDT[23:59:59Z]"),
             utcTime
                 .hour(23)
                 .minute(59)
                 .second(59)
-                .format("YYYY-MM-DDTHH:mm:ssZ")
+                .format("YYYY-MM-DDT[23:59:59Z]")
         );
 
         let findIsInRange = events.find((event) => {
