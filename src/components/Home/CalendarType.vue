@@ -82,7 +82,7 @@ async function fetchEvents() {
                 .hour(0)
                 .minute(0)
                 .second(0)
-                .format(),
+                .format("YYYY-MM-DDT[23:59:59Z]"),
             dayjs
                 .utc(
                     new Date(
