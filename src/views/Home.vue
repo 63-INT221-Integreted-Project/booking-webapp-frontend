@@ -22,7 +22,7 @@ const calendarType = ref(null);
 const listType = ref(null);
 
 const route = useRoute();
-const userStore = useUserStore()
+const userStore = useUserStore();
 
 const modal = useModalStore();
 
@@ -101,8 +101,12 @@ async function saveEvent({ event: form, file }) {
         );
         let utcTime = dayjs.utc(localTime);
         let events = await EventService.findAllByBetweenDate(
-            utcTime.hour(0).minute(0).second(0).format(),
-            utcTime.hour(23).minute(59).second(59).format()
+            utcTime.hour(0).minute(0).second(0).format("YYYY-MM-DDTHH:mm:ssZ"),
+            utcTime
+                .hour(23)
+                .minute(59)
+                .second(59)
+                .format("YYYY-MM-DDTHH:mm:ssZ")
         );
 
         let findIsInRange = events.find((event) => {
@@ -135,19 +139,18 @@ async function saveEvent({ event: form, file }) {
             return;
         }
         if (form.eventId) {
-            let res = await EventService.updateEvent(form.eventId, {
-                
-            // {
-            //     eventStartTime: utcTime,
-            //     eventNotes: form.eventNotes,
-            // }{
-                eventStartTime: utcTime,
-                eventNotes: form.eventNotes,
+            let res = await EventService.updateEvent(
+                form.eventId,
+                {
+                    // {
+                    //     eventStartTime: utcTime,
+                    //     eventNotes: form.eventNotes,
+                    // }{
+                    eventStartTime: utcTime,
+                    eventNotes: form.eventNotes,
                 },
                 file
-            
             );
-            
         } else {
             await EventService.createEvent(
                 {
