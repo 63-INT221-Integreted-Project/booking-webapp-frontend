@@ -170,13 +170,20 @@ async function deleteUser(user) {
             await Sweetalert.fire({
                 icon: "error",
                 title: "ไม่สามารถลบได้",
-                text: "เนื่องจากอาจารย์ท่านนี้เป็นเจ้าของ Category อยู่",
+                text: "เนื่องจากอาจารย์ท่านนี้เป็นเจ้าของ Category เพียงคนเดียว",
             });
         }
     }
     dialog.toggleWarningModal({
         isOpen: false,
         user: null,
+    });
+    await Sweetalert.fire({
+        icon: "success",
+        title: "ลบข้อมูล",
+        text: "ระบบได้ทำการลบข้อมูลผู้ใช้งานเรียบร้อยแล้ว",
+        timer: 2000,
+        showConfirmButton: false,
     });
     users.value = await UserService.findAll();
 }
