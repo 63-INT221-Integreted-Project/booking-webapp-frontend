@@ -18,7 +18,7 @@ const navItems = ref([
         name: "Home",
         path: "/kp2/",
         text: "หน้าหลัก",
-        showMode: ["admin", "student", "lecturer", "guest"],
+        showMode: ["admin", "student", "lecturer", "guest", "not-logged-in"],
     },
     {
         name: "Users",
@@ -30,19 +30,19 @@ const navItems = ref([
         name: "EventCategories",
         path: "/kp2/event-categories",
         text: "หมวดหมู่การจอง",
-        showMode: ["admin", "student", "lecturer", "guest"],
+        showMode: ["admin", "student", "lecturer", "guest", "not-logged-in"],
     },
     {
         name: "Teams",
         path: "/kp2/teams",
         text: "ทีมของเรา",
-        showMode: ["admin", "student", "lecturer", "guest"],
+        showMode: ["admin", "student", "lecturer", "guest", "not-logged-in"],
     },
     {
         name: "Login",
         path: "/kp2/login",
         text: "เข้าสู่ระบบ",
-        showMode: ["guest"],
+        showMode: ["not-logged-in"],
     },
     // {
     //     name: "Signup",
@@ -57,8 +57,12 @@ function getActiveNavbar(path) {
 }
 
 function isShowNavbar(navItem) {
-    let role = userStore?.getUserRole();
-    if (!role) return navItem.showMode.includes("guest");
+    let isLogged = userStore?.isLogged();
+    if (!isLogged)
+        return (
+            ["guest"].includes(navItem.showMode) ||
+            navItem.showMode.includes("not-logged-in")
+        );
     return navItem.showMode.includes(userStore?.getUserRole());
 }
 

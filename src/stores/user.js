@@ -35,6 +35,12 @@ export const useUserStore = defineStore("user", {
                 return "";
             }
         },
+        isLogged() {
+            return this.user !== null;
+        },
+        isGuest() {
+            return this.user?.role === "guest" || false;
+        },
         isAdmin() {
             return this.user?.role === "admin" || false;
         },

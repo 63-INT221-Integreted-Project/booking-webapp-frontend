@@ -316,12 +316,17 @@ function formatBookingName(bookingName) {
                             <div class="flex-shrink-0 text-red-500">
                                 ({{ util.getHoursAndMinutes(event) }})
                             </div>
-                            <div class="flex-1 min-w-0">
+                            <div class="flex-1 min-w-0 mt-3">
                                 <p
                                     class="text-sm font-medium text-gray-900 truncate"
                                 >
-                                    <span class="font-bold">ชื่อ:</span>
-                                    {{ event.bookingName }}
+                                    <span class="font-bold">ชื่อ: </span>
+                                    <span v-if="event.bookingName">
+                                        {{ event.bookingName }}
+                                    </span>
+                                    <span v-else class="text-red-600 font-bold">
+                                        ไม่ระบุชื่อ
+                                    </span>
                                 </p>
                             </div>
                         </div>

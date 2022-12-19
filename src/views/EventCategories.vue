@@ -24,16 +24,23 @@ const pagination = ref({
 onMounted(async () => {
     try {
         await userStore.fetchUser();
-        await getUsers();
-        if (
-            userStore.isAdmin() ||
-            userStore.isLecturer() ||
-            userStore.isStudent()
-        ) {
-            eventCategories.value = await EventCategoriesService.findAll();
-        } else {
-            eventCategories.value = await EventCategoriesService.findAllGuest();
+        if (userStore.isAdmin()) {
+            await getUsers();
         }
+        if (!userStore.isLogged() || userStore.isGuest()) {
+            eventCategories.value = await EventCategoriesService.findAllGuest();
+        } else {
+            eventCategories.value = await EventCategoriesService.findAll();
+        }
+        // if (
+        //     userStore.isAdmin() ||
+        //     userStore.isLecturer() ||
+        //     userStore.isStudent()
+        // ) {
+        //     eventCategories.value = await EventCategoriesService.findAll();
+        // } else {
+        //     eventCategories.value = await EventCategoriesService.findAllGuest();
+        // }
 
         // if (userStore.isAdmin()) {
         //   eventCategories.value = await EventCategoriesService.findAll();

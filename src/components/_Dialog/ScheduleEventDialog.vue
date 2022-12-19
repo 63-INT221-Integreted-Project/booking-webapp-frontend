@@ -76,7 +76,7 @@ function filePath(file) {
             </div>
 
             <div
-                class="shadow w-full rounded-lg bg-white overflow-hidden w-full block p-8"
+                class="shadow w-full rounded-lg bg-white overflow-hidden block p-8"
             >
                 <h2 class="font-bold text-2xl mb-6 text-gray-800 border-b pb-2">
                     {{ title }}
@@ -104,7 +104,7 @@ function filePath(file) {
                     </div>
                 </div>
 
-                <div class="mt-4 h-[1200px] overflow-y-scroll" v-else>
+                <div class="mt-4 h-[600px] overflow-y-scroll" v-else>
                     <div
                         class="p-6 my-2 border-1 rounded-xl shadow-2xl"
                         v-for="(event, index) in eventSortByDateASC"
