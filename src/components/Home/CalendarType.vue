@@ -502,9 +502,9 @@ async function backToDateNow() {
                                                         !isEventPass(event),
                                                 }"
                                                 v-if="
-                                                    index <= 1 &&
-                                                    getCardEvents(date)
-                                                        .length <= 2
+                                                    index < 2 &&
+                                                    getCardEvents(date).length <
+                                                        3
                                                 "
                                             >
                                                 <p
