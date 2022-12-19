@@ -198,19 +198,18 @@ function openEventScheduleModal(date) {
 }
 
 function getCardEvents(date) {
-    return events.value
-        .filter((event) =>
-            util.dateCompare(
-                dayjs(`${year.value}-${month.value + 1}-${date}`).format(
-                    "YYYY-MM-DD"
-                ),
-                event.eventStartTime
-            )
+    return events.value.filter((event) =>
+        util.dateCompare(
+            dayjs(`${year.value}-${month.value + 1}-${date}`).format(
+                "YYYY-MM-DD"
+            ),
+            event.eventStartTime
         )
-        .sort(
-            (a, b) =>
-                dayjs(a.eventStartTime).unix() - dayjs(b.eventStartTime).unix()
-        );
+    );
+    // .sort(
+    //     (a, b) =>
+    //         dayjs(a.eventStartTime).unix() - dayjs(b.eventStartTime).unix()
+    // );
 }
 
 async function backToDateNow() {
