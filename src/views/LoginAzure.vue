@@ -12,7 +12,12 @@ const setUser = (userInput) => {
     email: "",
   };
   user.name = userInput.name;
-  user.role = userInput.idToken.roles[0];
+  try{
+    user.role = userInput.idToken.roles[0];
+  }
+  catch{
+    user.role = "guest"
+  }
   user.email = userInput.userName;
   return user;
 };
