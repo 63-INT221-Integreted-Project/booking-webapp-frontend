@@ -44,6 +44,11 @@ const eventSortByDateASC = computed(() => {
 function isCanModifyEvent(event) {
     return dayjs().diff(dayjs(event.eventStartTime), "second") <= 0;
 }
+
+function filePath(file) {
+    if (!file) return "";
+    return `${import.meta.env.VITE_FILE_BASE_URL}${file.filePath}`;
+}
 </script>
 
 <template>
@@ -102,7 +107,8 @@ function isCanModifyEvent(event) {
                 <div class="mt-4" v-else>
                     <div
                         class="p-6 my-2 border-1 rounded-xl shadow-2xl"
-                        v-for="(event,index) in eventSortByDateASC"  :key="index"
+                        v-for="(event, index) in eventSortByDateASC"
+                        :key="index"
                     >
                         <div class="flex justify-between items-center">
                             <div class="text-ellipsis overflow-auto w-[80%]">
@@ -113,14 +119,29 @@ function isCanModifyEvent(event) {
                                 </h2>
                                 <h2 class="block text-lg">
                                     <span class="text-blue-500 font-bold"
-                                        >ชื่อการจอง: </span
-                                    >{{ event.bookingName }}
+                                        >ชื่อการจอง:
+                                    </span>
+                                    <span
+                                        v-if="!event.bookingName"
+                                        class="text-red-700 italic font-thin"
+                                        >ไม่ระบุชื่อ</span
+                                    >
+                                    <span v-else>
+                                        {{ event.bookingName }}
+                                    </span>
                                 </h2>
                                 <h3 class="block text-lg">
                                     <span class="text-blue-500 font-bold"
                                         >อีเมล:
                                     </span>
-                                    {{ event.bookingEmail }}
+                                    <span
+                                        v-if="!event.bookingName"
+                                        class="text-red-700 italic font-thin"
+                                        >ไม่ระบุอีเมล</span
+                                    >
+                                    <span v-else>
+                                        {{ event.bookingEmail }}
+                                    </span>
                                 </h3>
                                 <h3 class="block text-lg">
                                     <span class="text-blue-500 font-bold"
@@ -143,6 +164,26 @@ function isCanModifyEvent(event) {
                                     <span v-else>
                                         {{ event.eventNotes }}
                                     </span>
+                                </h3>
+                                <h3 class="block text-lg">
+                                    <span class="text-blue-500 font-bold"
+                                        >File ที่แนบมาในระบบ:
+                                    </span>
+                                    <a
+                                        class="border-2 font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline ml-4"
+                                        :class="{
+                                            'border-green-500 hover:border-green-700 text-green-700':
+                                                event.file,
+                                            'border-red-500 hover:border-red-700 text-red-700':
+                                                !event.file,
+                                        }"
+                                        type="button"
+                                        :href="filePath(event.file)"
+                                    >
+                                        {{
+                                            event.file ? "View file" : "No file"
+                                        }}
+                                    </a>
                                 </h3>
                             </div>
                             <div v-if="isCanModifyEvent(event)">

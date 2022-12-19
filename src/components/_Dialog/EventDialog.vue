@@ -374,7 +374,7 @@ function filePath(file) {
                         type="button"
                         :href="filePath(event.file)"
                     >
-                        {{ event.file ? "View file" : "No file here" }}
+                        {{ event.file ? "View file" : "No file" }}
                     </a>
                 </div>
                 <div class="mb-4">

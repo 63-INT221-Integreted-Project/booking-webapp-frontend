@@ -219,6 +219,10 @@ async function backToDateNow() {
     getNoOfDays();
     await fetchEvents();
 }
+
+function formatBookingName(bookingName) {
+    return !bookingName ? "ไม่ระบุชื่อ" : bookingName;
+}
 </script>
 
 <template>
@@ -509,7 +513,11 @@ async function backToDateNow() {
                                                 "
                                             >
                                                 <p
-                                                    v-html="event.bookingName"
+                                                    v-html="
+                                                        formatBookingName(
+                                                            event.bookingName
+                                                        )
+                                                    "
                                                     class="text-sm truncate leading-tight"
                                                 ></p>
                                             </div>
