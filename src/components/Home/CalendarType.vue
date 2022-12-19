@@ -502,9 +502,10 @@ async function backToDateNow() {
                                                         !isEventPass(event),
                                                 }"
                                                 v-if="
-                                                    index < 2 &&
-                                                    getCardEvents(date).length <
-                                                        3
+                                                    index === 0 ||
+                                                    (index === 1 &&
+                                                        getCardEvents(date)
+                                                            .length === 2)
                                                 "
                                             >
                                                 <p
@@ -514,7 +515,11 @@ async function backToDateNow() {
                                             </div>
                                             <div
                                                 class="px-2 py-1 rounded-lg mt-1 overflow-hidden border border-gray-400 text-black bg-gray-100"
-                                                v-else
+                                                v-else-if="
+                                                    index === 1 &&
+                                                    getCardEvents(date)
+                                                        .length >= 3
+                                                "
                                             >
                                                 <p
                                                     class="text-sm truncate leading-tight"
