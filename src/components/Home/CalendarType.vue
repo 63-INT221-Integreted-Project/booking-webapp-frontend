@@ -212,18 +212,6 @@ function openEventScheduleModal(date) {
 }
 
 function getCardEvents(date) {
-<<<<<<< HEAD
-  return events.value
-    .filter((event) =>
-      util.dateCompare(
-        dayjs(`${year.value}-${month.value + 1}-${date}`).format("YYYY-MM-DD"),
-        event.eventStartTime
-      )
-    )
-    .sort(
-      (a, b) => dayjs(a.eventStartTime).unix() - dayjs(b.eventStartTime).unix()
-    );
-=======
     return events.value.filter((event) =>
         util.dateCompare(
             dayjs(`${year.value}-${month.value + 1}-${date}`).format(
@@ -236,7 +224,6 @@ function getCardEvents(date) {
     //     (a, b) =>
     //         dayjs(a.eventStartTime).unix() - dayjs(b.eventStartTime).unix()
     // );
->>>>>>> d04aa1dea4fecd87cc2c5f1d842353972a762c95
 }
 
 async function backToDateNow() {
