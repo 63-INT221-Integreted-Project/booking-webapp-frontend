@@ -14,6 +14,16 @@ const findAllByBetweenDate = async function (date1, date2) {
   // ).then((res) => res.json());
 };
 
+const findAllByBetweenDateGuest = async function (date1, date2) {
+  let { data } = await axios.get(
+    `${BaseUrl.getUrl()}/events/check-between/guest?date1=${date1}&date2=${date2}`
+  );
+  return data;
+  // return await fetch(
+  //     `${BaseUrl.getUrl()}/events/check-between?date1=${date1}&date2=${date2}`
+  // ).then((res) => res.json());
+};
+
 const search = async function (dateStart, dateEnd, category, word) {
   //* Find All
   if (
@@ -200,6 +210,7 @@ const cancleEvent = async function (eventId) {
 export default {
   search,
   findAllByBetweenDate,
+  findAllByBetweenDateGuest,
   createEvent,
   cancleEvent,
   updateEvent,
