@@ -22,7 +22,9 @@ const getOverlay = computed(() => {
 <template>
     <Navbar></Navbar>
     <div class="container mt-16 flex mx-auto">
-        <LoadingOverlay v-if="getOverlay" class="z-20"></LoadingOverlay>
+        <div class="z-20" v-if="getOverlay">
+            <LoadingOverlay></LoadingOverlay>
+        </div>
         <router-view></router-view>
     </div>
 </template>
