@@ -54,11 +54,11 @@ function filePath(file) {
 <template>
     <div
         style="background-color: rgba(0, 0, 0, 0.8)"
-        class="fixed z-40 top-0 right-0 left-0 bottom-0 h-full w-full"
+        class="fixed z-40 top-0 right-0 left-0 bottom-0 w-full"
         v-show.transition.opacity="openModal"
     >
         <div
-            class="p-4 max-w-6xl mx-auto absolute left-0 right-0 overflow-hidden top-[5%] 2xl:top-[15%]"
+            class="p-4 max-w-6xl mx-auto absolute left-0 right-0 overflow-hidden top-[5%] 2xl:top-[2%] 2xl:bottom-[2%]"
         >
             <div
                 class="shadow absolute right-0 top-0 w-10 h-10 rounded-full bg-white text-gray-500 hover:text-gray-800 inline-flex items-center justify-center cursor-pointer"
@@ -104,7 +104,7 @@ function filePath(file) {
                     </div>
                 </div>
 
-                <div class="mt-4" v-else>
+                <div class="mt-4 h-[1200px] overflow-y-scroll" v-else>
                     <div
                         class="p-6 my-2 border-1 rounded-xl shadow-2xl"
                         v-for="(event, index) in eventSortByDateASC"
