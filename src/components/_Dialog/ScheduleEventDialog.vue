@@ -104,7 +104,7 @@ function filePath(file) {
                     </div>
                 </div>
 
-                <div class="mt-4 h-[600px] overflow-y-scroll" v-else>
+                <div class="mt-4 h-[400px] overflow-y-scroll" v-else>
                     <div
                         class="p-6 my-2 border-1 rounded-xl shadow-2xl"
                         v-for="(event, index) in eventSortByDateASC"
