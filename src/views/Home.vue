@@ -96,23 +96,20 @@ async function saveEvent({ event: form, file }) {
     if (!validate(form)) return;
     try {
         util.setLoadingOverlay(true);
-        let localTime = dayjs(form.eventStartTime).format(
-            "YYYY-MM-DDTHH:mm:ssZ"
-        );
+        let localTime = dayjs(form.eventStartTime);
         let utcTime = dayjs.utc(localTime);
         let events = await EventService.findAllByBetweenDate(
             utcTime
                 .hour(0)
                 .minute(0)
                 .second(0)
-                .format("YYYY-MM-DDT[23:59:59Z]"),
+                .format("YYYY-MM-DDT[00:00:00Z]"),
             utcTime
                 .hour(23)
                 .minute(59)
                 .second(59)
                 .format("YYYY-MM-DDT[23:59:59Z]")
         );
-
         let findIsInRange = events.find((event) => {
             if (
                 event.eventCategory.eventCategoryName === form.eventCategory &&
@@ -135,6 +132,7 @@ async function saveEvent({ event: form, file }) {
                 (endFromForm >= startFromEvent && endFromForm <= endFromEvent)
             );
         });
+
         if (findIsInRange) {
             modal.eventModal.isInvalid = true;
             modal.eventModal.errorType = [
