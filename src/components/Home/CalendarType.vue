@@ -501,7 +501,11 @@ async function backToDateNow() {
                                                     'border-blue-200 text-blue-800 bg-blue-100':
                                                         !isEventPass(event),
                                                 }"
-                                                v-if="index < 2"
+                                                v-if="
+                                                    index <= 1 &&
+                                                    getCardEvents(date)
+                                                        .length <= 2
+                                                "
                                             >
                                                 <p
                                                     v-html="event.bookingName"
