@@ -2,6 +2,10 @@
 import { computed } from "@vue/runtime-core";
 import dayjs from "dayjs";
 import { useUtilStore } from "../../stores/utils";
+import {useUserStore} from '../../stores/user'
+
+const userStore = useUserStore();
+
 
 const props = defineProps({
     openModal: {
@@ -85,7 +89,7 @@ function filePath(file) {
                     <button
                         class="bg-indigo-500 text-white active:bg-indigo-600 text-sm font-bold uppercase px-3 py-3 rounded outline-none focus:outline-none mr-1 mb-1 ease-linear transition-all duration-150"
                         type="button"
-                        v-if="isFromFutureOrToday"
+                        v-if="isFromFutureOrToday && userStore.isAdmin() && userStore.isStudent()"
                         @click="emit('bookingThisDate', date)"
                     >
                         + จองวันนี้
