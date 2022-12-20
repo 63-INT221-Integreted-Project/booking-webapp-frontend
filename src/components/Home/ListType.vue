@@ -39,12 +39,8 @@ const getNameEventCategories = computed(() =>
 
 async function search() {
     try {
-        let localStartDateTime = dayjs(form.value.startDateTime).format(
-            "YYYY-MM-DDT[23:59:59Z]"
-        );
-        let localEndDateTime = dayjs(form.value.endDateTime).format(
-            "YYYY-MM-DDT[23:59:59Z]"
-        );
+        let localStartDateTime = dayjs(form.value.startDateTime)
+        let localEndDateTime = dayjs(form.value.endDateTime)
         let data = await EventService.search(
             dayjs.utc(localStartDateTime).format("YYYY-MM-DDTHH:mm:ss[Z]"),
             dayjs.utc(localEndDateTime).format("YYYY-MM-DDTHH:mm:ss[Z]"),
