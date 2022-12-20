@@ -46,8 +46,8 @@ async function search() {
             "YYYY-MM-DDT[23:59:59Z]"
         );
         let data = await EventService.search(
-            dayjs.utc(localStartDateTime).format(),
-            dayjs.utc(localEndDateTime).format(),
+            dayjs.utc(localStartDateTime).format("YYYY-MM-DDTHH:mm:ss[Z]"),
+            dayjs.utc(localEndDateTime).format("YYYY-MM-DDTHH:mm:ss[Z]"),
             form.value.eventCategory,
             form.value.search
         );
