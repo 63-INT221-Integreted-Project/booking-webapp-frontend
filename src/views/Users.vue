@@ -209,10 +209,6 @@ async function fetchUsers() {
 async function deleteUser(user) {
   try {
     await UserService.deleteUser(user.userId);
-    dialog.toggleWarningModal({
-      isOpen: false,
-      user: null,
-    });
     await Sweetalert.fire({
       icon: "success",
       title: "ลบข้อมูล",
@@ -229,6 +225,10 @@ async function deleteUser(user) {
       });
     }
   }
+  dialog.toggleWarningModal({
+      isOpen: false,
+      user: null,
+    });
   users.value = await UserService.findAll();
 }
 
