@@ -196,7 +196,6 @@ async function onSubmitLogin() {
         });
         window.open("/kp2/", "_self");
     } catch (error) {
-        console.log(error);
         await Sweetalert.fire({
             icon: "error",
             title: "Oops...",

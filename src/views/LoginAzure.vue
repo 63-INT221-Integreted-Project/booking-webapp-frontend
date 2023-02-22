@@ -1,54 +1,50 @@
-<template>
-</template>
+<template></template>
 
 <script setup>
 import { myMSAL, params } from "../authConfig";
 import { ref, onBeforeMount } from "vue";
 import AuthService from "../services/auth.service";
 const setUser = (userInput) => {
-  const user = {
-    name: "",
-    role: "",
-    email: "",
-  };
-  user.name = userInput.name;
-  try{
-    user.role = userInput.idToken.roles[0];
-  }
-  catch{
-    user.role = "guest"
-  }
-  user.email = userInput.userName;
-  return user;
+    const user = {
+        name: "",
+        role: "",
+        email: "",
+    };
+    user.name = userInput.name;
+    try {
+        user.role = userInput.idToken.roles[0];
+    } catch {
+        user.role = "guest";
+    }
+    user.email = userInput.userName;
+    return user;
 };
 
 async function getToken() {
-  localStorage.removeItem("accessToken");
-  localStorage.removeItem("refreshToken");
+    localStorage.removeItem("accessToken");
+    localStorage.removeItem("refreshToken");
 
-  try {
-    const login = await myMSAL.acquireTokenSilent(params);
-    console.log(login.accessToken);
-    console.log(myMSAL.getAccount(params));
-    const userAd = setUser(myMSAL.getAccount(params));
-    let res = await AuthService.loginAzure(userAd);
-    localStorage.setItem("access_token", res.access_token);
-    localStorage.setItem("refresh_token", res.refresh_token);
-    window.location.href = "/kp2/"
-    return login.accessToken;
-  } catch (error) {
-    await myMSAL.loginPopup(params);
-    const login = await myMSAL.acquireTokenSilent(params);
-    const userAd = setUser(myMSAL.getAccount(params));
-    let res = await AuthService.loginAzure(userAd);
-    localStorage.setItem("access_token", res.access_token);
-    localStorage.setItem("refresh_token", res.refresh_token);
-    window.location.href = "/kp2/"
-    return login.accessToken;
-  }
+    try {
+        const login = await myMSAL.acquireTokenSilent(params);
+        const userAd = setUser(myMSAL.getAccount(params));
+        let res = await AuthService.loginAzure(userAd);
+        localStorage.setItem("access_token", res.access_token);
+        localStorage.setItem("refresh_token", res.refresh_token);
+        window.location.href = "/kp2/";
+        return login.accessToken;
+    } catch (error) {
+        await myMSAL.loginPopup(params);
+        const login = await myMSAL.acquireTokenSilent(params);
+        const userAd = setUser(myMSAL.getAccount(params));
+        let res = await AuthService.loginAzure(userAd);
+        localStorage.setItem("access_token", res.access_token);
+        localStorage.setItem("refresh_token", res.refresh_token);
+        window.location.href = "/kp2/";
+        return login.accessToken;
+    }
 }
 onBeforeMount(() => {
-  getToken();
+    getToken();
 });
 // import { useIsAuthenticated } from "../composition-api/useIsAuthenticated";
 // import { useMsalAuthentication } from "../composition-api/useMsalAuthentication";

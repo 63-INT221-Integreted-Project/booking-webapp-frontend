@@ -5,7 +5,6 @@ import AuthService from "../services/auth.service";
 axios.interceptors.request.use((request) => {
     const token = localStorage.getItem("access_token");
     const refreshToken = localStorage.getItem("refresh_token");
-    console.log(request.url.includes("guest"));
     if (!request.url.includes("login") && !request.url.includes("guest")) {
         //* For check not authen endpoint
         request.headers.Authorization = `Bearer ${token}`;
@@ -33,9 +32,7 @@ axios.interceptors.response.use(
                     error.config.headers["Authorization"] =
                         "Bearer " + response.access_token;
                     return axios.request(error.config);
-                } catch (error) {
-                    console.log(error);
-                }
+                } catch (error) {}
             }
         }
         return Promise.reject(error);
